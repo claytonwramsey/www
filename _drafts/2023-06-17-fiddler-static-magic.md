@@ -2,7 +2,7 @@
 layout: post
 title: "Blowing up my compile times for fun and profit"
 date: 2023-06-17 09:53:00 -0500
-categories: rust, chess
+tags: rust, chess
 ---
 
 {% include mathjax.html %}
@@ -125,7 +125,7 @@ Suppose we want to extract the relevant occupancy for a bishop on B2.
 
 Take the original masked occupancy bitboard, \\(O\\).
 
-```
+```text
 8 |  .  .  .  .  .  .  .  .
 7 |  .  .  .  .  .  .  .  .
 6 |  .  .  .  .  .  .  b5 .
@@ -144,7 +144,8 @@ Now, multiply \\(O\\) by the magic number \\(M = 2^{17} + 2^{25} + 2^{33} + 2^{4
 
 \\[O * M = b_1 2^{59} + b_2 2^{60} + b_3 2^{61} + b_4 2^{62} + b_5 2^{63} + \\text{garbage on other exponents}\\]
 
-Using simple bitwise masking, we can then manually retrieve those packed bits to use as our index.
+Using simple bitwise masking, we can then manually retrieve those packed bits near the MSB to use as
+our index.
 We can generate a set of 128 magic numbers (64 for bishops, 64 for rooks) which individually can be
 used to map each square and occupancy to extract its bits, and then use that operation to retrieve
 a pre-computed set of moves in constant time.

@@ -18,21 +18,31 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: claytonwramsey.github.io
+title: clayt
 author: Clayton Ramsey
 email: claytonwramsey@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Clayton Ramsey's blog. 
   I'm a PhD student who likes to write about software.
+  Copyright © 2023 Clayton Ramsey. All rights reserved.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://claytonwramsey.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: claytonwramsey
+discord_username: claytn
 
 # Build settings
 theme: minima
 plugins:
   - jekyll-feed
   - jekyll-spaceship
+
+minima:
+  social_links:
+    - { platform: github, user_url: "https://github.com/claytonwramsey" }
+    - {
+        platform: linkedin,
+        user_url: "https://www.linkedin.com/in/clayton-ramsey-931092226/",
+      }
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

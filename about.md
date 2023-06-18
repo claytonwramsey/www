@@ -4,15 +4,15 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+![A picture of me, carrying a water bottle and waving,](assets/img/thatsme.jpg)
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+Hi!
+I'm a PhD student computer science at Rice University.
+In my free time, I figure skate, swing dance, and write a little code.
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+My biggest project is Fiddler, a chess engine.
+Check it out [here](https://github.com/claytonwramsey/fiddler)!.
 
-
-[jekyll-organization]: https://github.com/jekyll
+This website was designed using [Jekyll](https://github.com/jekyll/jekyll) and themed with
+[Minima](https://github.com/jekyll/minima).
+The source code for the site is [here](https://github.com/claytonwramsey/claytonwramsey.github.io).
