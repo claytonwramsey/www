@@ -558,5 +558,13 @@ I threw the new version of Fiddler, with its compile-time generated lookup table
 older dynamically-generated ones, and here are my results:
 
 ```text
-
+Score of fiddler_const_magic vs fiddler_dynamic_magic: 5278 - 5003 - 4271 [0.509]
+...      fiddler_const_magic playing White: 2766 - 2374 - 2136  [0.527] 7276
+...      fiddler_const_magic playing Black: 2512 - 2629 - 2135  [0.492] 7276
+...      White vs Black: 5395 - 4886 - 4271  [0.517] 14552
+Elo difference: 6.6 +/- 4.7, LOS: 99.7 %, DrawRatio: 29.3 %
+14566 of 30000 games finished.
 ```
+
+We get a whole 6 Elo points - equivalent to a 1% improvement in the engine.
+At least it's not a regression!
