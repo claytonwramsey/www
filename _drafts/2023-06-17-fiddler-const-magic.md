@@ -356,6 +356,94 @@ const fn construct_magic_table<const N: usize>(
 }
 ```
 
+<details markdown="1">
+
+<summary markdown="span">
+
+`compute_magic_key` and the other helper functions called above can be implemented with some basic
+drudgery.
+
+</summary>
+
+```rust
+/// Given some mask, create the occupancy [`Bitboard`] according to this index.
+///
+/// `index` must be less than or equal to 2 ^ (number of ones in `mask`).
+/// This is equivalent to the parallel-bits-deposit (PDEP) instruction on x86 architectures.
+const fn index_to_occupancy(index: usize, mask: Bitboard) -> Bitboard {
+    let mut result = 0u64;
+    let num_points = mask.len();
+    let mut editable_mask = mask.as_u64();
+    // go from right to left in the bits of num_points,
+    // and add an occupancy if something is there
+    let mut i = 0;
+    while i < num_points {
+        // make a bitboard which only occupies the rightmost square
+        let occupier = 1 << editable_mask.trailing_zeros();
+        // remove the occupier from the mask
+        editable_mask &= !occupier;
+        if (index & (1 << i)) != 0 {
+            // the bit corresponding to the occupier is nonzero
+            result |= occupier;
+        }
+        i += 1;
+    }
+
+    Bitboard::new(result)
+}
+
+/// Construct the squares attacked by the pieces at `sq` if it could move along the directions in
+/// `dirs` when the board is occupied by the pieces in `occupancy`.
+///
+/// This is slow and should only be used for generatic magic bitboards (instead of for move
+/// generation.
+const fn directional_attacks(
+    sq: Square,
+    dirs: &[Direction],
+    occupancy: Bitboard,
+) -> Bitboard {
+    // behold: much hackery for making this work as a const fn
+    let mut result = Bitboard::EMPTY;
+    let mut dir_idx = 0;
+    while dir_idx < dirs.len() {
+        let dir = dirs[dir_idx];
+        let mut current_square = sq;
+        let mut loop_idx = 0;
+        while loop_idx < 7 {
+            let next_square_int: i16 = current_square as i16
+                + unsafe {
+                    transmute::<Direction, i8>(dir) as i16
+                };
+            if next_square_int < 0 || 64 <= next_square_int {
+                break;
+            }
+            let next_square: Square = unsafe { transmute(next_square_int as u8) };
+            if next_square.chebyshev_to(current_square) > 1 {
+                break;
+            }
+            result = result.with_square(next_square);
+            if occupancy.contains(next_square) {
+                break;
+            }
+            current_square = next_square;
+            loop_idx += 1;
+        }
+        dir_idx += 1;
+    }
+
+    result
+}
+
+/// Use magic hashing to get the index to look up attacks in a bitboard.
+const fn compute_magic_key(occupancy: Bitboard, magic: u64, shift: u8) -> usize {
+    (occupancy.as_u64().wrapping_mul(magic) >> shift) as usize
+}
+```
+
+</details>
+
+<br>
+
 Lastly, we build each individual `AttacksLookup` with its references to `ROOK_ATTACKS_TABLE`.
 
 ```rust
