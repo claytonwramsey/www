@@ -246,7 +246,7 @@ You may notice something odd happening on ranks 7 and 8: the number of bits requ
 squares is 1 lower than their mask.
 This is intentional!
 As it turns out, certain magic numbers will yield just the right set of hash collisions so that you
-can use half as many entires are there are occupancies.
+can use half as many entries are there are occupancies.
 This saves about 18 kB of data.
 
 The size of our table is just the sum of 2 to the power of the number of bits required for each
