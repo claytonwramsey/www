@@ -16,3 +16,8 @@ Check it out [here](https://github.com/claytonwramsey/fiddler)!.
 This website was designed using [Jekyll](https://github.com/jekyll/jekyll) and themed with
 [Minima](https://github.com/jekyll/minima).
 The source code for the site is [here](https://github.com/claytonwramsey/claytonwramsey.github.io).
+If you find something broken, incorrect, or just plain bad about my site, send me an email or open
+an issue!
+
+Also, feel free to reach out to me about anything.
+I'd love to make new friends :).
