@@ -119,7 +119,7 @@ starter square, we can get a smaller total memory consumption at only 861 kB.
 
 However, we still have to be able to convert an occupancy bitboard into an index.
 What we really want to do is to take our masked out bits and extract them into an index.
-On x86 architecturs, the `pext` instruction is exactly designed to do this, but if we want it to
+On x86 architectures, the `pext` instruction is exactly designed to do this, but if we want it to
 work on any architecture, we'll have to be a little more clever than that.
 
 I'll start with a magic example, and we'll see if that can enlighten us.
