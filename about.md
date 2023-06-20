@@ -7,7 +7,7 @@ permalink: /about/
 ![A picture of me, carrying a water bottle and waving,](assets/img/thatsme.jpg)
 
 Hi!
-I'm a PhD student computer science at Rice University.
+I'm a PhD student studying computer science at Rice University.
 In my free time, I figure skate, swing dance, and write a little code.
 
 My biggest project is Fiddler, a chess engine.
