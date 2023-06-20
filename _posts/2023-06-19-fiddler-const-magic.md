@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Blowing up my compile times for dubious benefits"
-date: 2023-06-17 09:53:00 -0500
+date: 2023-06-19 23:33:00 -0500
 tags: rust, chess
 ---
 
