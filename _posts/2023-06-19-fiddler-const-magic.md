@@ -21,6 +21,9 @@ table to making it a statically allocated constant.
 Along the way, I'll take this opportunity to explain how magic move generation works, and hopefully
 have a little fun.
 
+**Update 2023-06-22:** I've added a few updates to handle questions that people in the comments on
+the [Orange Website](https://news.ycombinator.com/item?id=36399832) found confusing.
+
 ## A crash course in magic moves
 
 Chess engines are usually extremely high-performance pieces of software, and their move generators
@@ -72,7 +75,10 @@ Here's a short (but not exhaustive) list of operations we can do:
 | \\(A \\cup B\\)             | `a & b`            |
 | \\(A \\cap B\\)             | `a                 | b`  |
 | \\(A \\Delta B\\)           | `a ^ b`            |
-| \\(\\bar A \\)              | `!A`               |
+| \\(\\bar A \\)              | `!a`               |
+
+**Update 2023-06-22:** I use Rust's notation for `!a`.
+In C and C++, one would use `~a` for the bitwise not operation.
 
 ### Building a lookup table
 
@@ -105,6 +111,14 @@ For example, these are the only relevant squares for the set of legal moves for 
 --+------------------------
   |  A  B  C  D  E  F  G  H
 ```
+
+**Update 2023-06-22**:
+We can safely ignore those squares on the edge of the board because they actually don't affect what
+our rook can "see."
+For instance, the rook will be able to to see H4 if F4 and G4 are empty, but whether H4 is empty
+does not affect whether the rook can see H4.
+Once we have the set of squares the rook can see, we can convert that to the set of squares the rook
+can move to by masking out all pieces of the same color as the rook.
 
 For each square, then, we only need to consider a small handful of occupied spots.
 All we need to do is store a lookup for every `(square, relevant_occupancy)` pair, which is far
