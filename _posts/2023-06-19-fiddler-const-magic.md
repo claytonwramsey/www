@@ -63,9 +63,9 @@ LSB:
   |  A  B  C  D  E  F  G  H
 ```
 
-For example, consider a board with a piece on A2, G3, and C7.
-A2 has index 1, G3 has index 22, and C7 has index 50, so the bitboard uniquely representing
-{A2, G3, C7} is \\(2^1 + 2^{22} + 2^{50}\\), which is equal to 1125899911036930.
+For example, consider a board with a piece on B1, G3, and C7.
+B1 has index 1, G3 has index 22, and C7 has index 50, so the bitboard uniquely representing
+{B1, G3, C7} is \\(2^1 + 2^{22} + 2^{50}\\), which is equal to 1125899911036930.
 
 We can use our bitboards to compute setwise operations in \\(O(1)\\) time.
 Here's a short (but not exhaustive) list of operations we can do:
@@ -167,6 +167,8 @@ used to map each square and occupancy to extract its bits, and then use that ope
 a pre-computed set of moves in constant time.
 
 _Side note_: Most of the time, there are actually collisions when using magic numbers.
+Collisions occur when our magic multiply doesn't perfectly extract the relevant bits, but instead
+returns some other, bizarre combination of our relevant bits as the index.
 However, so long as the collisions map the same final moveset, that's OK, so finding magics is
 actually pretty easy - brute force search works quite well.
 
