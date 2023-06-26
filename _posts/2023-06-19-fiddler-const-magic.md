@@ -70,12 +70,12 @@ B1 has index 1, G3 has index 22, and C7 has index 50, so the bitboard uniquely r
 We can use our bitboards to compute setwise operations in \\(O(1)\\) time.
 Here's a short (but not exhaustive) list of operations we can do:
 
-| Mathematical representation | Bitboard operation |
-| --------------------------- | ------------------ | --- |
-| \\(A \\cup B\\)             | `a & b`            |
-| \\(A \\cap B\\)             | `a                 | b`  |
-| \\(A \\Delta B\\)           | `a ^ b`            |
-| \\(\\bar A \\)              | `!a`               |
+| Mathematical representation | Bitboard operation      |
+| --------------------------- | ----------------------- | --- |
+| \\(A \\cup B\\)             | `a                      | b`  |
+| \\(A \\cap B\\)             | `a                 & b` |
+| \\(A \\Delta B\\)           | `a ^ b`                 |
+| \\(\\bar A \\)              | `!a`                    |
 
 **Update 2023-06-22:** I use Rust's notation for `!a`.
 In C and C++, one would use `~a` for the bitwise not operation.
