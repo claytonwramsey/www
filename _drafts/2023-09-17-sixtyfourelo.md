@@ -5,8 +5,9 @@ date: 2023-08-26 15:29:00 -0500
 tags: rust, chess
 ---
 
-Sometimes, I make mistakes so puny that I feel like a moron for making them and so destructive that
-I feel like an idiot for not noticing them.
+I can either write a hundred lines of code for one or two Elo or find a one or two wrong lines of
+code for a hundred Elo.
+Such is life.
 
 {% include mathjax.html %}
 
@@ -308,6 +309,5 @@ punching far below its weight class.
 Currently, it's still not even beating out some simple engines - the kind which haven't even
 implemented late move reduction.
 
-I can either write a hundred lines of code for one or two Elo or find a one or two wrong lines of
-code for a hundred Elo.
-Such is life.
+This is the chess engine experience: I spend more time catching up with my own mistakes than I do
+on making newer, more exciting mistakes.
