@@ -5,7 +5,7 @@ date: 2023-08-26 15:29:00 -0500
 tags: rust, chess
 ---
 
-I can either write a hundred lines of code for one or two Elo or find a one or two wrong lines of
+I can either write a hundred lines of code for one or two Elo or find one or two wrong lines of
 code for a hundred Elo.
 Such is life.
 
@@ -24,22 +24,22 @@ To avoid clickbaiting you, here's the line in question.
 if best_score >= beta { BoundType::Upper } else { BoundType::Lower }
 ```
 
-However, for a full explanation as to why, you'll have to read the rest of this post.
+However you'll have to read the rest of this post for a full explanation..
 
 ## Learning to sing the alpha-beta
 
 Our story begins with the foundational algorithm of all classical chess engines: alpha-beta search.
 It's a small, yet critical improvement to the Minimax algorithm.
-By adding a set of bounds parameters, we can reduce the runtime of searching a game tree of with
+By adding a set of bounds parameters, we can reduce the runtime of searching a game tree with
 branch factor \\(b\\) and depth \\(d\\) from \\(O(b^d)\\) in Minimax to \\(O(b^{d / 2})\\) in
 alpha-beta, subject to some constraints.
 
 The core idea behind alpha-beta is that we never need to search a line that has already been
 refuted.
 If you try a move and find that it trivially loses the game, there's no point in finding out all the
-other ways that playing the move can lose the game.
+other ways that playing the move can lose you the game.
 Under ideal search heuristics, this means that we only need to check one move (the critical move)
-at each depth, which yields the halving in the effective depth of our search.
+at each depth, which yields a halving in the effective depth of our search.
 
 I'll give a brief pseudocode description of alpha-beta below.
 
@@ -72,6 +72,10 @@ For instance, `e4 e5 Nf3 Nc6` yields the same position as `Nf3 Nc6 e4 e5`.
 
 To take advantage of this, chess engines use a _transposition table_: a glorified hash-map from
 positions to useful evaluation data.
+If all you care about is the high-level algorithms, you can treat it like a hash-map and call that a
+day.
+However, since you've bothered to read this far, I think you might like to hear about the internal
+details of my transposition table's implementation.
 In my engine, every entry in the map stores the evaluation, search depth, best move, and some other
 extra data.
 
@@ -98,11 +102,11 @@ pub struct TTEntry {
 However, just storing a raw evaluation in the transposition table is insufficient.
 The core problem is that in an alpha-beta search, the evaluations of a position are not exact:
 often, we don't know the exact evaluation of a position, only a lower or upper bound on its value.
-If you wanted, you could simply store a pair containing the upper and lower bound of the evaluation
-for each position, but requires 32 bits - not very efficient.
+If you wanted, you could store a pair containing the upper and lower bound of the evaluation
+for each position, but that requires 32 bits - not very efficient.
 
 In my engine, each evaluation is a 16-bit integer.
-Meanwhile, there are 3 possible cases for the type of an evaluation:
+Meanwhile, there are three possible cases for the type of an evaluation:
 
 - **exact evaluations**, where the value stored in the table is the exact value of the evaluation of
   the position,
@@ -153,7 +157,7 @@ We convert back and forth between `BoundType`s (a convenient public API for the 
 table), `EntryType`s (used internally to discuss whether an entry is full), and `u8` (packing an
 entry type with its age) via evil cursed unsafe magic in the implementation.
 However, the details of my transposition table implementation are a story for another time.
-The important takeaway here is that entries can be marked with their bounding types.
+The takeaway is that entries can be marked with their bounding types.
 
 ## When to tag with what
 
@@ -177,7 +181,7 @@ if entry.depth >= depth {
 }
 ```
 
-An exact bound means that the search can quit early (huzzah!) while looser bounds restrict the
+An exact bound means that the search can quit early (huzzah!), while looser bounds restrict the
 search to comparing against alpha and beta.
 
 When inserting into the transposition table, we also need to decide how to tag our evaluations.
@@ -191,18 +195,18 @@ We can do this by a pretty simple rule, though:
 
 Most chess engines also have a search function called _quiescent search_.
 Engines only examine captures and promotions during a quiescent search.
-The goal of a quiescent search is to reach a quiet position: we want to make sure that our static
+The goal of a quiescent search is to reach a quiet position: we want to ensure that our static
 evaluation function doesn't assume that sacrificing a queen for a pawn is the best way to finish a
 tactical sequence.
 
-Otherwise, a quiescent search is a lot like a normal alpha-beta search, employing most of the same
+Otherwise, a quiescent search is a lot like a regular alpha-beta search, employing most of the same
 techniques, including the transposition tables.
 
 ## The mistake in itself
 
 When I originally wrote my quiescent search, I had noticed that a quiescent search doesn't visit
-every move, much like in a beta-cutoff in alpha-beta search.
-Accordingly, I assumed that most of the time, quiescent search yielded a lower bound.
+every move, much like in a beta-cutoff in an alpha-beta search.
+Accordingly, I assumed that most of the time, the quiescent search yielded a lower bound.
 However, I also knew that something different should be happening when a beta-cutoff occurred, so I
 created this monstrosity:
 
@@ -225,9 +229,9 @@ tt_guard.save(
 ```
 
 I called the version of Fiddler using this approach `fiddler_quiesce_lu`.
-You can safely ignore the rest of the ceremony, but note what we've passed in as a bound type: if
-the evaluation is _bigger_ than beta, it's an upper bound.
-This criterion makes absolutely no sense and it really should not have gone undiscovered for this
+You can safely ignore the rest of the ceremony, but remember what we've passed in as a bound type:
+if the evaluation is _bigger_ than beta, it's an upper bound.
+This criterion makes absolutely no sense, and it really should not have gone undiscovered for this
 long.
 However, all this bound does is make searches less efficient, rather than incorrect, so none of my
 numerous tests failed due to it.
@@ -286,7 +290,7 @@ SPRT: llr 0 (0.0%), lbound -inf, ubound inf
 The good news is that `fiddler_leu`, the most "theoretically correct" of all the implementations,
 also performs the best.
 I would have liked to run more matches to get a clear difference between `fiddler_leu` and
-`fiddler_quiesce_lower`, but the AC at my apartment isn't working and I'm not sure how much my poor
+`fiddler_quiesce_lower`, but the AC at my apartment isn't working, and I'm not sure how much my poor
 little laptop can take.
 
 ## Have I learned anything?
