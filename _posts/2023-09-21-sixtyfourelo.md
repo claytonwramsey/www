@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "One line of code cost me 9.2% of my matches"
-date: 2023-08-26 15:29:00 -0500
+date: 2023-09-17 15:29:00 -0500
 tags: rust, chess
 ---
 
