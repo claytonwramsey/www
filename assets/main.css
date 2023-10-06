@@ -1,0 +1,48 @@
+body {
+  margin: 40px auto;
+  max-width: 800px;
+  line-height: 1.6;
+  font-size: 18px;
+  padding: 0 10px;
+  /* Use system fonts */
+  font-family: system-ui, sans-serif;
+}
+
+code {
+  font-size: 15px;
+}
+
+nav {
+  font-size: 20px;
+  a {
+    margin-right: 5px;
+  }
+}
+
+table {
+  text-align: center;
+  border-spacing: 15px 5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+
+img {
+  width: 100%;
+  align-self: center;
+}
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: gray;
+}
