@@ -12,12 +12,14 @@
     <managingEditor>claytonwramsey@gmail.com (Clayton Ramsey)</managingEditor>
     <webMaster>claytonwramsey@gmail.com (Clayton Ramsey)</webMaster>
     <atom:link href="https://claytonwramsey.github.io/blog/rss.xml" rel="self" type="application/rss_xml"/>
+    
     <item>
         <title>One line of code cost me 9.2% of my matches</title>
         <link>https://claytonwramsey.github.io/blog/sixty-four-elo.html</link>
         <description>I can either write a hundred lines of code for one or two Elo or find one or two wrong lines of code for a hundred Elo. Such is life.</description>
         <pubDate>Thur, 21 Sep 2023 09:00 CST</pubDate>
         <guid>https://claytonwramsey.github.io/blog/sixty-four-elo.html</guid>
+        <author>claytonwramsey@gmail.com (Clayton Ramsey)</author>
     </item>
 
     <item>
@@ -26,8 +28,8 @@
         <description>If carcinization happens when languages evolve to be more like Rust, then what do you call it when Rust evolves to be more like Java? Caffeination?</description>
         <pubDate>Tue, 14 Aug 2023 09:00 CST</pubDate>
         <guid>https://claytonwramsey.github.io/blog/dumpster.html</guid>
+        <author>claytonwramsey@gmail.com (Clayton Ramsey)</author>
     </item>
-
 
     <item>
         <title>Blowing up my compile times for dubious benefits</title>
@@ -35,6 +37,7 @@
         <description>The tree of useless optimization yields questionable fruit.</description>
         <pubDate>Tue, 20 Jun 2023 09:00 CST</pubDate>
         <guid>https://claytonwramsey.github.io/blog/fiddler-const-magic.html</guid>
+        <author>claytonwramsey@gmail.com (Clayton Ramsey)</author>
     </item>
   </channel>
 </rss>
