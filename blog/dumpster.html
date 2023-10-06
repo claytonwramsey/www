@@ -14,9 +14,7 @@
     <meta name="description" content="If carcinization happens when languages evolve to be more like Rust, then what do you call it when Rust evolves to be more like Java? Caffeination?" />
     <meta name="keywords" content="Rust, garbage collector, dumpster" />
 
-    <title>
-      I built a garbage collector for a language that doesn't need one
-    </title>
+    <title>I built a garbage collector for a language that doesn't need one</title>
 
     <link rel="stylesheet" type="text/css" href="/assets/main.css" />
     <link rel="stylesheet" href="/assets/hljs.css" />
@@ -46,61 +44,53 @@
     </header>
     <h1>I built a garbage collector for a language that doesn't need one</h1>
     <p>
-      If carcinization happens when languages evolve to be more like Rust, then
-      what do you call it when Rust evolves to be more like Java? Caffeination?
+      If carcinization happens when languages evolve to be more like Rust, then what do you call it
+      when Rust evolves to be more like Java? Caffeination?
     </p>
     <p>
-      Over this summer, I’ve had a decent amount of time to kill. What better
-      way to spend a beautiful hot summer than sitting inside, staring at core
-      dumps in a supposedly memory-safe language? I built a garbage collector -
-      in short, a piece of software that manages allocations for another, more
-      exciting piece of software. The cool part: I made it in Rust, for Rust - a
-      language designed to eliminate garbage collection and which provides few
-      facilities for making it work properly. Not only that, I managed to make
-      my garbage collector work with relatively few compromises, which I’ll
-      describe in further detail lower down.
+      Over this summer, I’ve had a decent amount of time to kill. What better way to spend a
+      beautiful hot summer than sitting inside, staring at core dumps in a supposedly memory-safe
+      language? I built a garbage collector - in short, a piece of software that manages allocations
+      for another, more exciting piece of software. The cool part: I made it in Rust, for Rust - a
+      language designed to eliminate garbage collection and which provides few facilities for making
+      it work properly. Not only that, I managed to make my garbage collector work with relatively
+      few compromises, which I’ll describe in further detail lower down.
     </p>
     <p>
-      If you don’t like reading, don’t care about the journey to implement it,
-      or just want to get a sales pitch for the final result, check out the
-      source code on GitHub
-      <a href="https://github.com/claytonwramsey/dumpster">here</a>. You can
-      also download it directly from
-      <a href="https://crates.io/crates/dumpster">crates.io</a>.
+      If you don’t like reading, don’t care about the journey to implement it, or just want to get a
+      sales pitch for the final result, check out the source code on GitHub
+      <a href="https://github.com/claytonwramsey/dumpster">here</a>. You can also download it
+      directly from <a href="https://crates.io/crates/dumpster">crates.io</a>.
     </p>
     <h2 id="background">Background</h2>
     <p>
-      If you’re familiar with the details of Rust and its standard library, feel
-      free to skip this section.
+      If you’re familiar with the details of Rust and its standard library, feel free to skip this
+      section.
     </p>
     <p>
-      The core backing behind Rust’s memory model is <em>affine typing</em> and
-      the <em>borrow checker</em>. Values may only be bound to one identifier at
-      a time, and borrows (a.k.a. references) may not outlive the scope binding
-      their referent.
+      The core backing behind Rust’s memory model is <em>affine typing</em> and the
+      <em>borrow checker</em>. Values may only be bound to one identifier at a time, and borrows
+      (a.k.a. references) may not outlive the scope binding their referent.
     </p>
     <p>For example, the following code is invalid:</p>
     <pre class="rust"><code>let x = vec![1, 2, 3];
 let y = x;
 println!(&quot;{x:?}&quot;); // compile error - x has already been moved</code></pre>
     <p>
-      Normally, we work around this by borrowing against a binding, such as by
-      making <code>y = &amp;x</code> in the example above. However, we often
-      need to share some heap-allocated value without knowing which binding will
-      live the longest. The solution to this problem is shared ownership via
-      garbage collection.
+      Normally, we work around this by borrowing against a binding, such as by making
+      <code>y = &amp;x</code> in the example above. However, we often need to share some
+      heap-allocated value without knowing which binding will live the longest. The solution to this
+      problem is shared ownership via garbage collection.
     </p>
     <p>
-      Rust’s standard library offers two simple reference-counted garbage
-      collectors: the single-threaded
+      Rust’s standard library offers two simple reference-counted garbage collectors: the
+      single-threaded
       <a href="https://doc.rust-lang.org/std/rc/index.html"><code>Rc</code></a>
       and its atomically-indexed counterpart
-      <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"
-        ><code>Arc</code></a
-      >. They operate by maintaining a reference count in each heap allocation.
-      Under most circumstances, these work great, but they can’t handle cyclic
-      references. Combined with interior mutability, it’s trivial to refute
-      them.
+      <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"><code>Arc</code></a
+      >. They operate by maintaining a reference count in each heap allocation. Under most
+      circumstances, these work great, but they can’t handle cyclic references. Combined with
+      interior mutability, it’s trivial to refute them.
     </p>
     <pre class="rust"><code>use std::{cell::OnceCell, rc::Rc};
 struct Foo(OnceCell&lt;Rc&lt;Foo&gt;&gt;);
@@ -109,113 +99,96 @@ let x = Rc::new(Foo(OnceCell::new()));
 x.0.set(Rc::clone(&amp;x));
 // My foo has a reference to itself. It can never be freed!</code></pre>
     <p>
-      This is why people actually get paid money to build garbage collectors. If
-      using a reference counter were all you needed, a number of people working
-      at Oracle would be out of a job.
+      This is why people actually get paid money to build garbage collectors. If using a reference
+      counter were all you needed, a number of people working at Oracle would be out of a job.
     </p>
     <h2 id="battle-plan">Battle plan</h2>
     <p>
-      We’d like to create some <code>Gc</code> data structure with a similar API
-      to <code>Rc</code> and <code>Arc</code>, which can accept nearly any data
-      type contained within, and still manage to detect and collect cycles.
+      We’d like to create some <code>Gc</code> data structure with a similar API to
+      <code>Rc</code> and <code>Arc</code>, which can accept nearly any data type contained within,
+      and still manage to detect and collect cycles.
     </p>
     <p>We have a few weapons at our disposal:</p>
     <ul>
       <li>
         <strong><code>Drop</code></strong
-        >: Every non-copiable data type in Rust can implement the
-        <code>Drop</code> trait to ensure some code is called every time it is
-        dropped. In our case, we can implement <code>Drop</code> for
-        <code>Gc</code> to try to glean some knowledge about when an allocation
-        becomes inaccessible.
+        >: Every non-copiable data type in Rust can implement the <code>Drop</code> trait to ensure
+        some code is called every time it is dropped. In our case, we can implement
+        <code>Drop</code> for <code>Gc</code> to try to glean some knowledge about when an
+        allocation becomes inaccessible.
       </li>
       <li>
-        <strong>Traits</strong>: We can construct some trait (in our case, let’s
-        call it <code>Collectable</code>) as a mandatory requirement to be
-        contained in a <code>Gc</code>. Creating this trait has some major
-        downsides (libraries upstream of <code>dumpster</code> can’t implement
-        it) but it’s a necessary evil.
+        <strong>Traits</strong>: We can construct some trait (in our case, let’s call it
+        <code>Collectable</code>) as a mandatory requirement to be contained in a <code>Gc</code>.
+        Creating this trait has some major downsides (libraries upstream of
+        <code>dumpster</code> can’t implement it) but it’s a necessary evil.
       </li>
     </ul>
-    <p>
-      However, our formidable tools are matched by equally formidable
-      challenges:
-    </p>
+    <p>However, our formidable tools are matched by equally formidable challenges:</p>
     <ul>
       <li>
-        <strong>Undetectable moves</strong>. When a value is moved in Rust,
-        there is no way to detect that fact from within that value. If we had
-        some sort of trait like <code>OnMove</code> which could allow for a
-        function to be called every time it had moved, we could use it to detect
-        when a <code>Gc</code> moved inside another <code>Gc</code>, making it
-        unrooted, and allowing us to create a simple mark-sweep collector. At
-        this rate, though, we would just reinvent C++’s copy constructors.
+        <strong>Undetectable moves</strong>. When a value is moved in Rust, there is no way to
+        detect that fact from within that value. If we had some sort of trait like
+        <code>OnMove</code> which could allow for a function to be called every time it had moved,
+        we could use it to detect when a <code>Gc</code> moved inside another <code>Gc</code>,
+        making it unrooted, and allowing us to create a simple mark-sweep collector. At this rate,
+        though, we would just reinvent C++’s copy constructors.
       </li>
       <li>
-        <strong>Variable-sized data</strong>. I foolishly decided to make it so
-        that <code>Gc</code> could store <code>?Sized</code> types, which is
-        more flexible for library users (enabling things like
-        <code>Gc&lt;[T]&gt;</code>).
+        <strong>Variable-sized data</strong>. I foolishly decided to make it so that
+        <code>Gc</code> could store <code>?Sized</code> types, which is more flexible for library
+        users (enabling things like <code>Gc&lt;[T]&gt;</code>).
       </li>
       <li>
-        <strong>Type erasure</strong>. In a typical Rust program, generics are
-        implemented via monomorphization, and no type information is retained at
-        runtime. This makes it harder to clean up an allocation without prior
-        context.
+        <strong>Type erasure</strong>. In a typical Rust program, generics are implemented via
+        monomorphization, and no type information is retained at runtime. This makes it harder to
+        clean up an allocation without prior context.
       </li>
     </ul>
     <p>
-      With these two, relatively simple tools, we have enough to build a
-      collector which can handle just about any data type inside.
+      With these two, relatively simple tools, we have enough to build a collector which can handle
+      just about any data type inside.
     </p>
     <h2 id="my-approach">My approach</h2>
     <p>
-      We need to detect whether a <code>Gc</code> is reachable without actually
-      scanning the stack. I’ll start with a few definitions, using
-      graph-theoretical language.
+      We need to detect whether a <code>Gc</code> is reachable without actually scanning the stack.
+      I’ll start with a few definitions, using graph-theoretical language.
     </p>
     <ol type="1">
       <li>
-        An allocation graph \(G = (V, E, r)\) is a directed graph with a root
-        node \(r V\) whose indegree is zero.
+        An allocation graph \(G = (V, E, r)\) is a directed graph with a root node \(r V\) whose
+        indegree is zero.
       </li>
       <li>
-        A node \(v\) in an allocation graph is said to be <em>accessible</em> if
-        and only if there exists a path from \(r\) to \(v\) in the graph.
+        A node \(v\) in an allocation graph is said to be <em>accessible</em> if and only if there
+        exists a path from \(r\) to \(v\) in the graph.
       </li>
     </ol>
     <p>
-      It should be clear to see why these definitions are useful to us. We can
-      imagine each node being one allocation, pretending that all data not
-      indirected through a <code>Gc</code> is part of an imaginary allocation
-      for the root. Additionally, each <code>Gc</code> acts as an edge
-      connecting two allocations. If an allocation is accessible in the
-      graph-theoretical sense, it’s still possible for a program to reach it,
-      and if not, it’s safe to free that allocation. Note that the indegree of a
-      node is precisely equal to the reference count of its corresponding
-      allocation.
+      It should be clear to see why these definitions are useful to us. We can imagine each node
+      being one allocation, pretending that all data not indirected through a <code>Gc</code> is
+      part of an imaginary allocation for the root. Additionally, each <code>Gc</code> acts as an
+      edge connecting two allocations. If an allocation is accessible in the graph-theoretical
+      sense, it’s still possible for a program to reach it, and if not, it’s safe to free that
+      allocation. Note that the indegree of a node is precisely equal to the reference count of its
+      corresponding allocation.
     </p>
     <p>
-      I’ll roughly outline our approach to determining whether some node \(n:
-      r\) is accessible.
+      I’ll roughly outline our approach to determining whether some node \(n: r\) is accessible.
     </p>
     <ol type="1">
       <li>
-        Find \(W\), the set of all descendants of \(n\). Construct the subgraph
-        \(H\) of \(G\) whose vertex set is \(W\), preserving all edges
-        connecting nodes in \(W\).
+        Find \(W\), the set of all descendants of \(n\). Construct the subgraph \(H\) of \(G\) whose
+        vertex set is \(W\), preserving all edges connecting nodes in \(W\).
       </li>
       <li>
-        Find the set of nodes \(A W\) for which the indegree of each \(a A\) in
-        \(H\) is <em>not</em> equal to its indegree in \(G\).
+        Find the set of nodes \(A W\) for which the indegree of each \(a A\) in \(H\) is
+        <em>not</em> equal to its indegree in \(G\).
       </li>
       <li>For each \(a A\), mark it and its descendants as accessible.</li>
       <li>If and only if \(n\) was marked as accessible, it is accessible.</li>
     </ol>
-    <p>
-      Here’s a serpentine implementation in pseudocode, if that’s what you
-      prefer.
-    </p>
+    <p>Here’s a serpentine implementation in pseudocode, if that’s what you prefer.</p>
     <pre class="py"><code>def is_accessible(n):
     counts = {n: n.indegree()}
     for (_, m) in n.edges():
@@ -244,20 +217,15 @@ def mark(a, reachable):
         for (_, b) in a.edges():
             mark(b, reachable)</code></pre>
     <p>
-      It should be pretty clear to see that <code>is_accessible</code> runs in
-      \(O(|V| + |E|)\) time.
+      It should be pretty clear to see that <code>is_accessible</code> runs in \(O(|V| + |E|)\)
+      time.
     </p>
-    <h3 id="reference-counting-with-extra-steps">
-      Reference counting with extra steps
-    </h3>
+    <h3 id="reference-counting-with-extra-steps">Reference counting with extra steps</h3>
     <p>
-      Our single-threaded <code>Gc</code> will behave much like an
-      <code>Rc</code>, but with some minor details changed.
+      Our single-threaded <code>Gc</code> will behave much like an <code>Rc</code>, but with some
+      minor details changed.
     </p>
-    <p>
-      First, we define a <code>Gc</code> and the allocation it points to, a
-      <code>GcBox</code>.
-    </p>
+    <p>First, we define a <code>Gc</code> and the allocation it points to, a <code>GcBox</code>.</p>
     <pre class="rust"><code>pub struct Gc&lt;T: ?Sized&gt; {
     ptr: NonNull&lt;GcBox&lt;T&gt;&gt;
 }
@@ -268,8 +236,8 @@ struct GcBox&lt;T: ?Sized&gt; {
     value: T
 }</code></pre>
     <p>
-      We can then hook into the <code>Drop</code> behavior for our
-      <code>Gc</code> to make it all work.
+      We can then hook into the <code>Drop</code> behavior for our <code>Gc</code> to make it all
+      work.
     </p>
     <pre class="rust"><code>impl&lt;T: ?Sized&gt; Drop for Gc&lt;T&gt; {
     fn drop(&amp;mut self) {
@@ -290,28 +258,26 @@ struct GcBox&lt;T: ?Sized&gt; {
     }
 }</code></pre>
     <p>
-      I, being very clever, decided to use a sentinel value of 0 for the
-      reference count when an allocation is being cleaned up (to prevent
-      spurious double-frees).
+      I, being very clever, decided to use a sentinel value of 0 for the reference count when an
+      allocation is being cleaned up (to prevent spurious double-frees).
     </p>
     <p>
-      However, this code has a problem - how the hell are we supposed to
-      implement <code>is_accessible</code>?
+      However, this code has a problem - how the hell are we supposed to implement
+      <code>is_accessible</code>?
     </p>
     <h3 id="trait-hackery">Trait hackery</h3>
     <p>
-      Our pseudocode for <code>is_accessible</code> required us to be able to
-      access the set of edges going out from a node. Doing so is kind of hard.
-      If we were writing this in C, we would scan the allocation on the heap,
-      looking for data that looked like they could be pointers into other
-      allocations. In Rust, though, we can be a lot more precise by adding a
-      small constraint to every garbage-collected type.
+      Our pseudocode for <code>is_accessible</code> required us to be able to access the set of
+      edges going out from a node. Doing so is kind of hard. If we were writing this in C, we would
+      scan the allocation on the heap, looking for data that looked like they could be pointers into
+      other allocations. In Rust, though, we can be a lot more precise by adding a small constraint
+      to every garbage-collected type.
     </p>
     <p>
-      If the garbage collector wasn’t enough, we’re bringing the visitor pattern
-      over from Java. We force every garbage-collected value to implement the
-      <code>Collectable</code> trait, which will delegate some
-      <code>Visitor</code> to each of its garbage-collected fields.
+      If the garbage collector wasn’t enough, we’re bringing the visitor pattern over from Java. We
+      force every garbage-collected value to implement the
+      <code>Collectable</code> trait, which will delegate some <code>Visitor</code> to each of its
+      garbage-collected fields.
     </p>
     <pre class="rust"><code>pub struct Gc&lt;T: Collectable + ?Sized&gt; {
    // same as before ...
@@ -334,55 +300,47 @@ pub trait Visitor {
     }
 }</code></pre>
     <p>
-      We can now write code that finds the outgoing edges from each allocation
-      by simply applying a visitor to the allocation. I ended up writing two
-      visitors - one for the <code>dfs</code> step and one for the
-      <code>mark</code> step.
+      We can now write code that finds the outgoing edges from each allocation by simply applying a
+      visitor to the allocation. I ended up writing two visitors - one for the <code>dfs</code> step
+      and one for the <code>mark</code> step.
     </p>
     <p>
-      I would have liked to make <code>Collectable</code> object-safe, but that
-      would also require <code>Visitor</code> to be object safe. That, in turn,
-      would cause every garbage collector to be coercible to
-      <code>Gc&lt;dyn Collectable&gt;</code>, which would only be possible on
+      I would have liked to make <code>Collectable</code> object-safe, but that would also require
+      <code>Visitor</code> to be object safe. That, in turn, would cause every garbage collector to
+      be coercible to <code>Gc&lt;dyn Collectable&gt;</code>, which would only be possible on
       nightly, making it impossible to write a stable crate.
     </p>
     <h3 id="bulk-dropping">Bulk dropping</h3>
     <p>
-      A cursory analysis of the implementation of <code>Drop</code> above shows
-      that the call to <code>is_accessible</code> runs in linear time with
-      respect to the total number of <code>Gc</code>s existing. You would be
-      excused for thinking that <code>drop</code>, as written, runs in linear
-      time. However, the call to <code>drop_in_place</code> could also result in
-      another <code>Gc</code> being dropped, yielding a quadratic-time cleanup.
-      This is unacceptable, especially since our first call to
-      <code>is_accessible</code> actually did all the work of determining
-      whether the allocations are reachable from the original one - if the
-      original allocation being freed was inaccessible, any allocation referred
-      to by it should also be inaccessible.
+      A cursory analysis of the implementation of <code>Drop</code> above shows that the call to
+      <code>is_accessible</code> runs in linear time with respect to the total number of
+      <code>Gc</code>s existing. You would be excused for thinking that <code>drop</code>, as
+      written, runs in linear time. However, the call to <code>drop_in_place</code> could also
+      result in another <code>Gc</code> being dropped, yielding a quadratic-time cleanup. This is
+      unacceptable, especially since our first call to <code>is_accessible</code> actually did all
+      the work of determining whether the allocations are reachable from the original one - if the
+      original allocation being freed was inaccessible, any allocation referred to by it should also
+      be inaccessible.
     </p>
     <p>
-      We can save our time on marking by a pretty simple method: we’ll do one
-      more pass through the reference graph, recording a pointer to each
-      allocation to be destroyed and its implementation of <code>drop</code>.
-      Then, once we’ve found every inaccessible allocation, we’ll drop them all
-      in one quick go.
+      We can save our time on marking by a pretty simple method: we’ll do one more pass through the
+      reference graph, recording a pointer to each allocation to be destroyed and its implementation
+      of <code>drop</code>. Then, once we’ve found every inaccessible allocation, we’ll drop them
+      all in one quick go.
     </p>
     <p>
-      There’s one final problem, though: each <code>Gc</code> owned by a dropped
-      value could itself try to manipulate the reference counts of its pointees,
-      resulting in undefined behavior, or worse, slow code. However, all
-      problems in computer science can be solved by adding more state or more
-      indirection. We opt to solve it with extra state this time, creating a
-      thread-local value called <code>COLLECTING</code>.
+      There’s one final problem, though: each <code>Gc</code> owned by a dropped value could itself
+      try to manipulate the reference counts of its pointees, resulting in undefined behavior, or
+      worse, slow code. However, all problems in computer science can be solved by adding more state
+      or more indirection. We opt to solve it with extra state this time, creating a thread-local
+      value called <code>COLLECTING</code>.
     </p>
     <p>
-      When we do a bulk-drop, we set <code>COLLECTING</code> to
-      <code>true</code>. Then, when we call <code>drop</code> on a
-      <code>Gc</code>, it checks the state of <code>COLLECTING</code>. If
-      <code>COLLECTING</code> is true, the <code>Gc</code> does nothing when
-      dropped (not even affecting its reference count). To handle outbound edges
-      to still-accessible allocations, we add one more traversal before the
-      final cleanup to handle outbound edges.
+      When we do a bulk-drop, we set <code>COLLECTING</code> to <code>true</code>. Then, when we
+      call <code>drop</code> on a <code>Gc</code>, it checks the state of <code>COLLECTING</code>.
+      If <code>COLLECTING</code> is true, the <code>Gc</code> does nothing when dropped (not even
+      affecting its reference count). To handle outbound edges to still-accessible allocations, we
+      add one more traversal before the final cleanup to handle outbound edges.
     </p>
     <p>Let’s take a look at what the code for that roughly looks like now.</p>
     <pre class="rust"><code>thread_local! {
@@ -410,42 +368,36 @@ impl&lt;T: Collectable + ?Sized&gt; Drop for Gc&lt;T&gt; {
     }
 }</code></pre>
     <p>
-      <code>collect</code> is the function we’ll write to check if the
-      allocation is accessible and perform a bulk cleanup if needed. There’s one
-      more problem before we can implement <code>collect</code>, though: our
-      psuedocode required us to be able to store each allocation as a key in
-      <code>counts</code> and also to access the allocation’s neighbors. This
-      means we have to use a little bit of type erasure to achieve our ends. I
-      won’t go into too much detail, but we need to be able to do two things:
+      <code>collect</code> is the function we’ll write to check if the allocation is accessible and
+      perform a bulk cleanup if needed. There’s one more problem before we can implement
+      <code>collect</code>, though: our psuedocode required us to be able to store each allocation
+      as a key in <code>counts</code> and also to access the allocation’s neighbors. This means we
+      have to use a little bit of type erasure to achieve our ends. I won’t go into too much detail,
+      but we need to be able to do two things:
     </p>
     <ul>
       <li>Store pointers to allocations as keys in a hash-map.</li>
-      <li>
-        Reconstruct a stored pointer using type information to make it possible
-        to do work.
-      </li>
+      <li>Reconstruct a stored pointer using type information to make it possible to do work.</li>
     </ul>
     <p>
-      Due to the limitations of Rust, these are actually mutually exclusive.
-      Because it’s undefined behavior (due to provenance issues) to compare the
-      raw data in pointers, we can’t erase a pointer and then use it as a key in
-      a hash-map. However, we can’t just get a pointer to the first byte of the
-      allocation, because our allocation could be <code>?Sized</code>.
+      Due to the limitations of Rust, these are actually mutually exclusive. Because it’s undefined
+      behavior (due to provenance issues) to compare the raw data in pointers, we can’t erase a
+      pointer and then use it as a key in a hash-map. However, we can’t just get a pointer to the
+      first byte of the allocation, because our allocation could be <code>?Sized</code>.
     </p>
     <p>
-      As a result, my implementation actually has two different kinds of erased
-      pointers: a thin pointer which can be used for comparisons and a fat
-      pointer which can be used to reconstruct a pointer to any type.
+      As a result, my implementation actually has two different kinds of erased pointers: a thin
+      pointer which can be used for comparisons and a fat pointer which can be used to reconstruct a
+      pointer to any type.
     </p>
     <pre
       class="rust"
     ><code>struct AllocationId(NonNull&lt;Cell&lt;usize&gt;&gt;); // used as a key in hash-maps
 struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer to the allocation</code></pre>
     <p>
-      Then, all the functions which need to know the type information of the
-      allocation (such as <code>dfs</code> and <code>mark</code>) can be stored
-      opaquely as function pointers, and when called, they can “rehydrate” the
-      <code>ErasedPtr</code> passed in with type information.
+      Then, all the functions which need to know the type information of the allocation (such as
+      <code>dfs</code> and <code>mark</code>) can be stored opaquely as function pointers, and when
+      called, they can “rehydrate” the <code>ErasedPtr</code> passed in with type information.
     </p>
     <p>
       Below, I’ve included an example of how it can be used to implement
@@ -475,47 +427,44 @@ struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer 
     specified.as_ref().accept(&amp;mut DfsVisitor { counts });
 }</code></pre>
     <p>
-      I won’t include the implementation of <code>collect</code> here because
-      it’s lengthy and not even the final revision of the cleanup algorithm, but
-      you can trust me that it works. After much gnashing of teeth and tearing
-      of hair, this is finally enough to achieve bulk dropping, making calling
-      <code>drop()</code> on a <code>Gc</code> a linear-time operation.
+      I won’t include the implementation of <code>collect</code> here because it’s lengthy and not
+      even the final revision of the cleanup algorithm, but you can trust me that it works. After
+      much gnashing of teeth and tearing of hair, this is finally enough to achieve bulk dropping,
+      making calling <code>drop()</code> on a <code>Gc</code> a linear-time operation.
     </p>
     <h3 id="amortizing">Amortizing</h3>
     <p>
-      What’s that, you say? You need your reference operations to work in
-      \(O(1)\) time? Why are programmers these days so picky?
+      What’s that, you say? You need your reference operations to work in \(O(1)\) time? Why are
+      programmers these days so picky?
     </p>
     <p>
-      Luckily, it isn’t too hard to make our garbage-collection efforts
-      terminate in average-case \(O(1)\) time. Instead of calling
-      <code>collect</code> directly, we’ll just punt the allocation, which may
-      be inaccessible, into a set of “dirty” allocations. In my code, I call
-      that set a dumpster. Then, once every \(|E|\) times an allocation is
-      dropped, we’ll go through the whole dumpster and collect them all in
-      \(O(|E|)\) time. Amortized across all allocations, that’s technically
-      \(O(1)\), enabled by the same accounting wizardry that makes array-backed
-      lists useful and that caused the 2008 financial crisis.
+      Luckily, it isn’t too hard to make our garbage-collection efforts terminate in average-case
+      \(O(1)\) time. Instead of calling
+      <code>collect</code> directly, we’ll just punt the allocation, which may be inaccessible, into
+      a set of “dirty” allocations. In my code, I call that set a dumpster. Then, once every \(|E|\)
+      times an allocation is dropped, we’ll go through the whole dumpster and collect them all in
+      \(O(|E|)\) time. Amortized across all allocations, that’s technically \(O(1)\), enabled by the
+      same accounting wizardry that makes array-backed lists useful and that caused the 2008
+      financial crisis.
     </p>
     <p>
-      To save ourselves a little bit of work, whenever an allocation is accessed
-      (such as by dereferencing or cloning), we can yank the allocation away
-      from that same dirty set since it was just proven to be accessible.
+      To save ourselves a little bit of work, whenever an allocation is accessed (such as by
+      dereferencing or cloning), we can yank the allocation away from that same dirty set since it
+      was just proven to be accessible.
     </p>
     <h2 id="are-we-concurrent-yet">Are we concurrent yet?</h2>
     <p>
-      So far, the garbage collector I’ve been outlining to you has been a
-      single-threaded collector, which can only store thread-local
-      garbage-collected values. I’m told that all code worth writing ends up
-      being concurrent, so we have to do better than that. Lucky for us, this
-      algorithm can be made to operate concurrently with little effort, assuming
-      that only one thread collects at a time.
+      So far, the garbage collector I’ve been outlining to you has been a single-threaded collector,
+      which can only store thread-local garbage-collected values. I’m told that all code worth
+      writing ends up being concurrent, so we have to do better than that. Lucky for us, this
+      algorithm can be made to operate concurrently with little effort, assuming that only one
+      thread collects at a time.
     </p>
     <p>
-      However, even if only one thread is collecting, we can still run into some
-      nasty concurrency issues. Let’s imagine that we have 2 allocations, \(a\)
-      and \(b\), plus the imaginary “root” allocation \(r\), where \(a\) can
-      only be accessed from \(r\) and \(b\) can only be accessed from \(a\).
+      However, even if only one thread is collecting, we can still run into some nasty concurrency
+      issues. Let’s imagine that we have 2 allocations, \(a\) and \(b\), plus the imaginary “root”
+      allocation \(r\), where \(a\) can only be accessed from \(r\) and \(b\) can only be accessed
+      from \(a\).
     </p>
     <pre class="mermaid">
 flowchart LR
@@ -525,15 +474,14 @@ flowchart LR
   r --&gt; a</pre
     >
     <p>
-      Now, consider performing a depth-first search starting from \(a\). First,
-      we record that \(a\) has 1 unaccounted-for-reference in
-      <code>counts</code>. Then, we move on to looking at \(b\) because it’s one
-      of \(a\)’s children.
+      Now, consider performing a depth-first search starting from \(a\). First, we record that \(a\)
+      has 1 unaccounted-for-reference in
+      <code>counts</code>. Then, we move on to looking at \(b\) because it’s one of \(a\)’s
+      children.
     </p>
     <p>
-      However, between when we record \(a\)’s reference count and examine \(b\),
-      another malicious thread mutates \(b\), adding a back-reference from \(b\)
-      to \(a\).
+      However, between when we record \(a\)’s reference count and examine \(b\), another malicious
+      thread mutates \(b\), adding a back-reference from \(b\) to \(a\).
     </p>
     <pre class="mermaid">
 flowchart LR
@@ -544,38 +492,34 @@ flowchart LR
   r --&gt; a</pre
     >
     <p>
-      Then, the depth-first search will return to \(a\), decrement the number of
-      unaccounted references, and assume that all incoming references to \(a\)
-      and \(b\) were totally accounted for (and therefore inaccessible). Then
-      the garbage collector would happily destroy \(a\) and \(b\)’s allocations,
-      leaving a dangling reference to the heap, potentially causing a
+      Then, the depth-first search will return to \(a\), decrement the number of unaccounted
+      references, and assume that all incoming references to \(a\) and \(b\) were totally accounted
+      for (and therefore inaccessible). Then the garbage collector would happily destroy \(a\) and
+      \(b\)’s allocations, leaving a dangling reference to the heap, potentially causing a
       use-after-free or other gnarly memory errors.
     </p>
     <h3 id="resolving-concurrency">Resolving concurrency</h3>
     <p>
-      The simplest solution to this concurrency issue is to just wrap everything
-      in a big fat lock by forcing every single operation involving a
-      <code>Gc</code> to acquire a single global mutex, preventing any sort of
-      concurrency bugs at all. However, that’s ridiculously slow.
+      The simplest solution to this concurrency issue is to just wrap everything in a big fat lock
+      by forcing every single operation involving a
+      <code>Gc</code> to acquire a single global mutex, preventing any sort of concurrency bugs at
+      all. However, that’s ridiculously slow.
     </p>
     <p>
-      We’d like to have an approach that only needs to achieve mutual exclusion
-      over a small subset of all allocations if at all possible. To do so, let’s
-      take a closer look at our concurrency problem: we can see that we only
-      really get erroneous results when another thread mutates the subgraph
-      \(H\) as we interact with it. The solution is quite clever - we tag every
+      We’d like to have an approach that only needs to achieve mutual exclusion over a small subset
+      of all allocations if at all possible. To do so, let’s take a closer look at our concurrency
+      problem: we can see that we only really get erroneous results when another thread mutates the
+      subgraph \(H\) as we interact with it. The solution is quite clever - we tag every
       <code>Gc</code> with a special number, which I’ll call a collecting tag.
     </p>
     <p>
       First, we’ll add a global atomic integer called the
       <code>COLLECTING_TAG</code>.
     </p>
-    <pre
-      class="rust"
-    ><code>static COLLECTING_TAG: AtomicUsize = AtomicUsize::new(0);</code></pre>
+    <pre class="rust"><code>static COLLECTING_TAG: AtomicUsize = AtomicUsize::new(0);</code></pre>
     <p>
-      Whenever we create or clone a new <code>Gc</code>, we’ll annotate it with
-      the current value of <code>COLLECTING_TAG</code>.
+      Whenever we create or clone a new <code>Gc</code>, we’ll annotate it with the current value of
+      <code>COLLECTING_TAG</code>.
     </p>
     <pre class="rust"><code>// this new `Gc` type is intended to be `Sync`.
 
@@ -603,20 +547,17 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
     // carry on with DFS and such
 }</code></pre>
     <p>
-      Lastly, whenever we encounter a <code>Gc</code> during the
-      <code>dfs</code> process, we’ll check its tag. If the tag is equal to the
-      current value of <code>COLLECTING_TAG</code>, that means the
-      <code>Gc</code> was created after <code>dfs</code> started. If so, then
-      whatever spot we found the <code>Gc</code> in must have been accessible,
-      and we can mark it as so. To prevent us from visiting the same edge twice
-      (due to shenanigans), we’ll also update the tag on every edge we visit to
-      the value of <code>COLLECTING_TAG</code>.
+      Lastly, whenever we encounter a <code>Gc</code> during the <code>dfs</code> process, we’ll
+      check its tag. If the tag is equal to the current value of <code>COLLECTING_TAG</code>, that
+      means the <code>Gc</code> was created after <code>dfs</code> started. If so, then whatever
+      spot we found the <code>Gc</code> in must have been accessible, and we can mark it as so. To
+      prevent us from visiting the same edge twice (due to shenanigans), we’ll also update the tag
+      on every edge we visit to the value of <code>COLLECTING_TAG</code>.
     </p>
     <p>
-      Let’s return to our broken example to show how this modification fixes it.
-      We return to our reference graph with \(a\) pointing to \(b\) and \(r\)
-      pointing to \(a\). Since every <code>Gc</code> must be annotated with a
-      tag, let’s say they’re all tagged with 0.
+      Let’s return to our broken example to show how this modification fixes it. We return to our
+      reference graph with \(a\) pointing to \(b\) and \(r\) pointing to \(a\). Since every
+      <code>Gc</code> must be annotated with a tag, let’s say they’re all tagged with 0.
     </p>
     <pre class="mermaid">
 graph LR
@@ -626,9 +567,8 @@ graph LR
   a -- &quot;0&quot; --&gt; b</pre
     >
     <p>
-      Next, when <code>dfs</code> begins, <code>COLLECTING_TAG</code> is
-      incremented to 1. As a result, the new reference created by a malicious
-      thread must be tagged with 1.
+      Next, when <code>dfs</code> begins, <code>COLLECTING_TAG</code> is incremented to 1. As a
+      result, the new reference created by a malicious thread must be tagged with 1.
     </p>
     <pre class="mermaid">
 graph LR
@@ -638,20 +578,18 @@ graph LR
    b -- &quot;1&quot; --&gt; a</pre
     >
     <p>
-      Now, when <code>dfs</code> visits the edge pointing from \(b\) to \(a\),
-      it sees that the reference is labeled with a tag of 1, and therefore both
-      \(b\) and \(a\) must be accessible - no accidental early deallocations
-      here.
+      Now, when <code>dfs</code> visits the edge pointing from \(b\) to \(a\), it sees that the
+      reference is labeled with a tag of 1, and therefore both \(b\) and \(a\) must be accessible -
+      no accidental early deallocations here.
     </p>
     <h3 id="moving-in-and-out">Moving in and out</h3>
     <p>
-      We might hope that tagging the pointers is sufficient to prevent all
-      concurrency bugs. However, this is sadly not enough. To show why, we’ll
-      begin with an example.
+      We might hope that tagging the pointers is sufficient to prevent all concurrency bugs.
+      However, this is sadly not enough. To show why, we’ll begin with an example.
     </p>
     <p>
-      First, let’s imagine an allocation called \(x\), which contains two
-      optional references to itself.
+      First, let’s imagine an allocation called \(x\), which contains two optional references to
+      itself.
     </p>
     <pre class="rust"><code>struct X {
     x1: Mutex&lt;Option&lt;Gc&lt;X&gt;&gt;&gt;,
@@ -660,10 +598,9 @@ graph LR
     <p>
       At the start of our example, there will be only one <code>Gc</code>
       pointing from inside \(x\) to itself, and the other slot that can hold a
-      <code>Gc</code> will be empty. \(x\) is accessible directly from the root
-      allocation \(r\), and all existing references are tagged with 0. For the
-      sake of clarity, I’ll draw the arrow representing the first slot in \(x\)
-      with a solid line and the second slot with a dashed line.
+      <code>Gc</code> will be empty. \(x\) is accessible directly from the root allocation \(r\),
+      and all existing references are tagged with 0. For the sake of clarity, I’ll draw the arrow
+      representing the first slot in \(x\) with a solid line and the second slot with a dashed line.
     </p>
     <pre class="mermaid">
 graph LR
@@ -678,14 +615,10 @@ graph LR
     <p>Now, let’s have <code>dfs</code> begin, starting at \(x\).</p>
     <ol type="1">
       <li>We increment <code>COLLECTING_TAG</code> to 1.</li>
+      <li><code>dfs</code> records that \(x\) has 2 unaccounted-for references at the start.</li>
       <li>
-        <code>dfs</code> records that \(x\) has 2 unaccounted-for references at
-        the start.
-      </li>
-      <li>
-        <code>dfs</code> visits the \(x\)’s first slot and tags the
-        currently-existing self reference in that slot. \(x\) now has 1
-        unaccounted-for reference.
+        <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self
+        reference in that slot. \(x\) now has 1 unaccounted-for reference.
       </li>
     </ol>
     <pre class="mermaid">
@@ -701,9 +634,9 @@ graph LR
     <p>{:start=“4”}</p>
     <ol type="1">
       <li>
-        A malicious thread intervenes, first moving the <code>Gc</code> from
-        \(x\)’s first slot to \(r\), then moving the original
-        <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s second slot.
+        A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to
+        \(r\), then moving the original <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s
+        second slot.
       </li>
     </ol>
     <pre class="rust"><code>fn do_evil(r_to_x: Gc&lt;X&gt;) {
@@ -723,21 +656,19 @@ graph LR
     <p>{:start=“5”}</p>
     <ol type="1">
       <li>
-        <code>dfs</code> continues, now visiting the second slot in \(x\).
-        Seeing another reference to \(x\), we decrement the number of
-        unaccounted-for references to 0.
+        <code>dfs</code> continues, now visiting the second slot in \(x\). Seeing another reference
+        to \(x\), we decrement the number of unaccounted-for references to 0.
       </li>
       <li>
-        <code>dfs</code> found no ancestors of \(x\) with unaccounted-for
-        ancestors, so we free \(x\). However, \(x\) is still accessible!
+        <code>dfs</code> found no ancestors of \(x\) with unaccounted-for ancestors, so we free
+        \(x\). However, \(x\) is still accessible!
       </li>
     </ol>
     <p>
-      This problem stumped me for a decent while. It seems impossible to prevent
-      other threads from do-si-do-ing every <code>Gc</code> pointing to an
-      allocation in order to fool our search. Luckily, there is a way through.
-      Since tagging every <code>Gc</code> worked out for us before, we’ll try
-      tagging every allocation.
+      This problem stumped me for a decent while. It seems impossible to prevent other threads from
+      do-si-do-ing every <code>Gc</code> pointing to an allocation in order to fool our search.
+      Luckily, there is a way through. Since tagging every <code>Gc</code> worked out for us before,
+      we’ll try tagging every allocation.
     </p>
     <pre class="rust"><code>#[repr(C)]
 struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
@@ -746,8 +677,8 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
     value: T
 }</code></pre>
     <p>
-      Next, every time a <code>Gc</code> is dereferenced, we’ll update the tag
-      in the allocation to the current value of <code>COLLECTING_TAG</code>.
+      Next, every time a <code>Gc</code> is dereferenced, we’ll update the tag in the allocation to
+      the current value of <code>COLLECTING_TAG</code>.
     </p>
     <pre
       class="rust"
@@ -761,18 +692,16 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
     }
 }</code></pre>
     <p>
-      Whenever <code>dfs</code> observes that the tag on an allocation is equal
-      to <code>COLLECTING_TAG</code>, that means that the allocation was
-      accessed, and therefore accessible. In order to shuffle references around
-      in our above example, the malicious thread would have to dereference a
-      <code>Gc</code>, notifying the search and preventing an early
+      Whenever <code>dfs</code> observes that the tag on an allocation is equal to
+      <code>COLLECTING_TAG</code>, that means that the allocation was accessed, and therefore
+      accessible. In order to shuffle references around in our above example, the malicious thread
+      would have to dereference a <code>Gc</code>, notifying the search and preventing an early
       deallocation.
     </p>
     <p>
-      In fact, this is enough to prove that <code>dfs</code> will
-      <em>never</em> incorrectly mark an allocation as inaccessible, even under
-      concurrent execution. This blog post is already rather long, so I’ll only
-      provide a rough sketch of the proof.
+      In fact, this is enough to prove that <code>dfs</code> will <em>never</em> incorrectly mark an
+      allocation as inaccessible, even under concurrent execution. This blog post is already rather
+      long, so I’ll only provide a rough sketch of the proof.
     </p>
     <p>
       <strong
@@ -783,92 +712,83 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
     <p>Proof:</p>
     <ol type="1">
       <li>
-        If <code>dfs</code> encounters a <code>Gc</code> created after
-        <code>dfs</code> begins, it will know that the referent is accessible.
+        If <code>dfs</code> encounters a <code>Gc</code> created after <code>dfs</code> begins, it
+        will know that the referent is accessible.
       </li>
       <li>
-        Due to (1), if <code>dfs</code> marked some allocation \(a\) as
-        inaccessible, it must have only visited <code>Gc</code>s pointing to
-        \(a\) which existed before <code>dfs</code> began.
+        Due to (1), if <code>dfs</code> marked some allocation \(a\) as inaccessible, it must have
+        only visited <code>Gc</code>s pointing to \(a\) which existed before <code>dfs</code> began.
       </li>
       <li>
-        Weakening the statement from (2), if <code>dfs</code> marked some
-        allocation \(a\) as inaccessible, it must have only visited
-        <code>Gc</code>s pointing to \(a\) which existed when \(a\)’s reference
-        count was recorded.
+        Weakening the statement from (2), if <code>dfs</code> marked some allocation \(a\) as
+        inaccessible, it must have only visited <code>Gc</code>s pointing to \(a\) which existed
+        when \(a\)’s reference count was recorded.
       </li>
       <li>
-        <code>dfs</code> never visits a <code>Gc</code> while it points from the
-        root allocation \(r\) to any other allocation.
+        <code>dfs</code> never visits a <code>Gc</code> while it points from the root allocation
+        \(r\) to any other allocation.
       </li>
       <li>
-        <code>dfs</code> must visit every <code>Gc</code> which pointed to an
-        allocation at the point when its reference count was recorded in order
-        to mark it as inaccessible.
+        <code>dfs</code> must visit every <code>Gc</code> which pointed to an allocation at the
+        point when its reference count was recorded in order to mark it as inaccessible.
       </li>
       <li>
         Due to (4) and (5), if \(a\) is marked as inaccesssible, any
-        <code>Gc</code> which at any point connected \(r\) to \(a\) must have
-        been moved to connect another node (not \(r\)) to \(a\).
+        <code>Gc</code> which at any point connected \(r\) to \(a\) must have been moved to connect
+        another node (not \(r\)) to \(a\).
       </li>
       <li>
-        Due to (6), there is no lifetime <code>'x</code> which can borrow
-        against a <code>Gc</code> pointing from \(r\) to \(a\) and last between
-        when <code>dfs</code> first visits \(a\) and when it last visits \(a\).
+        Due to (6), there is no lifetime <code>'x</code> which can borrow against a
+        <code>Gc</code> pointing from \(r\) to \(a\) and last between when <code>dfs</code> first
+        visits \(a\) and when it last visits \(a\).
       </li>
       <li>
-        The final <code>Gc</code> to move into \(a\) before
-        <code>dfs</code> must have been moved while another borrow against a
+        The final <code>Gc</code> to move into \(a\) before <code>dfs</code> must have been moved
+        while another borrow against a
         <code>Gc</code>
         pointing from \(r\) to \(a\) existed. Let the lifetime of that borrow be
         <code>'y</code>.
       </li>
       <li>
-        Because <code>'y</code> lasts longer than the final move,
-        <code>'y</code> can be extended to last arbitrarily long, even until
-        after <code>dfs</code> has finished visiting every
+        Because <code>'y</code> lasts longer than the final move, <code>'y</code> can be extended to
+        last arbitrarily long, even until after <code>dfs</code> has finished visiting every
         <code>Gc</code> pointing to \(a\).
       </li>
       <li>
-        Due to (7), <code>'y</code> must not have existed before
-        <code>dfs</code> first visited \(a\). Therefore, if \(a\) is erroneously
-        marked as inaccessible, a <code>Gc</code> pointing to \(a\) must have
-        been dereferenced to generate a borrow with lifetime <code>'y</code>.
+        Due to (7), <code>'y</code> must not have existed before <code>dfs</code> first visited
+        \(a\). Therefore, if \(a\) is erroneously marked as inaccessible, a <code>Gc</code> pointing
+        to \(a\) must have been dereferenced to generate a borrow with lifetime <code>'y</code>.
       </li>
       <li>
-        If a <code>Gc</code> pointing to \(a\) was dereferenced before the last
-        time <code>dfs</code> visited a <code>Gc</code> pointing to \(a\), then
-        <code>dfs</code> would have observed that \(a\)’s tag had changed.
-        Therefore, if an allocation was erroneously marked as inaccessible, it
-        must have been marked as accessible. Therefore no allocations were ever
-        erroneously marked as inacessible by <code>dfs</code>. QED.
+        If a <code>Gc</code> pointing to \(a\) was dereferenced before the last time
+        <code>dfs</code> visited a <code>Gc</code> pointing to \(a\), then <code>dfs</code> would
+        have observed that \(a\)’s tag had changed. Therefore, if an allocation was erroneously
+        marked as inaccessible, it must have been marked as accessible. Therefore no allocations
+        were ever erroneously marked as inacessible by <code>dfs</code>. QED.
       </li>
     </ol>
     <p>
-      This proof is relatively handwavy, but it should be possible for an astute
-      reader to fill in the details. I will leave it to such astute readers to
-      prove the complementary proof to this; namely, that <code>dfs</code> will
-      never erroneously mark an allocation as accessible.
+      This proof is relatively handwavy, but it should be possible for an astute reader to fill in
+      the details. I will leave it to such astute readers to prove the complementary proof to this;
+      namely, that <code>dfs</code> will never erroneously mark an allocation as accessible.
     </p>
     <p>
-      I also think that it’s really cool that the entire mechanism of the
-      correctness of this approach is totally supported by Rust’s borrow
-      checking semantics. It makes the whole thing feel like it fits right in.
+      I also think that it’s really cool that the entire mechanism of the correctness of this
+      approach is totally supported by Rust’s borrow checking semantics. It makes the whole thing
+      feel like it fits right in.
     </p>
     <h3 id="its-the-weak-ones-that-count">It’s the weak ones that count</h3>
     <p>
-      There’s one more cause for memory safety issues from concurrency. If an
-      allocation is freed because its reference count reached zero, it could
-      still be accessible by another thread because it was stored in the global
-      dumpster. We can’t guarantee that we’ve obliterated all references to that
-      allocation from every other thread’s memory, so it seems like we’re hosed.
+      There’s one more cause for memory safety issues from concurrency. If an allocation is freed
+      because its reference count reached zero, it could still be accessible by another thread
+      because it was stored in the global dumpster. We can’t guarantee that we’ve obliterated all
+      references to that allocation from every other thread’s memory, so it seems like we’re hosed.
     </p>
     <p>
-      However, there’s no problem in computer science that can’t be solved by
-      adding more state. Taking a leaf from <code>Rc</code>’s book and adapting
-      it liberally, we annotate each allocation with a “weak” reference count,
-      which is the number of times it’s referenced by a dumpster or cleanup
-      thread. We’ll rename our original reference count to be the strong count
+      However, there’s no problem in computer science that can’t be solved by adding more state.
+      Taking a leaf from <code>Rc</code>’s book and adapting it liberally, we annotate each
+      allocation with a “weak” reference count, which is the number of times it’s referenced by a
+      dumpster or cleanup thread. We’ll rename our original reference count to be the strong count
       instead.
     </p>
     <pre class="rust"><code>#[repr(C)]
@@ -879,23 +799,20 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
     value: T,
 }</code></pre>
     <p>
-      Then, when dropping the last strong reference to a <code>Gc</code>, we
-      first check that its weak reference count is nonzero before we can
-      deallocate it. If not, it’s the cleanup threads’ problem to take care of
-      it.
+      Then, when dropping the last strong reference to a <code>Gc</code>, we first check that its
+      weak reference count is nonzero before we can deallocate it. If not, it’s the cleanup threads’
+      problem to take care of it.
     </p>
     <p>
-      Whenever an allocation is removed from a dumpster and about to be thrown
-      away by a thread running a cleanup procedure, the thread decrements the
-      weak count of the allocation and checks if both the weak and strong count
-      have reached zero. If so, that thread can then safely destroy the
-      allocation.
+      Whenever an allocation is removed from a dumpster and about to be thrown away by a thread
+      running a cleanup procedure, the thread decrements the weak count of the allocation and checks
+      if both the weak and strong count have reached zero. If so, that thread can then safely
+      destroy the allocation.
     </p>
     <h3 id="deadlocked">Deadlocked!</h3>
     <p>
-      Imagine that we want to create a <code>Gc&lt;Mutex&lt;()&gt;&gt;</code>,
-      and then drop a <code>Gc</code> pointing to it while the
-      <code>Mutex</code> is locked.
+      Imagine that we want to create a <code>Gc&lt;Mutex&lt;()&gt;&gt;</code>, and then drop a
+      <code>Gc</code> pointing to it while the <code>Mutex</code> is locked.
     </p>
     <pre class="rust"><code>let gc1 = Gc::new(Mutex::new(()));
 let gc2 = gc1.clone();
@@ -904,19 +821,16 @@ let guard = gc1.lock()?;
 drop(gc2); // suppose this triggers a cleanup
 drop(guard);</code></pre>
     <p>
-      While traversing the reference graph, the <code>dfs</code> visitor would
-      attempt to visit the mutex, lock it, and try to carry on. However, since
-      the same thread that triggered the allocation still holds a guard to that
-      mutex, the thread would deadlock disastrously. Lucky for us, we know that
-      any allocation with a held mutex guard must still be accessible (due to
-      <code>Mutex</code>’s excellent API), so we can be certain that if we fail
-      to acquire a mutex, we have immediate proof that an allocation is
-      accessible.
+      While traversing the reference graph, the <code>dfs</code> visitor would attempt to visit the
+      mutex, lock it, and try to carry on. However, since the same thread that triggered the
+      allocation still holds a guard to that mutex, the thread would deadlock disastrously. Lucky
+      for us, we know that any allocation with a held mutex guard must still be accessible (due to
+      <code>Mutex</code>’s excellent API), so we can be certain that if we fail to acquire a mutex,
+      we have immediate proof that an allocation is accessible.
     </p>
     <p>
-      To take advantage of that, we’ll make visiting a collectable type a
-      fallible operation, and make it so that failing to acquire a lock also
-      fails the visit.
+      To take advantage of that, we’ll make visiting a collectable type a fallible operation, and
+      make it so that failing to acquire a lock also fails the visit.
     </p>
     <pre class="rust"><code>pub trait Collectable {
     fn accept&lt;V: Visitor&gt;(&amp;self, visitor: &amp;mut V) -&gt; Result&lt;(), ()&gt;;
@@ -940,47 +854,38 @@ impl&lt;T: Collectable + ?Sized&gt; Collectable for Mutex&lt;T&gt; {
         alt="A hand-drawn garbage truck in ink on a white background. It’s crudely done, as if drawn by the sort of person who knows what perspective is but doesn’t quite understand how it works."
       />
       <figcaption aria-hidden="true">
-        A hand-drawn garbage truck in ink on a white background. It’s crudely
-        done, as if drawn by the sort of person who knows what perspective is
-        but doesn’t quite understand how it works.
+        A hand-drawn garbage truck in ink on a white background. It’s crudely done, as if drawn by
+        the sort of person who knows what perspective is but doesn’t quite understand how it works.
       </figcaption>
     </figure>
     <p>
-      You’ve made it this far into this (admittedly rather lengthy) post. Enjoy
-      this hand-drawn picture by yours truly.
+      You’ve made it this far into this (admittedly rather lengthy) post. Enjoy this hand-drawn
+      picture by yours truly.
     </p>
     <p>
-      When implementing this garbage collector, one of the biggest bottlenecks
-      with concurrent performance is accessing the one, global dumpster every
-      single time a <code>Gc</code> is dropped. If using a
-      <code>Mutex&lt;HashMap&gt;</code>, this will remove nearly all parallelism
-      from the whole system and make you wonder why you paid all that money for
-      a 16-core computer.
+      When implementing this garbage collector, one of the biggest bottlenecks with concurrent
+      performance is accessing the one, global dumpster every single time a <code>Gc</code> is
+      dropped. If using a <code>Mutex&lt;HashMap&gt;</code>, this will remove nearly all parallelism
+      from the whole system and make you wonder why you paid all that money for a 16-core computer.
     </p>
     <p>
-      As a result, any sane person might lean for a concurrent hashmap. There
-      are many Rust implementations - I tried
-      <a href="https://gitlab.redox-os.org/redox-os/chashmap"
-        ><code>chashmap</code></a
-      >
+      As a result, any sane person might lean for a concurrent hashmap. There are many Rust
+      implementations - I tried
+      <a href="https://gitlab.redox-os.org/redox-os/chashmap"><code>chashmap</code></a>
       but gave up on it due to a
-      <a href="https://gitlab.redox-os.org/redox-os/chashmap/-/issues/3"
-        >rare panic bug</a
-      >, and then I tried
-      <a href="https://github.com/xacrimon/dashmap"><code>dashmap</code></a
+      <a href="https://gitlab.redox-os.org/redox-os/chashmap/-/issues/3">rare panic bug</a>, and
+      then I tried <a href="https://github.com/xacrimon/dashmap"><code>dashmap</code></a
       >, which worked fine but was too slow as thread counts increased.
     </p>
     <p>
-      The heart of the issue is that concurrently updating any data structure is
-      going to be slow. Even so-called “concurrent” data structures which use
-      clever sharded locks have this issue - there’s always some contention
-      overhead. The best workaround to concurrency slowdowns is to just not do
-      things concurrently. We can fix this by making every thread have its own
-      dumpster, and then having a global collection of to-be-cleaned allocations
-      which I’ll call the <em>garbage truck</em>. Whenever another allocation is
-      marked dirty, we can check if this thread’s dumpster is full according to
-      some heuristic, and if so, transfer all the allocations from this thread’s
-      dumpster to the garbage truck. I’ve included some pseudocode for the whole
+      The heart of the issue is that concurrently updating any data structure is going to be slow.
+      Even so-called “concurrent” data structures which use clever sharded locks have this issue -
+      there’s always some contention overhead. The best workaround to concurrency slowdowns is to
+      just not do things concurrently. We can fix this by making every thread have its own dumpster,
+      and then having a global collection of to-be-cleaned allocations which I’ll call the
+      <em>garbage truck</em>. Whenever another allocation is marked dirty, we can check if this
+      thread’s dumpster is full according to some heuristic, and if so, transfer all the allocations
+      from this thread’s dumpster to the garbage truck. I’ve included some pseudocode for the whole
       process below.
     </p>
     <pre class="py"><code>dumpster = set() # local to this thread
@@ -995,27 +900,25 @@ def mark_dirty(allocation):
         garbage_truck.unlock()
         dumpster = set()</code></pre>
     <p>
-      If <code>is_full</code> returns <code>true</code> rarely enough, there
-      will be almost no contention over the garbage truck. This means that the
-      concurrency overhead is vastly reduced and we get to pocket some great
-      performance returns.
+      If <code>is_full</code> returns <code>true</code> rarely enough, there will be almost no
+      contention over the garbage truck. This means that the concurrency overhead is vastly reduced
+      and we get to pocket some great performance returns.
     </p>
     <h2 id="okay-but-how-fast-is-it">Okay, but how fast is it?</h2>
     <p>In short, this garbage collector runs pretty fast!</p>
     <p>
-      In the end, I made two different garbage collector implementations - one
-      which is thread-local, saving us from all the concurrency headaches, and
-      another thread-safe one that has all the bells and whistles at the cost of
-      some performance. Borrowing from
+      In the end, I made two different garbage collector implementations - one which is
+      thread-local, saving us from all the concurrency headaches, and another thread-safe one that
+      has all the bells and whistles at the cost of some performance. Borrowing from
       <a href="https://github.com/matklad/once_cell"><code>once_cell</code></a
-      >’s API, the former lives in the <code>unsync</code> module of the crate
-      and the latter in <code>sync</code>.
+      >’s API, the former lives in the <code>unsync</code> module of the crate and the latter in
+      <code>sync</code>.
     </p>
     <p>
-      Next, I collected all the garbage collectors I could find in order to
-      compare them. I selected all the ones which had a similar API to
-      <code>dumpster</code>, were published on
-      <a href="https://crates.io">crates.io</a>, and actually worked.
+      Next, I collected all the garbage collectors I could find in order to compare them. I selected
+      all the ones which had a similar API to
+      <code>dumpster</code>, were published on <a href="https://crates.io">crates.io</a>, and
+      actually worked.
     </p>
     <table>
       <colgroup>
@@ -1043,36 +946,28 @@ def mark_dirty(allocation):
         </tr>
         <tr class="odd">
           <td>
-            <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"
-              ><code>Rc</code></a
-            >
+            <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a>
           </td>
           <td style="text-align: center">❌</td>
           <td style="text-align: center">✅</td>
         </tr>
         <tr class="even">
           <td>
-            <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"
-              ><code>Arc</code></a
-            >
+            <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"><code>Arc</code></a>
           </td>
           <td style="text-align: center">✅</td>
           <td style="text-align: center">✅</td>
         </tr>
         <tr class="odd">
           <td>
-            <a href="https://github.com/fitzgen/bacon-rajan-cc"
-              ><code>bacon-rajan-cc</code></a
-            >
+            <a href="https://github.com/fitzgen/bacon-rajan-cc"><code>bacon-rajan-cc</code></a>
           </td>
           <td style="text-align: center">❌</td>
           <td style="text-align: center">✅</td>
         </tr>
         <tr class="even">
           <td>
-            <a href="https://github.com/artichoke/cactusref"
-              ><code>cactusref</code></a
-            >
+            <a href="https://github.com/artichoke/cactusref"><code>cactusref</code></a>
           </td>
           <td style="text-align: center">❌</td>
           <td style="text-align: center">❌</td>
@@ -1093,27 +988,21 @@ def mark_dirty(allocation):
         </tr>
         <tr class="odd">
           <td>
-            <a href="https://github.com/quark-zju/gcmodule"
-              ><code>gcmodule</code></a
-            >
+            <a href="https://github.com/quark-zju/gcmodule"><code>gcmodule</code></a>
           </td>
           <td style="text-align: center">yes, but with a different API</td>
           <td style="text-align: center">✅</td>
         </tr>
         <tr class="even">
           <td>
-            <a href="https://github.com/jonas-schievink/rcgc"
-              ><code>rcgc</code></a
-            >
+            <a href="https://github.com/jonas-schievink/rcgc"><code>rcgc</code></a>
           </td>
           <td style="text-align: center">❌</td>
           <td style="text-align: center">❌</td>
         </tr>
         <tr class="odd">
           <td>
-            <a href="https://github.com/Others/shredder"
-              ><code>shredder</code></a
-            >
+            <a href="https://github.com/Others/shredder"><code>shredder</code></a>
           </td>
           <td style="text-align: center">✅</td>
           <td style="text-align: center">✅</td>
@@ -1121,32 +1010,29 @@ def mark_dirty(allocation):
       </tbody>
     </table>
     <p>
-      I excluded the ones that didn’t have a <code>dumpster</code>-like API
-      because it would have been a pain to set up a benchmarking harness to
-      handle them. If you feel this is poor diligence, you can go benchmark them
-      yourself. I also included <code>Rc</code> and <code>Arc</code>, even
-      though they don’t collect cycles, because they’re a decent baseline for
-      the minimum performance of a garbage collector. During my research, I also
-      found that <code>bacon-rajan-cc</code> doesn’t initiate collections of its
-      own accord, so I added a version of each of <code>dumpster</code>’s
-      garbage collectors which doesn’t automatically trigger collections in the
-      spirit of competitive fairness. Those versions are labeled as “manual.”
-      Lastly, I found that <code>gcmodule</code> simply stack-overflows and
-      sometimes segfaults when facing extremely large collection loads, so I
-      removed it from the benchmark set.
+      I excluded the ones that didn’t have a <code>dumpster</code>-like API because it would have
+      been a pain to set up a benchmarking harness to handle them. If you feel this is poor
+      diligence, you can go benchmark them yourself. I also included <code>Rc</code> and
+      <code>Arc</code>, even though they don’t collect cycles, because they’re a decent baseline for
+      the minimum performance of a garbage collector. During my research, I also found that
+      <code>bacon-rajan-cc</code> doesn’t initiate collections of its own accord, so I added a
+      version of each of <code>dumpster</code>’s garbage collectors which doesn’t automatically
+      trigger collections in the spirit of competitive fairness. Those versions are labeled as
+      “manual.” Lastly, I found that <code>gcmodule</code> simply stack-overflows and sometimes
+      segfaults when facing extremely large collection loads, so I removed it from the benchmark
+      set.
     </p>
     <p>
-      As my benchmark, I decided to do the very simplest thing I could think of:
-      have a bunch of allocations randomly add and remove references to each
-      other in a loop, dropping and creating new allocations as well. To account
-      for random noise, I ran 100 trials of each garbage collector doing 1
-      million operations. Each operation is either the creation of a reference
-      or a deletion.
+      As my benchmark, I decided to do the very simplest thing I could think of: have a bunch of
+      allocations randomly add and remove references to each other in a loop, dropping and creating
+      new allocations as well. To account for random noise, I ran 100 trials of each garbage
+      collector doing 1 million operations. Each operation is either the creation of a reference or
+      a deletion.
     </p>
     <p>
-      First, I ran a benchmark of all the garbage collectors, measuring pure
-      single-threaded performance. I’ve shown my benchmark results as a set of
-      violin plots below, relating runtime to frequency.
+      First, I ran a benchmark of all the garbage collectors, measuring pure single-threaded
+      performance. I’ve shown my benchmark results as a set of violin plots below, relating runtime
+      to frequency.
     </p>
     <figure>
       <img
@@ -1154,21 +1040,18 @@ def mark_dirty(allocation):
         alt="A violin plot, titled “Single-threaded GC comparison.” The x-axis is labeled “Runtime for 1M ops (ms),” and the y-axis is labeled “Garbage collector,” with various collectors labeled on the ticks. In order, the garbage collectors on the y-axis are Arc, Rc, shredder, bacon-rajan-cc, gc, dumpster (sync/manual), dumpster (sync), dumpster (unsync/manual), and dumpster (unsync). The x-axis ranges from 0 ms to 4000 ms. All of the violins, except for shredder’s, are very near to the left side. The violin labeled “shredder” is far off to the right side, with a mean of roughly 3700ms."
       />
       <figcaption aria-hidden="true">
-        A violin plot, titled “Single-threaded GC comparison.” The x-axis is
-        labeled “Runtime for 1M ops (ms),” and the y-axis is labeled “Garbage
-        collector,” with various collectors labeled on the ticks. In order, the
-        garbage collectors on the y-axis are Arc, Rc, shredder, bacon-rajan-cc,
-        gc, dumpster (sync/manual), dumpster (sync), dumpster (unsync/manual),
-        and dumpster (unsync). The x-axis ranges from 0 ms to 4000 ms. All of
-        the violins, except for shredder’s, are very near to the left side. The
-        violin labeled “shredder” is far off to the right side, with a mean of
-        roughly 3700ms.
+        A violin plot, titled “Single-threaded GC comparison.” The x-axis is labeled “Runtime for 1M
+        ops (ms),” and the y-axis is labeled “Garbage collector,” with various collectors labeled on
+        the ticks. In order, the garbage collectors on the y-axis are Arc, Rc, shredder,
+        bacon-rajan-cc, gc, dumpster (sync/manual), dumpster (sync), dumpster (unsync/manual), and
+        dumpster (unsync). The x-axis ranges from 0 ms to 4000 ms. All of the violins, except for
+        shredder’s, are very near to the left side. The violin labeled “shredder” is far off to the
+        right side, with a mean of roughly 3700ms.
       </figcaption>
     </figure>
     <p>
-      This plot doesn’t tell us much other than that <code>shredder</code> is
-      slow. To take a closer look, let’s remove <code>shredder</code> from the
-      list and see what we find.
+      This plot doesn’t tell us much other than that <code>shredder</code> is slow. To take a closer
+      look, let’s remove <code>shredder</code> from the list and see what we find.
     </p>
     <figure>
       <img
@@ -1176,59 +1059,49 @@ def mark_dirty(allocation):
         alt="The same violin plot as before, but now shredder’s violin and y-axis label have been removed. The x-axis now varies from 40 to 160 ms. The violin labeled Rc is furthest to the left, followed by Arc, bacon-rajan-cc, dumpster (unsync), dumpster (unsync/manual), dumpster (sync/manual), gc, and finally dumpster (sync)."
       />
       <figcaption aria-hidden="true">
-        The same violin plot as before, but now shredder’s violin and y-axis
-        label have been removed. The x-axis now varies from 40 to 160 ms. The
-        violin labeled Rc is furthest to the left, followed by Arc,
-        bacon-rajan-cc, dumpster (unsync), dumpster (unsync/manual), dumpster
+        The same violin plot as before, but now shredder’s violin and y-axis label have been
+        removed. The x-axis now varies from 40 to 160 ms. The violin labeled Rc is furthest to the
+        left, followed by Arc, bacon-rajan-cc, dumpster (unsync), dumpster (unsync/manual), dumpster
         (sync/manual), gc, and finally dumpster (sync).
       </figcaption>
     </figure>
     <p>
-      <code>dumpster</code>’s unsync implementation is in a decent position,
-      beat out only by the non-cycle-detecting allocators and
-      <code>bacon-rajan-cc</code>. <code>bacon-rajan-cc</code> has very little
-      overhead and is quite performant.
+      <code>dumpster</code>’s unsync implementation is in a decent position, beat out only by the
+      non-cycle-detecting allocators and <code>bacon-rajan-cc</code>.
+      <code>bacon-rajan-cc</code> has very little overhead and is quite performant.
     </p>
     <p>
-      I think there are two main reasons why the concurrent version of the
-      garbage collector is much slower than the single-threaded one. First,
-      moving allocations from a thread-local dumpster to the global garbage
-      truck takes some time. Second, the <code>dfs</code> operation in a
-      concurrent environment must record the current set of children of an
-      allocation, typically in a separate heap-allocated structure, to prevent
-      some concurrency bugs. It’s certainly possible to mitigate the losses from
-      the first issue, but the second is harder to handle.
+      I think there are two main reasons why the concurrent version of the garbage collector is much
+      slower than the single-threaded one. First, moving allocations from a thread-local dumpster to
+      the global garbage truck takes some time. Second, the <code>dfs</code> operation in a
+      concurrent environment must record the current set of children of an allocation, typically in
+      a separate heap-allocated structure, to prevent some concurrency bugs. It’s certainly possible
+      to mitigate the losses from the first issue, but the second is harder to handle.
     </p>
     <p>
-      My guess as to why the concurrent version is significantly slower when
-      using automatic collection triggering is that it’s a consequence of my
-      testing harness. Currently, it runs all the tests in a loop, so the
-      single-threaded benchmark could run directly after the multi-threaded one
-      and be forced to clean up some of its garbage.
+      My guess as to why the concurrent version is significantly slower when using automatic
+      collection triggering is that it’s a consequence of my testing harness. Currently, it runs all
+      the tests in a loop, so the single-threaded benchmark could run directly after the
+      multi-threaded one and be forced to clean up some of its garbage.
     </p>
-    <p>
-      In any event, let’s move on to the results from the multi-threaded
-      benchmark.
-    </p>
+    <p>In any event, let’s move on to the results from the multi-threaded benchmark.</p>
     <figure>
       <img
         src="/assets/img/dumpster/scaling.png"
         alt="A scatter plot, titled “Parallel garbage collector scaling.” The x-axis is labeled “Number of threads” and varies from 1 to 16. The y-axis is labeled “Time for 1M ops (ms)” and varies from 0 to 3500. On the legend, there are four series: dumpster (sync), dumpster (sync/manual), shredder, and Arc. The points associated with shredder’s series start out at 3500ms for 1 thread, scaling asymptotically down to roughly 1800ms at 6 threads. All other points are very close to zero."
       />
       <figcaption aria-hidden="true">
-        A scatter plot, titled “Parallel garbage collector scaling.” The x-axis
-        is labeled “Number of threads” and varies from 1 to 16. The y-axis is
-        labeled “Time for 1M ops (ms)” and varies from 0 to 3500. On the legend,
-        there are four series: dumpster (sync), dumpster (sync/manual),
-        shredder, and Arc. The points associated with shredder’s series start
-        out at 3500ms for 1 thread, scaling asymptotically down to roughly
-        1800ms at 6 threads. All other points are very close to zero.
+        A scatter plot, titled “Parallel garbage collector scaling.” The x-axis is labeled “Number
+        of threads” and varies from 1 to 16. The y-axis is labeled “Time for 1M ops (ms)” and varies
+        from 0 to 3500. On the legend, there are four series: dumpster (sync), dumpster
+        (sync/manual), shredder, and Arc. The points associated with shredder’s series start out at
+        3500ms for 1 thread, scaling asymptotically down to roughly 1800ms at 6 threads. All other
+        points are very close to zero.
       </figcaption>
     </figure>
     <p>
-      The only other concurrent garbage collector available for me to test
-      against was <code>shredder</code>, and it looks like it wasn’t much of a
-      competition.
+      The only other concurrent garbage collector available for me to test against was
+      <code>shredder</code>, and it looks like it wasn’t much of a competition.
     </p>
     <figure>
       <img
@@ -1236,127 +1109,110 @@ def mark_dirty(allocation):
         alt="A scatter plot, titled “Parallel garbage collector scaling (sans shredder).” The x-axis remains the same as before, but now the y-axis only goes up to 200ms. “shredder” has been removed from the legend, but otherwise it is the same as the previous image. The points associated with dumpster (sync) and dumpster (sync/manual) start out at roughly 80 ms for 1 thread, jump up to about 110 ms for 2 threads, then decrease asymptotically to around 70 ms for 16 threads. Meanwhile, the points associated with Arc start out at roughly 70 ms for 1 thread and decrease asymptotically with the thread count to around 25 ms for 15 threads."
       />
       <figcaption aria-hidden="true">
-        A scatter plot, titled “Parallel garbage collector scaling (sans
-        shredder).” The x-axis remains the same as before, but now the y-axis
-        only goes up to 200ms. “shredder” has been removed from the legend, but
-        otherwise it is the same as the previous image. The points associated
-        with dumpster (sync) and dumpster (sync/manual) start out at roughly 80
-        ms for 1 thread, jump up to about 110 ms for 2 threads, then decrease
-        asymptotically to around 70 ms for 16 threads. Meanwhile, the points
-        associated with Arc start out at roughly 70 ms for 1 thread and decrease
-        asymptotically with the thread count to around 25 ms for 15 threads.
+        A scatter plot, titled “Parallel garbage collector scaling (sans shredder).” The x-axis
+        remains the same as before, but now the y-axis only goes up to 200ms. “shredder” has been
+        removed from the legend, but otherwise it is the same as the previous image. The points
+        associated with dumpster (sync) and dumpster (sync/manual) start out at roughly 80 ms for 1
+        thread, jump up to about 110 ms for 2 threads, then decrease asymptotically to around 70 ms
+        for 16 threads. Meanwhile, the points associated with Arc start out at roughly 70 ms for 1
+        thread and decrease asymptotically with the thread count to around 25 ms for 15 threads.
       </figcaption>
     </figure>
     <p>
-      <code>dumpster</code> doesn’t scale as smoothly as I’d like with thread
-      count, but it’s a relief that performance does actually improve with
-      thread count, except for the jump from one thread to two. I think being
-      only 3x slower than Arc is a decent victory, especially for a project that
-      I wasn’t paid any money to do. I’m not much of an expert at
-      high-performance computing in concurrent situations, so trying to optimize
-      this further would likely just be an adventure in trying random things and
-      seeing if they yield an improvement. If anyone out there has clever ideas
-      on how to optimize this approach, let me know! My email is on the “About”
+      <code>dumpster</code> doesn’t scale as smoothly as I’d like with thread count, but it’s a
+      relief that performance does actually improve with thread count, except for the jump from one
+      thread to two. I think being only 3x slower than Arc is a decent victory, especially for a
+      project that I wasn’t paid any money to do. I’m not much of an expert at high-performance
+      computing in concurrent situations, so trying to optimize this further would likely just be an
+      adventure in trying random things and seeing if they yield an improvement. If anyone out there
+      has clever ideas on how to optimize this approach, let me know! My email is on the “About”
       page.
     </p>
     <h2 id="coda">Coda</h2>
     <p>
-      Over the last few months, I built a garbage collector for Rust from
-      scratch. I implemented a novel (ish) algorithm of my own design, got it to
-      work in both single-threaded and multi-threaded contexts, and showed that
-      it was actually pretty performant.
+      Over the last few months, I built a garbage collector for Rust from scratch. I implemented a
+      novel (ish) algorithm of my own design, got it to work in both single-threaded and
+      multi-threaded contexts, and showed that it was actually pretty performant.
     </p>
     <p>
       The implementation of this crate is now
-      <a href="https://crates.io/crates/dumpster">up on crates.io</a> and
-      available for anyone to download. It’s licensed under the GNU GPLv3.
+      <a href="https://crates.io/crates/dumpster">up on crates.io</a> and available for anyone to
+      download. It’s licensed under the GNU GPLv3.
     </p>
     <p>
       Special thanks to <a href="https://wisha.page/">Wisha</a>,
       <a href="https://seniormars.github.io/">Charlie</a>, and
-      <a href="https://shreyasminocha.me/">Shreyas</a> for reviewing this post,
-      fielding my bad questions, and putting up with me rambling about this for
-      nearly two months straight.
+      <a href="https://shreyasminocha.me/">Shreyas</a> for reviewing this post, fielding my bad
+      questions, and putting up with me rambling about this for nearly two months straight.
     </p>
     <h2 id="postscript">Postscript</h2>
     <p>
-      I have a few things that I thought were interesting along the way but
-      didn’t quite have a good spot to include in the story above, so they’ll
-      all be mish-mashed in here.
+      I have a few things that I thought were interesting along the way but didn’t quite have a good
+      spot to include in the story above, so they’ll all be mish-mashed in here.
     </p>
     <h3 id="ode-to-bad-good-ideas">Ode to bad good ideas</h3>
     <p>
-      The final, polished solution you see in this blog post is actually quite
-      far from my original idea. In particular, almost all of my first ideas for
-      handling concurrency didn’t work. Here’s a quick roll of them all:
+      The final, polished solution you see in this blog post is actually quite far from my original
+      idea. In particular, almost all of my first ideas for handling concurrency didn’t work. Here’s
+      a quick roll of them all:
     </p>
     <ul>
       <li>
-        Wrap a <code>Mutex</code> around every single allocation’s reference
-        count and hold them while doing <code>dfs</code>
+        Wrap a <code>Mutex</code> around every single allocation’s reference count and hold them
+        while doing <code>dfs</code>
       </li>
       <li>
-        Save on space in <code>Gc</code>s by tagging only the lowest bit instead
-        of adding an entire <code>usize</code>
+        Save on space in <code>Gc</code>s by tagging only the lowest bit instead of adding an entire
+        <code>usize</code>
       </li>
-      <li>
-        Make everything enable dynamic dispatch so we can have real Java-like
-        objects
-      </li>
+      <li>Make everything enable dynamic dispatch so we can have real Java-like objects</li>
       <li>Clean up allocations locally on every thread</li>
       <li>
-        Avoid directly dropping allocations and instead cleverly decrement their
-        reference count
+        Avoid directly dropping allocations and instead cleverly decrement their reference count
       </li>
     </ul>
     <h3 id="cool-nightly-tricks">Cool nightly tricks</h3>
     <p>
-      <code>Rc</code> and the other pointer types are somewhat “blessed” in that
-      they can access nightly features from the Rust compiler and still be
-      consumed by stable projects. <code>dumpster</code> has no such blessings.
+      <code>Rc</code> and the other pointer types are somewhat “blessed” in that they can access
+      nightly features from the Rust compiler and still be consumed by stable projects.
+      <code>dumpster</code> has no such blessings.
     </p>
     <p>
-      I would like to implement <code>CoerceUnsized</code> unconditionally for
-      all my garbage collectors, but that’s simply not possible on stable yet.
+      I would like to implement <code>CoerceUnsized</code> unconditionally for all my garbage
+      collectors, but that’s simply not possible on stable yet.
     </p>
     <p>
-      Likewise, pending the implementation of strict provenance, there’s
-      actually no way for a stable crate to manipulate the address portion of a
-      fat pointer. This means that even if I found some space optimization using
-      lower bit tagging, I wouldn’t be able to use it because it’s gated behind
-      a nightly feature.
+      Likewise, pending the implementation of strict provenance, there’s actually no way for a
+      stable crate to manipulate the address portion of a fat pointer. This means that even if I
+      found some space optimization using lower bit tagging, I wouldn’t be able to use it because
+      it’s gated behind a nightly feature.
     </p>
-    <h3 id="another-path-to-gcdyn-t">
-      Another path to <code>Gc&lt;dyn T&gt;</code>
-    </h3>
+    <h3 id="another-path-to-gcdyn-t">Another path to <code>Gc&lt;dyn T&gt;</code></h3>
     <p>
-      Without the ability to coerce <code>Gc</code> as an unsized type, I can’t
-      make <code>Collectable</code> object safe due to the function signature of
-      <code>accept</code>, which forces <code>Visitor</code> to also be
-      object-safe, forcing <code>visit</code> operations to also be object-safe.
+      Without the ability to coerce <code>Gc</code> as an unsized type, I can’t make
+      <code>Collectable</code> object safe due to the function signature of <code>accept</code>,
+      which forces <code>Visitor</code> to also be object-safe, forcing
+      <code>visit</code> operations to also be object-safe.
     </p>
     <p>
       I’ve thought of a slightly different approach, though. We can make
-      <code>Visitor</code> a single concrete type, and that makes
-      <code>Collectable</code> trivially object-safe. The downside here is that
-      I would then have to store all 5 of my current visitor implementations in
-      the same structure, and that loses a lot of my nice type safety features
-      and adds a large runtime penalty. I’m not very happy with that idea,
-      though.
+      <code>Visitor</code> a single concrete type, and that makes <code>Collectable</code> trivially
+      object-safe. The downside here is that I would then have to store all 5 of my current visitor
+      implementations in the same structure, and that loses a lot of my nice type safety features
+      and adds a large runtime penalty. I’m not very happy with that idea, though.
     </p>
     <h3 id="miri-rules">Miri rules</h3>
     <p>
       I would probably not have been able to finish this project without
       <a href="https://github.com/rust-lang/miri"><code>cargo miri</code></a
-      >. If you haven’t heard of it, you should download it right now and run
-      all of your Rust projects with it. It’s such a fantastic tool for
-      debugging unsafe code that I wish I could have it in other languages, too
-      - valgrind is a poor substitute for it when using C.
+      >. If you haven’t heard of it, you should download it right now and run all of your Rust
+      projects with it. It’s such a fantastic tool for debugging unsafe code that I wish I could
+      have it in other languages, too - valgrind is a poor substitute for it when using C.
     </p>
     <h3 id="testing-and-debugging">Testing and debugging</h3>
     <p>
-      Early on, I had just a few handwritten tests. The first reference graph
-      that I found that gave me trouble looked like this:
+      Early on, I had just a few handwritten tests. The first reference graph that I found that gave
+      me trouble looked like this:
     </p>
     <pre class="mermaid">
 graph LR
@@ -1367,22 +1223,19 @@ graph LR
   c --&gt; d</pre
     >
     <p>
-      However, once I had simple graphs with multiple cycles down, it was hard
-      to come up with new tests. As a result, I resorted to fuzzing, using the
-      same approach as my benchmark - randomly generating references and then
-      seeing if they got cleaned up properly.
+      However, once I had simple graphs with multiple cycles down, it was hard to come up with new
+      tests. As a result, I resorted to fuzzing, using the same approach as my benchmark - randomly
+      generating references and then seeing if they got cleaned up properly.
     </p>
     <p>
-      Debugging the results of those fuzzed tests absolutely sucked, though. The
-      experience of trying to find the source of an issue was awful, so I ended
-      up having to make some (crude) tools to make the process easier.
-      Eventually, I had settled on printing out the reference graph at choice
-      times during the run of my tests and then visualizing them to get a good
-      guess of what was wrong. However, when making the concurrent
-      implementation, printing something can change the execution behavior of
-      the program. Not only that, it’s not always obvious what the issue is. I
-      had one bug which only occurred after several thousand operations had
-      completed, resulting in reference graphs that looked like this:
+      Debugging the results of those fuzzed tests absolutely sucked, though. The experience of
+      trying to find the source of an issue was awful, so I ended up having to make some (crude)
+      tools to make the process easier. Eventually, I had settled on printing out the reference
+      graph at choice times during the run of my tests and then visualizing them to get a good guess
+      of what was wrong. However, when making the concurrent implementation, printing something can
+      change the execution behavior of the program. Not only that, it’s not always obvious what the
+      issue is. I had one bug which only occurred after several thousand operations had completed,
+      resulting in reference graphs that looked like this:
     </p>
     <pre class="mermaid">
 graph LR
@@ -1486,8 +1339,8 @@ graph LR
   2892 --&gt; 2867</pre
     >
     <p>
-      The graph above was made by fuzzing my garbage collector, using the same
-      approach as my benchmarks.
+      The graph above was made by fuzzing my garbage collector, using the same approach as my
+      benchmarks.
     </p>
 
     <footer>Copyright (C) 2023 Clayton Ramsey. All rights reserved.</footer>
