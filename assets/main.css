@@ -16,13 +16,12 @@ body {
   }
 
   a:link {
-    color:cadetblue;
+    color: cadetblue;
   }
 
   a:visited {
-    color:orchid;
+    color: orchid;
   }
-
 
   /* Fixes for mermaid's appearance */
   pre.mermaid {
@@ -40,7 +39,6 @@ body {
 
 pre.mermaid {
   text-align: center;
-
 }
 
 code {
@@ -79,4 +77,15 @@ img {
 footer {
   text-align: center;
   font-size: 12px;
+}
+
+blockquote {
+  margin-left: 5px;
+  padding-left: 10px;
+  border-left: 2px solid;
+  footer {
+    text-align: left;
+    margin-left: 20px;
+    font-size: 15px;
+  }
 }
