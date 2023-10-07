@@ -16,11 +16,11 @@ body {
   }
 
   a:link {
-    color: cadetblue;
+    color: lightskyblue;
   }
 
   a:visited {
-    color: orchid;
+    color: violet;
   }
 
   /* Fixes for mermaid's appearance */
