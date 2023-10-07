@@ -11,7 +11,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="Clayton Ramsey" />
-    <meta name="description" content="If carcinization happens when languages evolve to be more like Rust, then what do you call it when Rust evolves to be more like Java? Caffeination?" />
+    <meta
+      name="description"
+      content="If carcinization happens when languages evolve to be more like Rust, then what do you call it when Rust evolves to be more like Java? Caffeination?"
+    />
     <meta name="keywords" content="Rust, garbage collector, dumpster" />
 
     <title>I built a garbage collector for a language that doesn't need one</title>
@@ -156,7 +159,7 @@ x.0.set(Rc::clone(&amp;x));
     </p>
     <ol type="1">
       <li>
-        An allocation graph \(G = (V, E, r)\) is a directed graph with a root node \(r V\) whose
+        An allocation graph \(G = (V, E, r)\) is a directed graph with a root node \(r \in V\) whose
         indegree is zero.
       </li>
       <li>
@@ -174,7 +177,8 @@ x.0.set(Rc::clone(&amp;x));
       corresponding allocation.
     </p>
     <p>
-      I’ll roughly outline our approach to determining whether some node \(n: r\) is accessible.
+      I’ll roughly outline our approach to determining whether some node \(n: \neq r\) is
+      accessible.
     </p>
     <ol type="1">
       <li>
@@ -182,10 +186,11 @@ x.0.set(Rc::clone(&amp;x));
         vertex set is \(W\), preserving all edges connecting nodes in \(W\).
       </li>
       <li>
-        Find the set of nodes \(A W\) for which the indegree of each \(a A\) in \(H\) is
+        Find the set of nodes \(A \subseteq W\) for which the indegree of each \(a \in A\) in \(H\)
+        is
         <em>not</em> equal to its indegree in \(G\).
       </li>
-      <li>For each \(a A\), mark it and its descendants as accessible.</li>
+      <li>For each \(a \in A\), mark it and its descendants as accessible.</li>
       <li>If and only if \(n\) was marked as accessible, it is accessible.</li>
     </ol>
     <p>Here’s a serpentine implementation in pseudocode, if that’s what you prefer.</p>

@@ -151,7 +151,7 @@ pub struct TTEntry {
     </ul>
     <p>
       If we assume that all values of an <code>Eval</code> are used, that means we need to express
-      \(16 + \) bits of information in each entry. To avoid rounding up to 24 bits (for
+      \(16 + \log_2(3) \) bits of information in each entry. To avoid rounding up to 24 bits (for
       word-alignment), we can squeeze that extra bound-type information in with the other entry-type
       information.
     </p>
