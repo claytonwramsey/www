@@ -14,6 +14,15 @@
     <atom:link href="https://claytonwramsey.github.io/blog/rss.xml" rel="self" type="application/rss_xml"/>
     
     <item>
+        <title>Writing my own damn HTML</title>
+        <link>https://claytonwramsey.github.io/blog/own-html.html</link>
+        <description>The future of the web doesn't have to be webapp frameworks and cookie prompts.</description>
+        <pubDate>Sat, 07 Oct 2023 14:51 CST</pubDate>
+        <guid>https://claytonwramsey.github.io/blog/own-html.html</guid>
+        <author>claytonwramsey@gmail.com (Clayton Ramsey)</author>
+    </item>
+
+    <item>
         <title>One line of code cost me 9.2% of my matches</title>
         <link>https://claytonwramsey.github.io/blog/sixty-four-elo.html</link>
         <description>I can either write a hundred lines of code for one or two Elo or find one or two wrong lines of code for a hundred Elo. Such is life.</description>
