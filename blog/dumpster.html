@@ -858,10 +858,6 @@ impl&lt;T: Collectable + ?Sized&gt; Collectable for Mutex&lt;T&gt; {
         src="/assets/img/dumpster/garbagetruck.jpg"
         alt="A hand-drawn garbage truck in ink on a white background. It’s crudely done, as if drawn by the sort of person who knows what perspective is but doesn’t quite understand how it works."
       />
-      <figcaption aria-hidden="true">
-        A hand-drawn garbage truck in ink on a white background. It’s crudely done, as if drawn by
-        the sort of person who knows what perspective is but doesn’t quite understand how it works.
-      </figcaption>
     </figure>
     <p>
       You’ve made it this far into this (admittedly rather lengthy) post. Enjoy this hand-drawn
@@ -1044,15 +1040,6 @@ def mark_dirty(allocation):
         src="/assets/img/dumpster/single_threaded.png"
         alt="A violin plot, titled “Single-threaded GC comparison.” The x-axis is labeled “Runtime for 1M ops (ms),” and the y-axis is labeled “Garbage collector,” with various collectors labeled on the ticks. In order, the garbage collectors on the y-axis are Arc, Rc, shredder, bacon-rajan-cc, gc, dumpster (sync/manual), dumpster (sync), dumpster (unsync/manual), and dumpster (unsync). The x-axis ranges from 0 ms to 4000 ms. All of the violins, except for shredder’s, are very near to the left side. The violin labeled “shredder” is far off to the right side, with a mean of roughly 3700ms."
       />
-      <figcaption aria-hidden="true">
-        A violin plot, titled “Single-threaded GC comparison.” The x-axis is labeled “Runtime for 1M
-        ops (ms),” and the y-axis is labeled “Garbage collector,” with various collectors labeled on
-        the ticks. In order, the garbage collectors on the y-axis are Arc, Rc, shredder,
-        bacon-rajan-cc, gc, dumpster (sync/manual), dumpster (sync), dumpster (unsync/manual), and
-        dumpster (unsync). The x-axis ranges from 0 ms to 4000 ms. All of the violins, except for
-        shredder’s, are very near to the left side. The violin labeled “shredder” is far off to the
-        right side, with a mean of roughly 3700ms.
-      </figcaption>
     </figure>
     <p>
       This plot doesn’t tell us much other than that <code>shredder</code> is slow. To take a closer
@@ -1063,12 +1050,6 @@ def mark_dirty(allocation):
         src="/assets/img/dumpster/single_threaded_sans_shredder.png"
         alt="The same violin plot as before, but now shredder’s violin and y-axis label have been removed. The x-axis now varies from 40 to 160 ms. The violin labeled Rc is furthest to the left, followed by Arc, bacon-rajan-cc, dumpster (unsync), dumpster (unsync/manual), dumpster (sync/manual), gc, and finally dumpster (sync)."
       />
-      <figcaption aria-hidden="true">
-        The same violin plot as before, but now shredder’s violin and y-axis label have been
-        removed. The x-axis now varies from 40 to 160 ms. The violin labeled Rc is furthest to the
-        left, followed by Arc, bacon-rajan-cc, dumpster (unsync), dumpster (unsync/manual), dumpster
-        (sync/manual), gc, and finally dumpster (sync).
-      </figcaption>
     </figure>
     <p>
       <code>dumpster</code>’s unsync implementation is in a decent position, beat out only by the
@@ -1095,14 +1076,6 @@ def mark_dirty(allocation):
         src="/assets/img/dumpster/scaling.png"
         alt="A scatter plot, titled “Parallel garbage collector scaling.” The x-axis is labeled “Number of threads” and varies from 1 to 16. The y-axis is labeled “Time for 1M ops (ms)” and varies from 0 to 3500. On the legend, there are four series: dumpster (sync), dumpster (sync/manual), shredder, and Arc. The points associated with shredder’s series start out at 3500ms for 1 thread, scaling asymptotically down to roughly 1800ms at 6 threads. All other points are very close to zero."
       />
-      <figcaption aria-hidden="true">
-        A scatter plot, titled “Parallel garbage collector scaling.” The x-axis is labeled “Number
-        of threads” and varies from 1 to 16. The y-axis is labeled “Time for 1M ops (ms)” and varies
-        from 0 to 3500. On the legend, there are four series: dumpster (sync), dumpster
-        (sync/manual), shredder, and Arc. The points associated with shredder’s series start out at
-        3500ms for 1 thread, scaling asymptotically down to roughly 1800ms at 6 threads. All other
-        points are very close to zero.
-      </figcaption>
     </figure>
     <p>
       The only other concurrent garbage collector available for me to test against was
@@ -1113,15 +1086,6 @@ def mark_dirty(allocation):
         src="/assets/img/dumpster/scaling_sans_shredder.png"
         alt="A scatter plot, titled “Parallel garbage collector scaling (sans shredder).” The x-axis remains the same as before, but now the y-axis only goes up to 200ms. “shredder” has been removed from the legend, but otherwise it is the same as the previous image. The points associated with dumpster (sync) and dumpster (sync/manual) start out at roughly 80 ms for 1 thread, jump up to about 110 ms for 2 threads, then decrease asymptotically to around 70 ms for 16 threads. Meanwhile, the points associated with Arc start out at roughly 70 ms for 1 thread and decrease asymptotically with the thread count to around 25 ms for 15 threads."
       />
-      <figcaption aria-hidden="true">
-        A scatter plot, titled “Parallel garbage collector scaling (sans shredder).” The x-axis
-        remains the same as before, but now the y-axis only goes up to 200ms. “shredder” has been
-        removed from the legend, but otherwise it is the same as the previous image. The points
-        associated with dumpster (sync) and dumpster (sync/manual) start out at roughly 80 ms for 1
-        thread, jump up to about 110 ms for 2 threads, then decrease asymptotically to around 70 ms
-        for 16 threads. Meanwhile, the points associated with Arc start out at roughly 70 ms for 1
-        thread and decrease asymptotically with the thread count to around 25 ms for 15 threads.
-      </figcaption>
     </figure>
     <p>
       <code>dumpster</code> doesn’t scale as smoothly as I’d like with thread count, but it’s a
