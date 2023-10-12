@@ -636,9 +636,8 @@ graph LR
 
   style nowhere fill:#FFFFFF00, stroke:#FFFFFF00;</pre
     >
-    <p>{:start=“4”}</p>
     <ol type="1">
-      <li>
+      <li value="4">
         A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to
         \(r\), then moving the original <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s
         second slot.
@@ -658,9 +657,8 @@ graph LR
 
   style nowhere fill:#FFFFFF00, stroke:#FFFFFF00;</pre
     >
-    <p>{:start=“5”}</p>
     <ol type="1">
-      <li>
+      <li value="5">
         <code>dfs</code> continues, now visiting the second slot in \(x\). Seeing another reference
         to \(x\), we decrement the number of unaccounted-for references to 0.
       </li>
