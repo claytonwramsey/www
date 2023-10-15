@@ -6,13 +6,15 @@ body {
   padding: 0 10px;
   /* Use system fonts */
   font-family: system-ui, sans-serif;
+  color: #222;
+  background-color: #eee;
 }
 
 /* Change color in night mode */
 @media (prefers-color-scheme: dark) {
   body {
-    color: white;
-    background-color: black;
+    color: #eee;
+    background-color: #222;
   }
 
   a:link {
@@ -26,13 +28,13 @@ body {
   /* Fixes for mermaid's appearance */
   pre.mermaid {
     path {
-      stroke: white !important;
-      fill: white;
+      stroke: #eee !important;
+      fill: #eee;
     }
 
     .edgeLabel {
-      background-color: black !important;
-      color: white !important;
+      background-color: #222 !important;
+      color: #eee !important;
     }
   }
 }
