@@ -7,7 +7,6 @@ body {
   /* Use system fonts */
   font-family: system-ui, sans-serif;
   color: #222;
-  background-color: #eee;
 }
 
 /* Change color in night mode */
