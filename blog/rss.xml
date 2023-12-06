@@ -12,7 +12,16 @@
     <managingEditor>claytonwramsey@gmail.com (Clayton Ramsey)</managingEditor>
     <webMaster>claytonwramsey@gmail.com (Clayton Ramsey)</webMaster>
     <atom:link href="https://claytonwramsey.github.io/blog/rss.xml" rel="self" type="application/rss_xml"/>
-    
+
+    <item>
+        <title>Things I learned from teaching</title>
+        <link>https://claytonwramsey.github.io/blog/learned-from-teaching.html</link>
+        <description>This spring, I taught an undergraduate class on chess engines. I probably learned more than any of my students.</description>
+        <pubDate>Wed, 05 Dec 2023 14:44 CST</pubDate>
+        <guid>https://claytonwramsey.github.io/blog/learned-from-teaching.html</guid>
+        <author>claytonwramsey@gmail.com (Clayton Ramsey)</author>
+    </item>
+
     <item>
         <title>Writing my own damn HTML</title>
         <link>https://claytonwramsey.github.io/blog/own-html.html</link>
