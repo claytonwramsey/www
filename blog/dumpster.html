@@ -30,7 +30,6 @@
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     ></script>
     <script src="/assets/js/highlight.min.js"></script>
-    <script src="/assets/js/mermaid.min.js"></script>
 
     <script>
       hljs.highlightAll();
@@ -471,13 +470,7 @@ struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer 
       allocation \(r\), where \(a\) can only be accessed from \(r\) and \(b\) can only be accessed
       from \(a\).
     </p>
-    <pre class="mermaid">
-flowchart LR
-  r(&quot;r&quot;)
-
-  a --&gt; b
-  r --&gt; a</pre
-    >
+    <img src="/assets/img/dumpster/chain2.dot.svg" />
     <p>
       Now, consider performing a depth-first search starting from \(a\). First, we record that \(a\)
       has 1 unaccounted-for-reference in
@@ -488,14 +481,7 @@ flowchart LR
       However, between when we record \(a\)’s reference count and examine \(b\), another malicious
       thread mutates \(b\), adding a back-reference from \(b\) to \(a\).
     </p>
-    <pre class="mermaid">
-flowchart LR
-  r(&quot;r&quot;)
-
-  a --&gt; b
-  b --&gt; a
-  r --&gt; a</pre
-    >
+    <img src="/assets/img/dumpster/onecycle.dot.svg" />
     <p>
       Then, the depth-first search will return to \(a\), decrement the number of unaccounted
       references, and assume that all incoming references to \(a\) and \(b\) were totally accounted
@@ -564,24 +550,12 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
       reference graph with \(a\) pointing to \(b\) and \(r\) pointing to \(a\). Since every
       <code>Gc</code> must be annotated with a tag, let’s say they’re all tagged with 0.
     </p>
-    <pre class="mermaid">
-graph LR
-  r(&quot;r&quot;)
-
-  r -- &quot;0&quot; --&gt; a
-  a -- &quot;0&quot; --&gt; b</pre
-    >
+    <img src="/assets/img/dumpster/chain2labeled.dot.svg" />
     <p>
       Next, when <code>dfs</code> begins, <code>COLLECTING_TAG</code> is incremented to 1. As a
       result, the new reference created by a malicious thread must be tagged with 1.
     </p>
-    <pre class="mermaid">
-graph LR
-   r(&quot;r&quot;)
-   r -- &quot;0&quot; --&gt; a
-   a -- &quot;0&quot; --&gt; b
-   b -- &quot;1&quot; --&gt; a</pre
-    >
+    <img src="/assets/img/dumpster/onecyclelabeled.dot.svg" />
     <p>
       Now, when <code>dfs</code> visits the edge pointing from \(b\) to \(a\), it sees that the
       reference is labeled with a tag of 1, and therefore both \(b\) and \(a\) must be accessible -
@@ -607,16 +581,7 @@ graph LR
       and all existing references are tagged with 0. For the sake of clarity, I’ll draw the arrow
       representing the first slot in \(x\) with a solid line and the second slot with a dashed line.
     </p>
-    <pre class="mermaid">
-graph LR
-  r(&quot;r&quot;)
-
-  r -- &quot;0&quot; --&gt; x
-  x -- &quot;0&quot; --&gt; x
-  x -.-&gt; nowhere[ ]
-
-  style nowhere fill:#FFFFFF00, stroke:#FFFFFF00;</pre
-    >
+    <img src="/assets/img/dumpster/dash0.dot.svg" />
     <p>Now, let’s have <code>dfs</code> begin, starting at \(x\).</p>
     <ol type="1">
       <li>We increment <code>COLLECTING_TAG</code> to 1.</li>
@@ -624,40 +589,19 @@ graph LR
       <li>
         <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self
         reference in that slot. \(x\) now has 1 unaccounted-for reference.
+        <img src="/assets/img/dumpster/dash1.dot.svg" />
       </li>
-    </ol>
-    <pre class="mermaid">
-graph LR
-  r(&quot;r&quot;)
-
-  r -- &quot;0&quot; --&gt; x
-  x -- &quot;1&quot; --&gt; x
-  x -.-&gt; nowhere[ ]
-
-  style nowhere fill:#FFFFFF00, stroke:#FFFFFF00;</pre
-    >
-    <ol type="1">
       <li value="4">
         A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to
         \(r\), then moving the original <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s
         second slot.
-      </li>
-    </ol>
-    <pre class="rust"><code>fn do_evil(r_to_x: Gc&lt;X&gt;) {
+
+        <pre class="rust"><code>fn do_evil(r_to_x: Gc&lt;X&gt;) {
     let z = std::mem::take(&amp;mut *r_to_x.x1.lock().unwrap());
     *z.x2.lock().unwrap() = r_to_x;
 }</code></pre>
-    <pre class="mermaid">
-graph LR
-  r(&quot;r&quot;)
-
-  r -- &quot;1&quot; --&gt; x
-  x --&gt; nowhere[ ]
-  x -. &quot;0&quot; .-&gt; x
-
-  style nowhere fill:#FFFFFF00, stroke:#FFFFFF00;</pre
-    >
-    <ol type="1">
+        <img src="/assets/img/dumpster/dash2.dot.svg" />
+      </li>
       <li value="5">
         <code>dfs</code> continues, now visiting the second slot in \(x\). Seeing another reference
         to \(x\), we decrement the number of unaccounted-for references to 0.
@@ -1181,14 +1125,7 @@ def mark_dirty(allocation):
       Early on, I had just a few handwritten tests. The first reference graph that I found that gave
       me trouble looked like this:
     </p>
-    <pre class="mermaid">
-graph LR
-  a --&gt; b
-  b --&gt; d
-  d --&gt; a
-  a --&gt; c
-  c --&gt; d</pre
-    >
+    <img src="/assets/img/dumpster/test4.dot.svg" />
     <p>
       However, once I had simple graphs with multiple cycles down, it was hard to come up with new
       tests. As a result, I resorted to fuzzing, using the same approach as my benchmark - randomly
@@ -1204,107 +1141,7 @@ graph LR
       issue is. I had one bug which only occurred after several thousand operations had completed,
       resulting in reference graphs that looked like this:
     </p>
-    <pre class="mermaid">
-graph LR
-  2892 --&gt; 2883
-  2892 --&gt; 2852
-
-  2849 --&gt; 2848
-  2849 --&gt; 2852
-
-  2868 --&gt; 2890
-  2868 --&gt; 2837
-
-  2776 --&gt; 2762
-
-  2853 --&gt; 2857
-  2853 --&gt; 2871
-
-  2822 --&gt; 2814
-
-  2836 --&gt; 2822
-
-  2837 --&gt; 2868
-
-  2848 --&gt; 2801
-
-  2835 --&gt; 2765
-
-  2851 --&gt; 2783
-  2851 --&gt; 2852
-
-  2828 --&gt; 2878
-
-  2857 --&gt; 2862
-  2857 --&gt; 2837
-
-  2713 --&gt; 2698
-  2713 --&gt; 2835
-
-  2698 --&gt; 2685
-  2698 --&gt; 2712
-  2698 --&gt; 2742
-
-  2813 --&gt; 2819
-  2813 --&gt; 2783
-
-  2772 --&gt; 2713
-  2772 --&gt; 2813
-  2772 --&gt; 2823
-  2772 --&gt; 2846
-
-  2771 --&gt; 2807
-  2771 --&gt; 2759
-  2771 --&gt; 2851
-
-  2881 --&gt; 2771
-  2881 --&gt; 2837
-
-  2783 --&gt; 2836
-  2783 --&gt; 2807
-  2783 --&gt; 2849
-  2783 --&gt; 2843
-
-  2890 --&gt; 2901
-
-  2765 --&gt; 2750
-  2765 --&gt; 2776
-  2765 --&gt; 2776
-  2765 --&gt; 2849
-
-  2819 --&gt; 2853
-
-  root --&gt; 2871
-  root --&gt; 2890
-  root --&gt; 2902
-  root --&gt; 2900
-  root --&gt; 2842
-  root --&gt; 2837
-  root --&gt; 2877
-  root --&gt; 2869
-  root --&gt; 2873
-  root --&gt; 2867
-  root --&gt; 2881
-  root --&gt; 2868
-  root --&gt; 2897
-  root --&gt; 2884
-  root --&gt; 2855
-  root --&gt; 2892
-  root --&gt; 2852
-  root --&gt; 2822
-  root --&gt; 2901
-  root --&gt; 2874
-  root --&gt; 2899
-  root --&gt; 2893
-  root --&gt; 2828
-  root --&gt; 2883
-  root --&gt; 2896
-  root --&gt; 2903
-  root --&gt; 2904
-  root --&gt; 2772
-
-  2892 --&gt; 2867</pre
-    >
+    <img src="/assets/img/dumpster/evil.dot.svg" />
     <p>
       The graph above was made by fuzzing my garbage collector, using the same approach as my
       benchmarks.

@@ -23,23 +23,10 @@ body {
   a:visited {
     color: violet;
   }
-
-  /* Fixes for mermaid's appearance */
-  pre.mermaid {
-    path {
-      stroke: #eee !important;
-      fill: #eee;
-    }
-
-    .edgeLabel {
-      background-color: #222 !important;
-      color: #eee !important;
-    }
-  }
 }
 
-pre.mermaid {
-  text-align: center;
+img {
+  fill: currentColor !important;
 }
 
 code {
