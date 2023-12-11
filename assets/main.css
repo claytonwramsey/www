@@ -78,7 +78,8 @@ blockquote {
   }
 }
 
-@media only screen and (min-width: 300px) and (max-width: 750px) {
+/* Raise text size on small screens */
+@media only screen and (min-width: 300px) and (max-width: 900px) {
   body {
     font-size: 25px;
   }
