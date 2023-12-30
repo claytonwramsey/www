@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<!-- 
+  Hi! Thanks for checking out this website. 
+  I made it myself! 
+  This website was made by hand. 
+  I intentionally haven't minified anything so you can see how it all fits together.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="TODO" />
+    <meta name="keywords" content="robots, Rust, SIMD" />
+
+    <title>Making robots plan faster with SIMD and Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/hljs.css" />
+    <link rel="icon" href="/assets/img/favicon.ico" />
+
+    <script src="/assets/js/highlight.min.js"></script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+
+    <script>
+      hljs.highlightAll();
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/recipes.html">Recipes</a>
+      </nav>
+    </header>
+    <h1>Making robots plan faster with SIMD and Rust</h1>
+    <p>
+      I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
+      and very stressful at the same time.
+    </p>
+    <h2>The problem at hand</h2>
+    <p>
+      A few months ago, two postdocs in my lab published a
+      <a
+        href="https://arxiv.org/abs/2309.14545v2?trk=feed_main-feed-card_reshare_feed-article-content"
+        >paper</a
+      >
+      demonstrating dramatic speedups by using SIMD and precompilation for motion planning. However,
+      their approach assumed that they had access to a primitive representation of the environment,
+      which is rarely the case in reality. In many applications, robots must plan using their
+      observed sensor data - namely, pointclouds.
+    </p>
+    <p>
+      In most sampling-based planning algorithms, such as RRT and PRM, collision checking is
+      far-and-away the most commonly called (and therefore the most expensive) subroutine. This
+      means that we have to develop methods for efficiently checking whether our robot is in
+      collision with a pointcloud.
+    </p>
+    <p>
+      We can start by assuming that our robot can be modeled as a set of balls over some distance
+      metric. Using the \(L^2\) distance metric, these balls are spheres, which meshes conveniently
+      with sphere-hierarchy representations of robot geometry. This lets us neatly reduce the
+      problem of collision-checking all kinds of robot geometries into one simple case: checking
+      whether a single sphere collides with a set of points.
+    </p>
+    <h2>Review: \(k\)-d trees</h2>
+    <p>
+      There's a simple solution to our collision-checking problem using a nearest-neighbors data
+      structure. Given a set of points \(P\) in the pointcloud, construct a nearest-neighbor data
+      structure over \(P\). Then, whenever we have to check whether some sphere with center \(x\)
+      and radius \(r\) is in collision, we find the closest point \(p\) in \(P\) to \(x\), and check
+      whether the distance from \(x\) to \(p\) is greater than \(r\).
+    </p>
+    <p>
+      The canonical approach to computing nearest-neighbors is a \(k\)-d tree - a class of space
+      partitioning tree. There are many formulations, but I'll use a median-partitioning tree in
+      this case.
+    </p>
+    <p>
+      At each branch of a \(k\)-d tree, we split the the space into two sub-volumes, each containing
+      the same number of points, based on the median value along one dimension. For instance, if we
+      wanted to split the points \(\{(2, 3), (4, 4)\}\) along the first dimension, we'd choose a
+      split value of 3, and if we were splitting along the second dimension, we'd choose a split of
+      3.5.
+    </p>
+    <p><strong>TODO: add image of \(k\)-d tree partitioning here.</strong></p>
+    <p>There are many ways of representing a \(k\)-d tree, but</p>
+  </body>
+</html>
