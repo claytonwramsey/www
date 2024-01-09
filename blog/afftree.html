@@ -68,7 +68,9 @@
       metric. Using the \(L^2\) distance metric, these balls are spheres, which meshes conveniently
       with sphere-hierarchy representations of robot geometry. This lets us neatly reduce the
       problem of collision-checking all kinds of robot geometries into one simple case: checking
-      whether a single sphere collides with a set of points.
+      whether a some set of spheres collides with a set of points. In addition to that, we would
+      like to be able to do our collision checking in parallel at an instruction level to radically
+      improve our performance.
     </p>
     <h2>Review: \(k\)-d trees</h2>
     <p>
@@ -88,9 +90,168 @@
       the same number of points, based on the median value along one dimension. For instance, if we
       wanted to split the points \(\{(2, 3), (4, 4)\}\) along the first dimension, we'd choose a
       split value of 3, and if we were splitting along the second dimension, we'd choose a split of
-      3.5.
+      3.5. For efficiency, we'll have our tree split first on dimension 0 (\(x\)), then dimension 1
+      (\(y\)), and so on, until looping back around to dimension 0.
     </p>
-    <p><strong>TODO: add image of \(k\)-d tree partitioning here.</strong></p>
-    <p>There are many ways of representing a \(k\)-d tree, but</p>
+    <figure>
+      <img src="/assets/img/afftree/kdt_partition.svg" />
+      <figcaption>The partitioned cells of a \(k\)-d tree.</figcaption>
+    </figure>
+    <p>
+      When querying the nearest neighbor, we first do a quick binary search of the tree to find a
+      candidate closest point. Next, we perform a branch-and-bound search of every other subtree,
+      escaping early if the test point is further from a volume from the candidate-closest point.
+      I'm staying light on the exact details here, since the point of this article is not to explain
+      how \(k\)-d trees work.
+    </p>
+    <p>
+      These are very nice data structures, but they suffer from two core issues for our application:
+      first, \(k\)-d trees have extremely poor cache locality due to the fact that they jump around
+      everywhere during a search. Second, this approach is not at all amenable to SIMD parallelism,
+      which typically requires some amount of branchlessness. How do we make something which is
+      similarly performant without the same limitations?
+    </p>
+    <h2>Being stupid faster</h2>
+    <p>
+      We can start by noticing a neat quirk of the first pass on a \(k\)-d tree: the first downward
+      pass can be done completely branchlessly and in a very cache-friendly way. To do so, we'll
+      need to bring out a special data layout for trees, called an Eytzinger layout. This
+      <a href="https://algorithmica.org/en/eytzinger">Algorithmica article</a> gives a beautiful
+      explanation of it, but I'll try my own hand at an explanation as well.
+    </p>
+    <figure>
+      <img src="/assets/img/afftree/eytzinger.svg" />
+      <figcaption>An illustration of the Eytzinger layout on a tree with 7 elements.</figcaption>
+    </figure>
+    <p>
+      In an Eytzinger layout, we implicitly describe the location of each branch in the tree by its
+      location in a buffer. We store all the tests in some array (let's call it
+      <code>tests</code> for convenience), and for some branch-point at index \(i\), the left child
+      will be at position \(2i + 1\), while the right child will be at position \(2i + 2\). If we
+      assume that the number of points in the tree is a power of 2, and that the tree is perfectly
+      balanced, we can create an extremely efficient method for the first pass through the tree.
+    </p>
+    <pre class="rust"><code>struct ForwardTree&lt;const K: usize> {
+    /// contains 2^p - 1 tests
+    tests: Box&lt;[f32]>,
+    /// contains 2^p points
+    points: Box&lt;[[f32; K]]>,
+}
+
+/// Return the index representing 
+/// the cell in the tree containing `point`.
+fn first_pass&lt;const K: usize>(
+    t: &ForwardTree&lt;K>, 
+    point: [f32; K],
+) -> usize {
+    let mut k = 0;
+    let mut i = 0;
+    while i &lt; t.tests.len() {
+        i = 2 * i + 1 + usize::from(t.tests[i] &lt; point[k]);
+        k = (k + 1) % K;
+    }
+    
+    i - t.tests.len()
+}</code></pre>
+    <p>
+      This first pass a <code>usize</code> identifying which point in <code>points</code> is closest
+      to <code>point</code>. Approximation isn't really good enough for collision checking, but
+      we'll find some other tricks for that later. For now, we'll notice that it's pretty easy to
+      render this code as a parallel implementation using the nightly
+      <code>portable_simd</code> feature for Rust.
+    </p>
+    <pre class="rust"><code>fn first_pass_simd&lt;const K: usize, const L: usize>(
+    t: &ForwardTree&lt;K>,
+    points: &[Simd&lt;f32, L>; K],
+) -> Simd&lt;isize, L>
+where
+    LaneCount&lt;L>: SupportedLaneCount,
+{
+    let mut k = 0;
+    let mut i = Simd::splat(0);
+    let nlog2 = t.points.len().trailing_zeros();
+    
+    for _ in 0..nlog2 {
+        // Gather all tests
+        let test_ptrs = Simd::splat(t.tests.as_ptr()).wrapping_offset(i);
+        let relevant_tests: Simd&lt;f32, L> = unsafe { 
+            Simd::gather_ptr(test_ptrs) 
+        };
+
+        // Compare points to the tests
+        let cmp_results: Mask&lt;isize, L> = points[k]
+            .simd_ge(relevant_tests)
+            .into();
+
+        // Update i and k
+        let one = Simd::splat(1);
+        i = (i &lt;&lt; one) + one + (cmp_results.to_int() & one);
+        k = (k + 1) % K;
+    }
+    
+    i - Simd::splat(t.tests.len() as isize)
+}</code></pre>
+    <p>
+      In this case, we use <code>isize</code> instead of <code>usize</code> because it makes it a
+      little easier to convert masks and SIMD vectors, but otherwise the above code does the exact
+      same thing as <code>first_pass</code>, but this time in parallel.
+    </p>
+    <p>
+      Once we've extracted the identifier for our approximate-nearest-neighbor, we can do a quick
+      test for whether it's in collision by computing the distance to the center of the query sphere
+    </p>
+    <pre class="rust"><code>fn in_collision&lt;const K: usize&gt;(
+    t: &ForwardTree&lt;K&gt;,
+    center: &[f32; K],
+    radius: f32,
+) -> bool {
+    let nearest_id = first_pass(t, center);
+    center
+        .iter()
+        .zip(t.points[nearest_id].iter())
+        .map(|(a, b)| (a - b).powi(2))
+        .sum::&lt;f32&gt;()
+        &lt;= radius
+}</code></pre>
+    <p>
+      Of course, we can also do our collision checking in a SIMD parallel manner; however, the
+      resulting code would be rather verbose and not very interesting. I'll skip ahead to the good
+      part, which is the performance results.
+    </p>
+    <p>
+      At these scales, a \(k\)-d tree is the best competitor. Fortunately,
+      <code><a href="https://github.com/sdd/kiddo">kiddo</a></code> is one of the fastest \(k\)-d
+      tree implementations out there, and it's also easily installed via Cargo. I'll be using that
+      as a rough baseline for pointcloud-collision-checking. I found that the fastest results came
+      from using <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so I'm using that
+      as my baseline.
+    </p>
+    <img
+      src="/assets/img/afftree/forward_vs_kdt_query.svg"
+      alt="A 2D line plot titled 'Query performance of collision-checking structures.' 
+      The x-axis is labeled as 'Number of points in cloud,' ranging from 0 to 60000, and the y-axis is labeled as 'Collision check time (ns)'. 
+      There are three lines: 'k-d tree (kiddo)' in blue, 'forward tree, sequential' in green, and 'forward tree, SIMD' in green. 
+      All the lines grow roughly logarithmically. The blue line starts at around 60 ns, then grows to 250 ns. 
+      The orange line starts at around 20 ns, then grows to 60 ns. 
+      The green line starts at around 10 ns then grows to 20 ns."
+    />
+    <p>
+      We see that this single-pass approach blows a normal \(k\)-d tree out of the water, yielding
+      enormous speedups in query time from hundreds of nanoseconds to only about 10 ns. However,
+      this comparison isn't really fair: <code>kiddo</code> is giving us an exact answer to whether
+      we're in collision, while our forward tree is only returning an approximate answer.
+    </p>
+    <p>
+      Not only that, our approximate answer isn't even all that good. To test this, I collected a
+      real pointcloud and measured the distribution of position error when selecting nearest
+      neighbors.
+    </p>
+    <img src="/assets/img/afftree/forward_error_cdf.svg" />
+    <p>
+      Looking from the cumulative distribution function above, we see that roughly 25% of points
+      have an error of over 10 cm. In the world of collision checking, that's enormous - any padding
+      conservative enough to make this forward tree useful would make it impossible for a robot to
+      find a plan.
+    </p>
   </body>
 </html>
