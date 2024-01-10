@@ -23,6 +23,10 @@ body {
   a:visited {
     color: violet;
   }
+
+  .night-invert {
+    filter: invert(88%) hue-rotate(180deg);
+  }
 }
 
 img {

@@ -94,7 +94,7 @@
       (\(y\)), and so on, until looping back around to dimension 0.
     </p>
     <figure>
-      <img src="/assets/img/afftree/kdt_partition.svg" />
+      <img src="/assets/img/afftree/kdt_partition.svg" class="night-invert" />
       <figcaption>The partitioned cells of a \(k\)-d tree.</figcaption>
     </figure>
     <p>
@@ -120,7 +120,7 @@
       explanation of it, but I'll try my own hand at an explanation as well.
     </p>
     <figure>
-      <img src="/assets/img/afftree/eytzinger.svg" />
+      <img src="/assets/img/afftree/eytzinger.svg" class="night-invert" />
       <figcaption>An illustration of the Eytzinger layout on a tree with 7 elements.</figcaption>
     </figure>
     <p>
@@ -226,15 +226,18 @@ where
       from using <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so I'm using that
       as my baseline.
     </p>
-    <img
-      src="/assets/img/afftree/forward_vs_kdt_query.svg"
-      alt="A 2D line plot titled 'Query performance of collision-checking structures.' 
+    <figure>
+      <img
+        src="/assets/img/afftree/forward_vs_kdt_query.svg"
+        alt="A 2D line plot titled 'Query performance of collision-checking structures.' 
       The x-axis is labeled as 'Number of points in cloud,' ranging from 0 to 60000, and the y-axis is labeled as 'Collision check time (ns)'. 
       There are three lines: 'k-d tree (kiddo)' in blue, 'forward tree, sequential' in green, and 'forward tree, SIMD' in green. 
       All the lines grow roughly logarithmically. The blue line starts at around 60 ns, then grows to 250 ns. 
       The orange line starts at around 20 ns, then grows to 60 ns. 
       The green line starts at around 10 ns then grows to 20 ns."
-    />
+        class="night-invert"
+      />
+    </figure>
     <p>
       We see that this single-pass approach blows a normal \(k\)-d tree out of the water, yielding
       enormous speedups in query time from hundreds of nanoseconds to only about 10 ns. However,
@@ -246,7 +249,7 @@ where
       real pointcloud and measured the distribution of position error when selecting nearest
       neighbors.
     </p>
-    <img src="/assets/img/afftree/forward_error_cdf.svg" />
+    <figure><img src="/assets/img/afftree/forward_error_cdf.svg" class="night-invert" /></figure>
     <p>
       Looking from the cumulative distribution function above, we see that roughly 25% of points
       have an error of over 10 cm. In the world of collision checking, that's enormous - any padding
