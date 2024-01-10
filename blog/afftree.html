@@ -252,5 +252,36 @@ where
       conservative enough to make this forward tree useful would make it impossible for a robot to
       find a plan.
     </p>
+    <h2>A budget for affording</h2>
+    <p>
+      Let's briefly take stock of the situation. Using our forward tree, we can quickly classify a
+      query point as belonging to a single unit cell. We know that for any fixed cell and radius of
+      a test-sphere, there is a finite set of points which are close enough to collide with at least
+      one point in the cell. If we're targeting a particular robot, we also know \(r_{max}\), the
+      maximum radius of a sphere on the robot. If we trust that we'll never do a collision check for
+      a sphere larger than \(r_{max}\), then any query point in a given cell can only ever collide
+      with a fixed set of points in the cloud: namely, the set of points whose distance to the cell
+      is less than or equal to \(r_{max}\).
+    </p>
+    <figure>
+      <img src="/assets/img/afftree/affordance_min.svg" />
+      <figcaption>
+        The cell containing \(d\) affords \(a\), \(c\), and \(e\) at radius \(r\), but not \(b\) or
+        \(f\).
+      </figcaption>
+    </figure>
+    <p>
+      Let's call those points <em>afforded</em>; that is, for a given cell \(C\) and a radius \(r\),
+      \(C\) affords \(p\) if there exists a point \(x \in C\) such that \(\|p - x\| \leq r\).
+    </p>
+    <p>
+      Using our knowledge of \(r_{max}\), we can annotate each leaf of our forward-tree with the
+      list of all afforded points. Then, when checking for collision, we can traverse this list of
+      afforded points and test for collision against any of them. This allows us to convert our
+      approximate-nearest-neighbor guess into a completely accurate range-nearest-neighbors query. I
+      currently call the resulting structure an
+      <em>affordance tree</em>, or <em>afftree</em> for short.
+      <strong>TODO: come up with a better name.</strong>
+    </p>
   </body>
 </html>
