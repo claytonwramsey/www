@@ -127,7 +127,7 @@
       assume that the number of points in the tree is a power of 2, and that the tree is perfectly
       balanced, we can create an extremely efficient method for the first pass through the tree.
     </p>
-    <pre class="rust"><code>struct ForwardTree&lt;const K: usize> {
+    <pre class="rust"><code>struct ForwardTree&lt;const K: usize> {first_pass(t
     /// contains 2^p - 1 tests
     tests: Box&lt;[f32]>,
     /// contains 2^p points
@@ -137,17 +137,17 @@
 /// Return the index representing 
 /// the cell in the tree containing `point`.
 fn first_pass&lt;const K: usize>(
-    t: &ForwardTree&lt;K>, 
-    point: [f32; K],
+    tests: &[f32], 
+    point: &[f32; K],
 ) -> usize {
     let mut k = 0;
     let mut i = 0;
-    while i &lt; t.tests.len() {
-        i = 2 * i + 1 + usize::from(t.tests[i] &lt; point[k]);
+    while i &lt; tests.len() {
+        i = 2 * i + 1 + usize::from(tests[i] &lt; point[k]);
         k = (k + 1) % K;
     }
     
-    i - t.tests.len()
+    i - tests.len()
 }</code></pre>
     <p>
       This first pass a <code>usize</code> identifying which point in <code>points</code> is closest
@@ -156,36 +156,34 @@ fn first_pass&lt;const K: usize>(
       render this code as a parallel implementation using the nightly
       <code>portable_simd</code> feature for Rust.
     </p>
-    <pre class="rust"><code>fn first_pass_simd&lt;const K: usize, const L: usize>(
-    t: &ForwardTree&lt;K>,
-    points: &[Simd&lt;f32, L>; K],
-) -> Simd&lt;isize, L>
+    <pre class="rust"><code>use std::simd::{prelude::*, LaneCount, Mask, Simd, SupportedLaneCount};
+      
+fn first_pass_simd&lt;const K: usize, const L: usize&gt;(
+    tests: &[f32],
+    points: &[Simd&lt;f32, L&gt;; K],
+) -&gt; Simd&lt;isize, L&gt;
 where
-    LaneCount&lt;L>: SupportedLaneCount,
+    LaneCount&lt;L&gt;: SupportedLaneCount,
 {
     let mut k = 0;
     let mut i = Simd::splat(0);
-    let nlog2 = t.points.len().trailing_zeros();
-    
+    let nlog2 = tests.len().trailing_ones();
+
     for _ in 0..nlog2 {
         // Gather all tests
-        let test_ptrs = Simd::splat(t.tests.as_ptr()).wrapping_offset(i);
-        let relevant_tests: Simd&lt;f32, L> = unsafe { 
-            Simd::gather_ptr(test_ptrs) 
-        };
+        let ptrs = Simd::splat(tests.as_ptr()).wrapping_offset(i);
+        let tests: Simd&lt;f32, L&gt; = unsafe { Simd::gather_ptr(ptrs) };
 
         // Compare points to the tests
-        let cmp_results: Mask&lt;isize, L> = points[k]
-            .simd_ge(relevant_tests)
-            .into();
+        let cmp_results: Mask&lt;isize, L&gt; = points[k].simd_ge(tests).into();
 
         // Update i and k
         let one = Simd::splat(1);
         i = (i &lt;&lt; one) + one + (cmp_results.to_int() & one);
         k = (k + 1) % K;
     }
-    
-    i - Simd::splat(t.tests.len() as isize)
+
+    i - Simd::splat(tests.len() as isize)
 }</code></pre>
     <p>
       In this case, we use <code>isize</code> instead of <code>usize</code> because it makes it a
@@ -196,31 +194,33 @@ where
       Once we've extracted the identifier for our approximate-nearest-neighbor, we can do a quick
       test for whether it's in collision by computing the distance to the center of the query sphere
     </p>
-    <pre class="rust"><code>fn in_collision&lt;const K: usize&gt;(
+    <pre class="rust"><code>fn distsq&lt;const K: usize&gt;(a: &[f32; K], b: &[f32; K]) -&gt; f32 {
+    a.iter().zip(b).map(|(&x, &y)| (x - y).powi(2)).sum::&lt;f32&gt;()
+}
+
+/// If this returns `true`, a sphere centered at `point` 
+/// with radius `r` collides with a point in `t`.
+/// May erroneously return `false`.
+fn forward_collision&lt;const K: usize&gt;(
     t: &ForwardTree&lt;K&gt;,
-    center: &[f32; K],
+    point: &[f32; K],
     radius: f32,
-) -> bool {
-    let nearest_id = first_pass(t, center);
-    center
-        .iter()
-        .zip(t.points[nearest_id].iter())
-        .map(|(a, b)| (a - b).powi(2))
-        .sum::&lt;f32&gt;()
-        &lt;= radius
+) -&gt; bool {
+    let id = first_pass(&t.tests, point);
+    distsq(point, &t.points[id]) &lt;= radius
 }</code></pre>
     <p>
       Of course, we can also do our collision checking in a SIMD parallel manner; however, the
-      resulting code would be rather verbose and not very interesting. I'll skip ahead to the good
-      part, which is the performance results.
+      resulting code would be rather verbose and not very interesting, since we'll need to throw
+      that code away shortly. I'll skip ahead to the good part, which is the performance results.
     </p>
     <p>
       At these scales, a \(k\)-d tree is the best competitor. Fortunately,
-      <code><a href="https://github.com/sdd/kiddo">kiddo</a></code> is one of the fastest \(k\)-d
-      tree implementations out there, and it's also easily installed via Cargo. I'll be using that
-      as a rough baseline for pointcloud-collision-checking. I found that the fastest results came
-      from using <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so I'm using that
-      as my baseline.
+      <code><a href="https://github.com/sdd/kiddo">kiddo</a></code
+      >, one of the fastest \(k\)-d tree implementations out there, is to install via Cargo. I'll be
+      using that as a rough baseline for pointcloud-collision-checking. I found that the fastest
+      results came from using <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so
+      I'm using that as my baseline.
     </p>
     <figure>
       <img
@@ -283,5 +283,158 @@ where
       <em>affordance tree</em>, or <em>afftree</em> for short.
       <strong>TODO: come up with a better name.</strong>
     </p>
+    <p>
+      Now, instead of storing a single point for each leaf of the tree, we'll store a list of points
+      which might be in collision, called an <em>affordance buffer</em>.
+    </p>
+    <pre class="rust"><code>struct AffTree&lt;const K: usize&gt; {
+    tests: Box&lt;[f32]>,
+    affordances: Box&lt;[Box&lt;[[f32; K]]&gt;]&gt;,
+}</code></pre>
+    <p>
+      However, this data layout isn't quite optimal. We've broken up our possibly-colliding points
+      into a bunch of different allocations, requiring an extra size parameter on each and
+      fragmenting our memory. We can coagulate all the affordance buffers into one gigantic array,
+      and then use another lookup table to get the starting and ending indices relevant to one
+      point.
+    </p>
+    <pre class="rust"><code>struct AffTree&lt;const K: usize&gt; {
+    tests: Box&lt;[f32]&gt;,
+    /// contains 2^p + 1 elements
+    aff_starts: Box&lt;[usize]&gt;,
+    /// contains aff_starts[2^p] elements
+    affordances: Box&lt;[[f32; k]]&gt;,
+}</code></pre>
+    Once we have a cell index <code>id</code> from <code>first_pass</code>,
+    <code>affordances[aff_starts[id]..aff_starts[id + 1]]</code> will contain all the afforded
+    points for the cell.
   </body>
+  <pre class="rust"><code>fn aff_collides&lt;const K: usize&gt;(
+    t: &AffTree&lt;K&gt;,
+    point: &[f32; K],
+    radius: f32,
+) -&gt; bool {
+    let id = first_pass(&t.tests, point);
+    let rsq = radius * radius;
+    t.affordances[t.aff_starts[id]..t.aff_starts[id] + 1]
+        .iter()
+        .any(|p| distsq(p, point) &lt;= rsq)
+}</code></pre>
+  <p>
+    When adapting this code to SIMD, however, this presents a problem. The affordances table is
+    <em>ragged</em>, meaning that each buffer in the table is of a varying width. If we naively
+    loaded from every buffer in order, we could easily cause a buffer overrun as one lane shot past
+    its segment of the affordances table. To fix this, we take a leaf out of the GPU parallelism
+    book: we'll branch by masking out some lanes from all operations. During the scan through the
+    affordance array, we'll use the mask <code>inbounds</code> on
+    <code>gather_select</code> operations to prevent lanes from running out of bounds.
+  </p>
+  <pre class="rust"><code>fn check_affordances&lt;const K: usize, const L: usize&gt;(
+    aff_starts: &[usize],
+    affordances: &[[f32; K]],
+    points: &[Simd&lt;f32, L&gt;; K],
+    radii: Simd&lt;f32, L&gt;,
+    ids: Simd&lt;isize, L&gt;,
+) -&gt; bool
+where
+    LaneCount&lt;L&gt;: SupportedLaneCount,
+{
+
+    // Collect start and end offsets
+    let one = Simd::splat(1);
+    let off_ptrs = Simd::splat(aff_starts.as_ptr()).wrapping_offset(ids);
+    let start = unsafe { Simd::gather_ptr(off_ptrs) };
+    let end = unsafe { Simd::gather_ptr(off_ptrs.wrapping_add(one)) };
+
+    // Initialize pointers into affordance buffer
+    let base = Simd::splat(affordances.as_ptr());
+    let mut ptrs = base.wrapping_add(start).cast::&lt;f32&gt;();
+    let end_ptrs = base.wrapping_add(end).cast::&lt;f32&gt;();
+    let mut inbounds = ptrs.simd_gt(end_ptrs);
+    let rsqs = radii * radii;
+    let inf = Simd::splat(f32::INFINITY);
+    // For each point in the affordance buffer...
+    while inbounds.any() {
+        // Compute the distance from sphere centers to afforded points
+        let mut dists = Simd::splat(0.0);
+        for points_k in points {
+            let vals = unsafe { Simd::gather_select_ptr(ptrs, inbounds, inf) };
+            let diffs = points_k - vals;
+            dists += diffs * diffs;
+            ptrs = ptrs.wrapping_add(one);
+        }
+
+        // Test for collision
+        if dists.simd_le(rsqs).any() {
+            return true;
+        }
+
+        // Mask out overruns
+        inbounds &= ptrs.simd_lt(end_ptrs);
+    }
+
+    false
+}
+
+fn aff_collides_simd&lt;const K: usize, const L: usize&gt;(
+    t: &AffTree&lt;K&gt;,
+    points: &[Simd&lt;f32, L&gt;; K],
+    radii: Simd&lt;f32, L&gt;,
+) -&gt; bool
+where
+    LaneCount&lt;L&gt;: SupportedLaneCount,
+{
+    let ids = first_pass_simd(&t.tests, points);font-size
+    check_affordances(&t.aff_starts, &t.affordances, points, radii, ids)
+}</code></pre>
+  <p>
+    In practice, however, this code will still be quite slow. The main problem is that the number of
+    afforded points for a cell could be quite large - up to fifty or a hundred. Checking all of
+    thise points in a row will take a lot of time no matter what, so we need to find a way to reduce
+    the expected number of tests.
+  </p>
+  <p>
+    There are two solutions, each of which dovetail nicely with one another. First, we can sort the
+    points in each affordance buffer according to how far they are from the cell, in increasing
+    order. The point contained in the cloud would come first, followed by those that are extremely
+    close to the surface of the cell. This means that if a sphere is in collision, we will probably
+    find the points that it collides with quite quickly.
+  </p>
+  <p>
+    Once those points are sorted, we can observe a neat fact about our queries: we might be querying
+    the tree with a radius \(r \ll r_{max}\). In that case, we spend a lot of time checking against
+    points which will never collide with the query sphere, since a cell affords far more points at
+    radius \(r_max\) than it does at \(r\).
+  </p>
+  <strong>TODO: figure of affording at \(r\) and \(r_{max}\).</strong>
+  <p>
+    To amend this, we can amend every point in the affordance buffer with its distance to the cell.
+  </p>
+  <pre class="rust"><code>#[repr(C)]
+struct AffordedPoint&lt;const K: usize&gt; {
+    distsq_to_cell: f32,
+    point: [f32; K],
+}
+
+struct SortedAffTree&lt;const K: usize&gt; {
+    tests: Box&lt;[f32]&gt;,
+    aff_starts: Box&lt;[usize]&gt;,
+    affordances: Box&lt;[AffordedPoint&lt;K&gt;]&gt;,
+}</code></pre>
+  <p>
+    Since the distance of each afforded point to the cell is now in ascending order, we can stop
+    whenever we see a point which is further from the cell than our query radius.
+  </p>
+  <pre class="rust"><code>fn sorted_afftree_collides&lt;const K: usize&gt;(
+    t: &SortedAffTree&lt;K&gt;,
+    point: &[f32; K],
+    radius: f32,
+) -&gt; bool {
+    let id = first_pass(&t.tests, point);
+    let rsq = radius * radius;
+    t.affordances[t.aff_starts[id]..t.aff_starts[id] + 1]
+        .iter()
+        .take_while(|p| p.distsq_to_cell &lt;= rsq)
+        .any(|p| distsq(&p.point, point) &lt;= rsq)
+}</code></pre>
 </html>
