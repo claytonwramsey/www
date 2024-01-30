@@ -39,7 +39,9 @@
     <h1>Making robots plan faster with SIMD and Rust</h1>
     <p>
       I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
-      and very stressful at the same time.
+      and very stressful at the same time. I got to experiment with a lot of really cool things, but
+      most of them didn't actually work. I'm writing this blog post as a collection of the story
+      behind the paper, where I get to explain all the things I tried that never actually worked.
     </p>
     <h2>The problem at hand</h2>
     <p>
@@ -252,6 +254,24 @@ fn forward_collision&lt;const K: usize&gt;(
       conservative enough to make this forward tree useful would make it impossible for a robot to
       find a plan.
     </p>
+    <h2>Missing the forest for the trees</h2>
+    <p>
+      My first idea for fixing this error issue was very simple: if one tree was only right some of
+      the time, we could get the results from multiple trees and (hopefully) improve our accuracy.
+    </p>
+    <p>
+      This is not a new idea, per se: random forests are pretty well known in the ML community. The
+      core concept is this: we make \(T\) trees, each of which splits on a random dimension at each
+      branch.Then, when searching, we choose the nearest point from all the leaves of our trees.
+    </p>
+    <p>
+      To make branchless parallelism work out, I had to compromise a little bit. The main issue is
+      that every gather operation is extremely expensive, so doing multiple gathers for one test is
+      really not worth it. So instead of choosing a random axis to split on at every branch, we
+      choose a random axis at every depth. Then, instead of storing the branch axis, we can use a
+      PRNG to recreate the branch axes from scratch, preventing us from having to store the branch
+      axes somewhere.
+    </p>
     <h2>A budget for affording</h2>
     <p>
       Let's briefly take stock of the situation. Using our forward tree, we can quickly classify a
@@ -386,55 +406,5 @@ where
 {
     let ids = first_pass_simd(&t.tests, points);font-size
     check_affordances(&t.aff_starts, &t.affordances, points, radii, ids)
-}</code></pre>
-  <p>
-    In practice, however, this code will still be quite slow. The main problem is that the number of
-    afforded points for a cell could be quite large - up to fifty or a hundred. Checking all of
-    thise points in a row will take a lot of time no matter what, so we need to find a way to reduce
-    the expected number of tests.
-  </p>
-  <p>
-    There are two solutions, each of which dovetail nicely with one another. First, we can sort the
-    points in each affordance buffer according to how far they are from the cell, in increasing
-    order. The point contained in the cloud would come first, followed by those that are extremely
-    close to the surface of the cell. This means that if a sphere is in collision, we will probably
-    find the points that it collides with quite quickly.
-  </p>
-  <p>
-    Once those points are sorted, we can observe a neat fact about our queries: we might be querying
-    the tree with a radius \(r \ll r_{max}\). In that case, we spend a lot of time checking against
-    points which will never collide with the query sphere, since a cell affords far more points at
-    radius \(r_max\) than it does at \(r\).
-  </p>
-  <strong>TODO: figure of affording at \(r\) and \(r_{max}\).</strong>
-  <p>
-    To amend this, we can amend every point in the affordance buffer with its distance to the cell.
-  </p>
-  <pre class="rust"><code>#[repr(C)]
-struct AffordedPoint&lt;const K: usize&gt; {
-    distsq_to_cell: f32,
-    point: [f32; K],
-}
-
-struct SortedAffTree&lt;const K: usize&gt; {
-    tests: Box&lt;[f32]&gt;,
-    aff_starts: Box&lt;[usize]&gt;,
-    affordances: Box&lt;[AffordedPoint&lt;K&gt;]&gt;,
-}</code></pre>
-  <p>
-    Since the distance of each afforded point to the cell is now in ascending order, we can stop
-    whenever we see a point which is further from the cell than our query radius.
-  </p>
-  <pre class="rust"><code>fn sorted_afftree_collides&lt;const K: usize&gt;(
-    t: &SortedAffTree&lt;K&gt;,
-    point: &[f32; K],
-    radius: f32,
-) -&gt; bool {
-    let id = first_pass(&t.tests, point);
-    let rsq = radius * radius;
-    t.affordances[t.aff_starts[id]..t.aff_starts[id] + 1]
-        .iter()
-        .take_while(|p| p.distsq_to_cell &lt;= rsq)
-        .any(|p| distsq(&p.point, point) &lt;= rsq)
 }</code></pre>
 </html>
