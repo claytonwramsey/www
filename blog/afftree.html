@@ -41,7 +41,12 @@
       I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
       and very stressful at the same time. I got to experiment with a lot of really cool things, but
       most of them didn't actually work. I'm writing this blog post as a collection of the story
-      behind the paper, where I get to explain all the things I tried that never actually worked.
+      behind the paper, where I get to explain all the things I tried that didn't work out, as well
+      as to share the untold story of the paper.
+    </p>
+    <p>
+      If you want to skip straight to just reading the final paper, check it our on arXiV
+      <strong>INSERT ARXIV LINK!!!!</strong>.
     </p>
     <h2>The problem at hand</h2>
     <p>
@@ -50,6 +55,8 @@
         href="https://arxiv.org/abs/2309.14545v2?trk=feed_main-feed-card_reshare_feed-article-content"
         >paper</a
       >
+    </p>
+    <p>
       demonstrating dramatic speedups by using SIMD and precompilation for motion planning. However,
       their approach assumed that they had access to a primitive representation of the environment,
       which is rarely the case in reality. In many applications, robots must plan using their
@@ -152,10 +159,10 @@ fn first_pass&lt;const K: usize>(
     i - tests.len()
 }</code></pre>
     <p>
-      This first pass a <code>usize</code> identifying which point in <code>points</code> is closest
-      to <code>point</code>. Approximation isn't really good enough for collision checking, but
-      we'll find some other tricks for that later. For now, we'll notice that it's pretty easy to
-      render this code as a parallel implementation using the nightly
+      This first pass computes a <code>usize</code> identifying which point in
+      <code>points</code> is closest to <code>point</code>. Approximation isn't really good enough
+      for collision checking, but we'll find some other tricks for that later. For now, we'll notice
+      that it's pretty easy to render this code as a parallel implementation using the nightly
       <code>portable_simd</code> feature for Rust.
     </p>
     <pre class="rust"><code>use std::simd::{prelude::*, LaneCount, Mask, Simd, SupportedLaneCount};
@@ -196,11 +203,7 @@ where
       Once we've extracted the identifier for our approximate-nearest-neighbor, we can do a quick
       test for whether it's in collision by computing the distance to the center of the query sphere
     </p>
-    <pre class="rust"><code>fn distsq&lt;const K: usize&gt;(a: &[f32; K], b: &[f32; K]) -&gt; f32 {
-    a.iter().zip(b).map(|(&x, &y)| (x - y).powi(2)).sum::&lt;f32&gt;()
-}
-
-/// If this returns `true`, a sphere centered at `point` 
+    <pre class="rust"><code>/// If this returns `true`, a sphere centered at `point` 
 /// with radius `r` collides with a point in `t`.
 /// May erroneously return `false`.
 fn forward_collision&lt;const K: usize&gt;(
@@ -209,7 +212,12 @@ fn forward_collision&lt;const K: usize&gt;(
     radius: f32,
 ) -&gt; bool {
     let id = first_pass(&t.tests, point);
-    distsq(point, &t.points[id]) &lt;= radius
+    point
+        .iter()
+        .zip(t.points[id])
+        .map(|(&x, y)| (x - y).powi(2))
+        .sum::&lt;f32&gt;()
+        <= radius
 }</code></pre>
     <p>
       Of course, we can also do our collision checking in a SIMD parallel manner; however, the
@@ -261,16 +269,58 @@ fn forward_collision&lt;const K: usize&gt;(
     </p>
     <p>
       This is not a new idea, per se: random forests are pretty well known in the ML community. The
-      core concept is this: we make \(T\) trees, each of which splits on a random dimension at each
-      branch.Then, when searching, we choose the nearest point from all the leaves of our trees.
+      core concept is this: we make \(T\) different trees. Each tree is randomly different somehow,
+      yielding typically incorrect errors. We can then take the best result from each tree for a
+      (hopefully) dramatic improvement in result quality.
     </p>
+    <pre class="rust"><code>struct RandomTree&lt;const K: usize&gt; {
+    tests: Box&lt;[f32]&gt;,
+    points: Box&lt;[[f32; K]]&gt;,
+    seed: u32,
+}
+
+struct RandomForest&lt;const K: usize&gt; {
+  trees: Box&lt;[RandomTree&lt;K&gt;]&gt;,
+}</code></pre>
     <p>
-      To make branchless parallelism work out, I had to compromise a little bit. The main issue is
-      that every gather operation is extremely expensive, so doing multiple gathers for one test is
-      really not worth it. So instead of choosing a random axis to split on at every branch, we
-      choose a random axis at every depth. Then, instead of storing the branch axis, we can use a
-      PRNG to recreate the branch axes from scratch, preventing us from having to store the branch
-      axes somewhere.
+      For the sake of branchless parallelism, we'll randomize each tree according to a pseudo-random
+      number generator. Then, when we search through the tree, we determine the next axis to branch
+      on based on the outcome from the RNG.
+    </p>
+    <pre class="rust"><code>/// A simple PRNG.
+fn xorshift32(x: &mut u32) -&gt; u32 {
+    *x ^= *x &lt;&lt; 13;
+    *x ^= *x &gt;&gt; 17;
+    *x ^= *x &lt;&lt; 5;
+    *x
+}
+
+fn first_pass_random&lt;const K: usize&gt;(
+    tests: &[f32], 
+    mut seed: u32, 
+    point: &[f32; K]
+) -&gt; usize {
+    let mut i = 0;
+    while i &lt; tests.len() {
+        let k = xorshift32(&mut seed) as usize % K;
+        i = 2 * i + 1 + usize::from(tests[i] &lt; point[k]);
+    }
+
+    i - tests.len()
+}</code></pre>
+    <p>
+      An astute reader might note that this implementation branches on the same dimension for each
+      depth in each random tree, independent of which subtree we search. This is intentional: it
+      makes it easier to write a branchless SIMD implementation of random tree querying. Otherwise,
+      we'd need a convoluted sequence of shuffles to get every element in the correct lane, which
+      would chew up the performance.
+    </p>
+    <figure><img src="/assets/img/afftree/forest_error.svg" class="night-invert" /></figure>
+    <p>
+      When testing the error distribution for a forest, the results are less than impressive. We get
+      diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
+      that. Even with 10 trees in the first, we're off by 0.16m more than 50% of the time. These
+      results are simply not good enough for collision-checking.
     </p>
     <h2>A budget for affording</h2>
     <p>
