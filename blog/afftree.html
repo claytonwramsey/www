@@ -55,8 +55,6 @@
         href="https://arxiv.org/abs/2309.14545v2?trk=feed_main-feed-card_reshare_feed-article-content"
         >paper</a
       >
-    </p>
-    <p>
       demonstrating dramatic speedups by using SIMD and precompilation for motion planning. However,
       their approach assumed that they had access to a primitive representation of the environment,
       which is rarely the case in reality. In many applications, robots must plan using their
@@ -136,26 +134,23 @@
       assume that the number of points in the tree is a power of 2, and that the tree is perfectly
       balanced, we can create an extremely efficient method for the first pass through the tree.
     </p>
-    <pre class="rust"><code>struct ForwardTree&lt;const K: usize> {first_pass(t
+    <pre class="rust"><code>struct ForwardTree {
     /// contains 2^p - 1 tests
-    tests: Box&lt;[f32]>,
+    tests: Box&lt;[f32]&gt;,
     /// contains 2^p points
-    points: Box&lt;[[f32; K]]>,
+    points: Box&lt;[[f32; 3]]&gt;,
 }
 
-/// Return the index representing 
+/// Return the index representing
 /// the cell in the tree containing `point`.
-fn first_pass&lt;const K: usize>(
-    tests: &[f32], 
-    point: &[f32; K],
-) -> usize {
+fn first_pass(tests: &[f32], point: &[f32; 3]) -&gt; usize {
     let mut k = 0;
     let mut i = 0;
     while i &lt; tests.len() {
         i = 2 * i + 1 + usize::from(tests[i] &lt; point[k]);
-        k = (k + 1) % K;
+        k = (k + 1) % 3;
     }
-    
+
     i - tests.len()
 }</code></pre>
     <p>
@@ -165,59 +160,48 @@ fn first_pass&lt;const K: usize>(
       that it's pretty easy to render this code as a parallel implementation using the nightly
       <code>portable_simd</code> feature for Rust.
     </p>
-    <pre class="rust"><code>use std::simd::{prelude::*, LaneCount, Mask, Simd, SupportedLaneCount};
-      
-fn first_pass_simd&lt;const K: usize, const L: usize&gt;(
+    <pre class="rust"><code>use std::simd::{prelude::*, LaneCount, Simd, SupportedLaneCount};
+
+fn first_pass_simd&lt;const L: usize&gt;(
     tests: &[f32],
-    points: &[Simd&lt;f32, L&gt;; K],
-) -&gt; Simd&lt;isize, L&gt;
+    points: &[Simd&lt;f32, L&gt;; 3],
+) -&gt; Simd&lt;usize, L&gt;
 where
     LaneCount&lt;L&gt;: SupportedLaneCount,
 {
     let mut k = 0;
     let mut i = Simd::splat(0);
     let nlog2 = tests.len().trailing_ones();
-
     for _ in 0..nlog2 {
-        // Gather all tests
-        let ptrs = Simd::splat(tests.as_ptr()).wrapping_offset(i);
-        let tests: Simd&lt;f32, L&gt; = unsafe { Simd::gather_ptr(ptrs) };
-
-        // Compare points to the tests
-        let cmp_results: Mask&lt;isize, L&gt; = points[k].simd_ge(tests).into();
-
-        // Update i and k
+        let tests = Simd::gather_or_default(tests, i);
+        let cmp = points[k].simd_ge(tests).to_int().cast();
         let one = Simd::splat(1);
-        i = (i &lt;&lt; one) + one + (cmp_results.to_int() & one);
-        k = (k + 1) % K;
+        i = (i << one) + one + (cmp & one);
+        k = (k + 1) % 3;
     }
 
-    i - Simd::splat(tests.len() as isize)
+    i - Simd::splat(tests.len())
 }</code></pre>
     <p>
-      In this case, we use <code>isize</code> instead of <code>usize</code> because it makes it a
-      little easier to convert masks and SIMD vectors, but otherwise the above code does the exact
-      same thing as <code>first_pass</code>, but this time in parallel.
+      The above code does the exact same thing as <code>first_pass</code>, but this time in
+      parallel.
     </p>
     <p>
       Once we've extracted the identifier for our approximate-nearest-neighbor, we can do a quick
-      test for whether it's in collision by computing the distance to the center of the query sphere
+      test for whether it's in collision by computing the distance to the center of the query
+      sphere.
     </p>
-    <pre class="rust"><code>/// If this returns `true`, a sphere centered at `point` 
+    <pre class="rust"><code>/// If this returns `true`, a sphere centered at `point`
 /// with radius `r` collides with a point in `t`.
 /// May erroneously return `false`.
-fn forward_collision&lt;const K: usize&gt;(
-    t: &ForwardTree&lt;K&gt;,
-    point: &[f32; K],
-    radius: f32,
-) -&gt; bool {
+fn forward_coll(t: &ForwardTree, point: &[f32; 3], radius: f32) -&gt; bool {
     let id = first_pass(&t.tests, point);
     point
         .iter()
         .zip(t.points[id])
         .map(|(&x, y)| (x - y).powi(2))
         .sum::&lt;f32&gt;()
-        <= radius
+        &lt;= radius
 }</code></pre>
     <p>
       Of course, we can also do our collision checking in a SIMD parallel manner; however, the
@@ -227,10 +211,10 @@ fn forward_collision&lt;const K: usize&gt;(
     <p>
       At these scales, a \(k\)-d tree is the best competitor. Fortunately,
       <code><a href="https://github.com/sdd/kiddo">kiddo</a></code
-      >, one of the fastest \(k\)-d tree implementations out there, is to install via Cargo. I'll be
-      using that as a rough baseline for pointcloud-collision-checking. I found that the fastest
-      results came from using <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so
-      I'm using that as my baseline.
+      >, one of the fastest \(k\)-d tree implementations out there, is easy to install via Cargo.
+      I'll be using that as a rough baseline for pointcloud-collision-checking. I found that the
+      fastest results came from using <code>within_unsorted</code> on an
+      <code>ImmutableKdTree</code>, so I'm using that as my baseline.
     </p>
     <figure>
       <img
@@ -273,15 +257,13 @@ fn forward_collision&lt;const K: usize&gt;(
       yielding typically incorrect errors. We can then take the best result from each tree for a
       (hopefully) dramatic improvement in result quality.
     </p>
-    <pre class="rust"><code>struct RandomTree&lt;const K: usize&gt; {
+    <pre class="rust"><code>struct RandomTree {
     tests: Box&lt;[f32]&gt;,
-    points: Box&lt;[[f32; K]]&gt;,
+    points: Box&lt;[[f32; 3]]&gt;,
     seed: u32,
 }
 
-struct RandomForest&lt;const K: usize&gt; {
-  trees: Box&lt;[RandomTree&lt;K&gt;]&gt;,
-}</code></pre>
+struct RandomForest(Box&lt;[RandomTree]&gt;);</code></pre>
     <p>
       For the sake of branchless parallelism, we'll randomize each tree according to a pseudo-random
       number generator. Then, when we search through the tree, we determine the next axis to branch
@@ -295,25 +277,27 @@ fn xorshift32(x: &mut u32) -&gt; u32 {
     *x
 }
 
-fn first_pass_random&lt;const K: usize&gt;(
-    tests: &[f32], 
-    mut seed: u32, 
-    point: &[f32; K]
-) -&gt; usize {
+fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     let mut i = 0;
     while i &lt; tests.len() {
-        let k = xorshift32(&mut seed) as usize % K;
+        let k = xorshift32(&mut x) as usize % 3;
         i = 2 * i + 1 + usize::from(tests[i] &lt; point[k]);
     }
 
     i - tests.len()
-}</code></pre>
+}
+</code></pre>
     <p>
       An astute reader might note that this implementation branches on the same dimension for each
       depth in each random tree, independent of which subtree we search. This is intentional: it
       makes it easier to write a branchless SIMD implementation of random tree querying. Otherwise,
       we'd need a convoluted sequence of shuffles to get every element in the correct lane, which
       would chew up the performance.
+    </p>
+    <p>
+      Young and full of hope, I tried checking the error distribution of the random forest approach.
+      I constructed a point cloud, randomly generated a bunch of query points, and tested those
+      points for their distance to their nearest neighbor in the cloud.
     </p>
     <figure><img src="/assets/img/afftree/forest_error.svg" class="night-invert" /></figure>
     <p>
@@ -350,16 +334,15 @@ fn first_pass_random&lt;const K: usize&gt;(
       afforded points and test for collision against any of them. This allows us to convert our
       approximate-nearest-neighbor guess into a completely accurate range-nearest-neighbors query. I
       currently call the resulting structure an
-      <em>affordance tree</em>, or <em>afftree</em> for short.
-      <strong>TODO: come up with a better name.</strong>
+      <em>collision-affording point tree</em>, or <em>CAPT</em> for short.
     </p>
     <p>
       Now, instead of storing a single point for each leaf of the tree, we'll store a list of points
       which might be in collision, called an <em>affordance buffer</em>.
     </p>
-    <pre class="rust"><code>struct AffTree&lt;const K: usize&gt; {
+    <pre class="rust"><code>struct Capt {
     tests: Box&lt;[f32]>,
-    affordances: Box&lt;[Box&lt;[[f32; K]]&gt;]&gt;,
+    afforded: Box&lt;[Box&lt;[[f32; 3]]&gt;]&gt;,
 }</code></pre>
     <p>
       However, this data layout isn't quite optimal. We've broken up our possibly-colliding points
@@ -368,93 +351,91 @@ fn first_pass_random&lt;const K: usize&gt;(
       and then use another lookup table to get the starting and ending indices relevant to one
       point.
     </p>
-    <pre class="rust"><code>struct AffTree&lt;const K: usize&gt; {
+    <p>
+      Additionally, to make SIMD parallelism easier, we can use a struct-of-arrays layout for each
+      point in <code>afforded</code>, which means that we split out each dimension of every point,
+      and store them in separate buffers.
+    </p>
+    captree
+    <pre class="rust"><code>struct Capt {
+    /// contains n - 1 elements
     tests: Box&lt;[f32]&gt;,
-    /// contains 2^p + 1 elements
-    aff_starts: Box&lt;[usize]&gt;,
-    /// contains aff_starts[2^p] elements
-    affordances: Box&lt;[[f32; k]]&gt;,
+    /// contains n + 1 elements
+    starts: Box&lt;[usize]&gt;,
+    /// each buffer contains aff_starts[n] elements
+    afforded: [Box&lt;[f32]&gt;; 3],
 }</code></pre>
     Once we have a cell index <code>id</code> from <code>first_pass</code>,
-    <code>affordances[aff_starts[id]..aff_starts[id + 1]]</code> will contain all the afforded
-    points for the cell.
+    <code>afforded[starts[id]..starts[id + 1]]</code> will contain all the afforded points for the
+    cell.
   </body>
-  <pre class="rust"><code>fn aff_collides&lt;const K: usize&gt;(
-    t: &AffTree&lt;K&gt;,
-    point: &[f32; K],
-    radius: f32,
-) -&gt; bool {
+  <pre class="rust"><code>fn capt_collides(t: &Capt, point: &[f32; 3], radius: f32) -&gt; bool {
     let id = first_pass(&t.tests, point);
     let rsq = radius * radius;
-    t.affordances[t.aff_starts[id]..t.aff_starts[id] + 1]
-        .iter()
-        .any(|p| distsq(p, point) &lt;= rsq)
+    (t.starts[id]..t.starts[id] + 1).any(|i| {
+        t.afforded
+            .iter()
+            .zip(point)
+            .map(|(a, &b)| (a[i] - b).powi(2))
+            .sum::&lt;f32&gt;()
+            &lt;= rsq
+    })
 }</code></pre>
   <p>
-    When adapting this code to SIMD, however, this presents a problem. The affordances table is
-    <em>ragged</em>, meaning that each buffer in the table is of a varying width. If we naively
-    loaded from every buffer in order, we could easily cause a buffer overrun as one lane shot past
-    its segment of the affordances table. To fix this, we take a leaf out of the GPU parallelism
-    book: we'll branch by masking out some lanes from all operations. During the scan through the
-    affordance array, we'll use the mask <code>inbounds</code> on
-    <code>gather_select</code> operations to prevent lanes from running out of bounds.
+    If we tried to parallelize collision-checking between our query spheres and afforded points like
+    we did in <code>first_pass</code>, we wouldn't actually see much perfomance benefit. I know this
+    because that's what I had originally tried, and it was hardly faster than the sequential
+    implementation. The heart of the problem is that gather instructions are comically slow on
+    nearly all processors, so the CPU spends far more time waiting for memory to arrive than it does
+    on churning through computations.
   </p>
-  <pre class="rust"><code>fn check_affordances&lt;const K: usize, const L: usize&gt;(
-    aff_starts: &[usize],
-    affordances: &[[f32; K]],
-    points: &[Simd&lt;f32, L&gt;; K],
+  <p>
+    To fix this, we need to have a way to test for collision without touching a large about of
+    memory at the same time. The simplest fix is the best: instead of parallelizing across queries,
+    we parallelize across afforded points for one query. We iterate sequentially through the query
+    spheres, but in parallel, we check whether <code>L</code> different afforded points collide with
+    the same sphere. The upside of this is that the data for these points are stored contiguously,
+    so we waste no time waiting on gathers.
+  </p>
+  <pre class="rust"><code>fn capt_collides_simd&lt;const L: usize&gt;(
+    t: &Capt,
+    points: &[Simd&lt;f32, L&gt;; 3],
     radii: Simd&lt;f32, L&gt;,
-    ids: Simd&lt;isize, L&gt;,
 ) -&gt; bool
 where
     LaneCount&lt;L&gt;: SupportedLaneCount,
 {
+    let ids = first_pass_simd(&t.tests, points);
 
-    // Collect start and end offsets
-    let one = Simd::splat(1);
-    let off_ptrs = Simd::splat(aff_starts.as_ptr()).wrapping_offset(ids);
-    let start = unsafe { Simd::gather_ptr(off_ptrs) };
-    let end = unsafe { Simd::gather_ptr(off_ptrs.wrapping_add(one)) };
+    let start = Simd::gather_or_default(&t.starts, ids);
+    let end = Simd::gather_or_default(&t.starts, ids + Simd::splat(1));
 
-    // Initialize pointers into affordance buffer
-    let base = Simd::splat(affordances.as_ptr());
-    let mut ptrs = base.wrapping_add(start).cast::&lt;f32&gt;();
-    let end_ptrs = base.wrapping_add(end).cast::&lt;f32&gt;();
-    let mut inbounds = ptrs.simd_gt(end_ptrs);
-    let rsqs = radii * radii;
-    let inf = Simd::splat(f32::INFINITY);
-    // For each point in the affordance buffer...
-    while inbounds.any() {
-        // Compute the distance from sphere centers to afforded points
-        let mut dists = Simd::splat(0.0);
-        for points_k in points {
-            let vals = unsafe { Simd::gather_select_ptr(ptrs, inbounds, inf) };
-            let diffs = points_k - vals;
-            dists += diffs * diffs;
-            ptrs = ptrs.wrapping_add(one);
+    for l in 0..L {
+        let pt = [0, 1, 2].map(|k| Simd::splat(points[k][l]));
+        let rsq = Simd::splat(radii[l].powi(2));
+        for s in (start[l]..end[l]).step_by(L) {
+            let mut distsq = Simd::splat(0.0);
+            for (pt_k, aff_k) in pt.iter().zip(&t.afforded) {
+                // assume `affordances[k]` is sufficently long
+                // for simplicity
+                let diff = pt_k - Simd::from_slice(&aff_k[s..]);
+                distsq += diff * diff;
+            }
+            if distsq.simd_le(rsq).any() {
+                return true;
+            }
         }
-
-        // Test for collision
-        if dists.simd_le(rsqs).any() {
-            return true;
-        }
-
-        // Mask out overruns
-        inbounds &= ptrs.simd_lt(end_ptrs);
     }
 
     false
-}
-
-fn aff_collides_simd&lt;const K: usize, const L: usize&gt;(
-    t: &AffTree&lt;K&gt;,
-    points: &[Simd&lt;f32, L&gt;; K],
-    radii: Simd&lt;f32, L&gt;,
-) -&gt; bool
-where
-    LaneCount&lt;L&gt;: SupportedLaneCount,
-{
-    let ids = first_pass_simd(&t.tests, points);font-size
-    check_affordances(&t.aff_starts, &t.affordances, points, radii, ids)
 }</code></pre>
+  <h2>Squeezing out some juice</h2>
+  <h3>Getting in order</h3>
+  <h3>Shrinking down</h3>
+  <h3>Bounding my boxes</h3>
+  <h2>Under construction</h2>
+  <h2>Into the C++ mines</h2>
+  <h2>The final scramble</h2>
+  <h2>Victory laps</h2>
+  <h2>Auslaut</h2>
 </html>
