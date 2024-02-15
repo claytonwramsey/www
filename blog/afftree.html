@@ -338,7 +338,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     </p>
     <p>
       Now, instead of storing a single point for each leaf of the tree, we'll store a list of points
-      which might be in collision, called an <em>affordance buffer</em>.
+      which might be in collision, called an <em>affordance set</em>.
     </p>
     <pre class="rust"><code>struct Capt {
     tests: Box&lt;[f32]>,
@@ -347,16 +347,14 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     <p>
       However, this data layout isn't quite optimal. We've broken up our possibly-colliding points
       into a bunch of different allocations, requiring an extra size parameter on each and
-      fragmenting our memory. We can coagulate all the affordance buffers into one gigantic array,
-      and then use another lookup table to get the starting and ending indices relevant to one
-      point.
+      fragmenting our memory. We can coagulate all the affordance set into one gigantic array, and
+      then use another lookup table to get the starting and ending indices relevant to one point.
     </p>
     <p>
       Additionally, to make SIMD parallelism easier, we can use a struct-of-arrays layout for each
       point in <code>afforded</code>, which means that we split out each dimension of every point,
       and store them in separate buffers.
     </p>
-    captree
     <pre class="rust"><code>struct Capt {
     /// contains n - 1 elements
     tests: Box&lt;[f32]&gt;,
@@ -430,10 +428,44 @@ where
     false
 }</code></pre>
   <h2>Squeezing out some juice</h2>
+  <p>
+    The performance of this "default" tree is pretty good, but there's one place where it suffers a
+    lot: non-colliding queries. If a query sphere doesn't collide with any afforded point, we have
+    to check every single afforded point. Some cells could afford hundreds of points, which would
+    yield extremely poor runtimes. We need some sort of fast-path rejection for queries which are
+    certainly not in collision.
+  </p>
   <h3>Getting in order</h3>
+  <p>
+    I first observed that many query spheres had much smaller radii than the maximum afforded radius
+    of the tree. This means that many of the afforded points for each cell would be further from the
+    cell than the query radius, meaning that they could never collide with a query sphere of that
+    radius.
+  </p>
+  <figure>
+    <img src="/assets/img/afftree/sort_affordance.svg" class="night-invert" />
+    <figcaption>
+      The cell affords 3 points at \(r_\text{max}\) that it doesn't afford at \(r_q\), so a query
+      sphere of radius \(r_q\) wouldn't need to check collision against those points.
+    </figcaption>
+  </figure>
+  <p>
+    The first idea we had for this was to sort all the points in each affordance set in descending
+    order of distance to the cell. That way, searches with small query radi would be able to
+    terminate earlier: as soon as the collision-check found a point further from the cell than the
+    query radius, the search could terminate immediately.
+  </p>
+  <p>
+    This was good for query performance, but came at a significant cost in tree construction time.
+    I'll explain the details of construction later in this post, but for now, know that this measure
+    put construction times into the worst-case regime of \(O(n^2 \log n)\) for trees containing
+    \(n\) points. This is far too much time when \(n\) is measured in thousands; in some of my tests
+    it took 30 seconds to construct the tree on large point clouds.
+  </p>
   <h3>Shrinking down</h3>
   <h3>Bounding my boxes</h3>
   <h2>Under construction</h2>
+  <h2>Filter feeders</h2>
   <h2>Into the C++ mines</h2>
   <h2>The final scramble</h2>
   <h2>Victory laps</h2>
