@@ -36,7 +36,7 @@
         <a href="/recipes.html">Recipes</a>
       </nav>
     </header>
-    <h1>Making robots plan faster with SIMD and Rust</h1>
+    <h1>Making robots plan in real-time with SIMD</h1>
     <p>
       I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
       and very stressful at the same time. I got to experiment with a lot of really cool things, but
@@ -66,6 +66,19 @@
       means that we have to develop methods for efficiently checking whether our robot is in
       collision with a pointcloud.
     </p>
+    <figure style="display: flex">
+      <div>
+        <img src="/assets/img/afftree/ur5.png" />
+        <figcaption>A Universal Robots model UR-5e robot arm.</figcaption>
+      </div>
+      <div>
+        <img src="/assets/img/afftree/ur5_ball.svg" />
+        <figcaption>A conservative spherical approximation of the UR-5e's geometry.</figcaption>
+      </div>
+    </figure>
+    <strong
+      >TODO: use one of our own images instead of this (which I got from the UR-5 website)</strong
+    >
     <p>
       We can start by assuming that our robot can be modeled as a set of balls over some distance
       metric. Using the \(L^2\) distance metric, these balls are spheres, which meshes conveniently
@@ -192,16 +205,16 @@ where
       sphere.
     </p>
     <pre class="rust"><code>/// If this returns `true`, a sphere centered at `point`
-/// with radius `r` collides with a point in `t`.
+/// with radius-squared `rsq` collides with a point in `t`.
 /// May erroneously return `false`.
-fn forward_coll(t: &ForwardTree, point: &[f32; 3], radius: f32) -&gt; bool {
+fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
     let id = first_pass(&t.tests, point);
     point
         .iter()
         .zip(t.points[id])
         .map(|(&x, y)| (x - y).powi(2))
         .sum::&lt;f32&gt;()
-        &lt;= radius
+        &lt;= rsq
 }</code></pre>
     <p>
       Of course, we can also do our collision checking in a SIMD parallel manner; however, the
@@ -367,10 +380,9 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     <code>afforded[starts[id]..starts[id + 1]]</code> will contain all the afforded points for the
     cell.
   </body>
-  <pre class="rust"><code>fn capt_collides(t: &Capt, point: &[f32; 3], radius: f32) -&gt; bool {
+  <pre class="rust"><code>fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
     let id = first_pass(&t.tests, point);
-    let rsq = radius * radius;
-    (t.starts[id]..t.starts[id] + 1).any(|i| {
+    (t.starts[id]..t.starts[id + 1]).any(|i| {
         t.afforded
             .iter()
             .zip(point)
@@ -460,16 +472,97 @@ where
     I'll explain the details of construction later in this post, but for now, know that this measure
     put construction times into the worst-case regime of \(O(n^2 \log n)\) for trees containing
     \(n\) points. This is far too much time when \(n\) is measured in thousands; in some of my tests
-    it took 30 seconds to construct the tree on large point clouds.
+    it took 30 seconds to construct the tree on large point clouds. In the end, I had to nix this
+    feature for performance.
   </p>
   <h3>Shrinking down</h3>
   <figure>
     <img src="/assets/img/afftree/rmin.svg" class="night-invert" />
+    <figcaption>
+      The sphere centered on the representative point with radius \(r_\text{min}\) contains the
+      entire cell, so all query spheres centered in this cell are in collision.
+    </figcaption>
   </figure>
+  <p>
+    While experimenting, I found that a very small minority of cells had extremely large affordance
+    sets. These cells were typically very small, and in the middle of a big cluster of points.
+    Often, because the cells were so small, every single query sphere inside the cell would collide
+    with the representative point of the cell.
+  </p>
+  <p>
+    I decided to take advantage of this to reduce the peak affordance size. We already accept that
+    we know \(r_\text{max}\), so why not also provide a minimum radius \(r_\text{min}\)? If a sphere
+    of radius \(r_\text{min}\) collides with a point, then any other query sphere with the same
+    center should also collide, no matter what.
+  </p>
   <h3>Bounding my boxes</h3>
   <figure>
     <img src="/assets/img/afftree/aabb.svg" class="night-invert" />
+    <figcaption>
+      The axis-aligned bounding box, in green, contains all points afforded by the cell.
+    </figcaption>
   </figure>
+  <p>
+    There's one last notable case where the search spends a lot of time needlessly checking for
+    collisions. Cells near the edge of a cluster are often long and skinny, with one tip of the cell
+    being very close to the cluster and the other tip extending far out into space. Those long,
+    skinny cells often take up the majority of the free space in the environment, meaning most of
+    our queries will actually be against a cell which is mostly taken up by free space.
+  </p>
+  <p>
+    We'd like to be able to filter out queries which aren't in collision as fast as possible,
+    ideally skipping the lengthy affordance set check. Since often only one part of the cell
+    contains afforded points, this opens up a possibility for improvement: what if we just didn't
+    check the spheres in the "empty" part of the cell?
+  </p>
+  <p>
+    To do this, we an axis-aligned bounding box (AABB) containing the affordance set for each cell.
+    If we're lucky, the AABB will often be much smaller than its cell.
+  </p>
+  <pre class="rust"><code>struct Capt {
+    /// contains n - 1 elements
+    tests: Box&lt;[f32]&gt;,
+    /// contains n elements
+    aabbs: Box&lt;[Aabb]&gt;,
+    /// contains n + 1 elements
+    starts: Box&lt;[usize]&gt;,
+    /// each buffer contains aff_starts[n] elements
+    afforded: [Box&lt;[f32]&gt;; 3],
+}
+
+#[derive(Clone, Copy)]
+struct Aabb {
+    lo: [f32; 3],
+    hi: [f32; 3],
+}
+</code></pre>
+  <p>
+    Then, when querying, we'll determine whether some query sphere intersects the AABB. If it
+    doesn't, then we know that the sphere is not in collision, and can quickly avoid checking it.
+  </p>
+  <pre class="rust"><code>fn intersects(aabb: &Aabb, center: &[f32; 3], rsq: f32) -&gt; bool {
+    aabb.lo
+        .into_iter()
+        .zip(aabb.hi)
+        .zip(center)
+        .map(|((l, h), x)| x.clamp(l, h))
+        .sum::&lt;f32&gt;()
+        &lt;= rsq
+}
+
+/// Rewritten from the previous version.
+fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
+  let id = first_pass(&t.tests, point);
+  intersects(&t.aabbs[id], point, rsq)
+      && (t.starts[id]..t.starts[id + 1]).any(|i| {
+          t.afforded
+              .iter()
+              .zip(point)
+              .map(|(a, &b)| (a[i] - b).powi(2))
+              .sum::&lt;f32&gt;()
+              &lt;= rsq
+      })
+}</code></pre>
   <h2>Under construction</h2>
   <h2>Filter feeders</h2>
   <h2>Into the C++ mines</h2>
