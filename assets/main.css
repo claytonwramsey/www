@@ -81,6 +81,11 @@ blockquote {
     font-size: 15px;
   }
 }
+
+figure {
+  text-align: center;
+}
+
 figcaption {
   text-align: center;
 }

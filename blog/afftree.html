@@ -562,6 +562,24 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
       })
 }</code></pre>
   <h2>Under construction</h2>
+  <figure>
+    <img src="/assets/img/afftree/construct_top.svg" style="width: 50%" />
+    <figcaption>
+      At the first step of construction, the cell is partitioned by its median plane on one axis.
+    </figcaption>
+  </figure>
+  <figure>
+    <div style="display: flex">
+      <!-- cursed hack to make this lay out like I want it to -->
+      <img src="/assets/img/afftree/construct_left.svg" />
+      <div style="min-width: 50px"></div>
+      <img src="/assets/img/afftree/construct_right.svg" />
+    </div>
+    <figcaption>
+      This produces two new cells, each with half as many points. The affordance set is filtered
+      down and then expanded to include points from the opposite side of the partition.
+    </figcaption>
+  </figure>
   <p>
     After all this, I still haven't explained how these trees are constructed. Efficiently
     constructing a CAPT is nontrivial, since the brute-force approach to affordance set construction
@@ -622,13 +640,11 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
       We start by padding the points to a power of two, then immediately call out to a helper
       function to populate all the buffers.
     </p>
-    <pre class="rust"><code>use std::iter::repeat;
-
-fn capt_new(points: &[[f32; 3]], r_range: (f32, f32)) -&gt; Capt {
+    <pre class="rust"><code>fn capt_new(points: &[[f32; 3]], r_range: (f32, f32)) -&gt; Capt {
     let n2 = points.len().next_power_of_two();
     let mut points2: Vec&lt;_&gt; = vec![[f32::INFINITY; 3]; n2];
     points2[..points.len()].copy_from_slice(points);
-    let mut tests: Box&lt;_&gt; = repeat(f32::NAN).take(n2 - 1).collect();
+    let mut tests = vec![f32::NAN; n2 - 1].into_boxed_slice();
     let mut afforded = [Vec::new(), Vec::new(), Vec::new()];
     let mut starts = vec![0];
     let mut aabbs = Vec::new();
@@ -658,108 +674,109 @@ fn capt_new(points: &[[f32; 3]], r_range: (f32, f32)) -&gt; Capt {
 }</code></pre>
     <p>
       Next, we write the main recursive helper function for splitting up cells and populating the
-      affordance sets. If this looks long, remember that the final version was even worse.
+      affordance sets. If this looks convoluted, remember that the version used in the final code
+      was even worse.
     </p>
     <pre class="rust"><code>#[allow(clippy::too_many_arguments)]
 fn capt_new_help(
-points: &mut [[f32; 3]],
-tests: &mut [f32],
-aabbs: &mut Vec&lt;Aabb&gt;,
-afforded: &mut [Vec&lt;f32&gt;; 3],
-starts: &mut Vec&lt;usize&gt;,
-k: usize,
-i: usize,
-r_range: (f32, f32),
-in_range: Vec&lt;[f32; 3]&gt;,
-cell: Aabb,
+    points: &mut [[f32; 3]],
+    tests: &mut [f32],
+    aabbs: &mut Vec&lt;Aabb&gt;,
+    afforded: &mut [Vec&lt;f32&gt;; 3],
+    starts: &mut Vec&lt;usize&gt;,
+    k: usize,
+    i: usize,
+    r_range: (f32, f32),
+    in_range: Vec&lt;[f32; 3]&gt;,
+    cell: Aabb,
 ) {
-// Base case: only one point in the cell means this is a leaf
-if let [rep] = *points {
-    // AABB of all afforded points
-    let mut aabb = Aabb { lo: rep, hi: rep };
-    if rep[0].is_finite() {
+    // Base case: only one point in the cell means this is a leaf
+    if let [rep] = *points {
+        // AABB of all afforded points
+        let mut aabb = Aabb { lo: rep, hi: rep };
+
         // Exclude padded infinites from affordance sets
-        afforded[0].push(rep[0]);
-        afforded[1].push(rep[1]);
-        afforded[2].push(rep[2]);
-        // Don't include other points if the cell is small enough
-        if !sphere_contains(&rep, r_range.0.powi(2), &cell) {
-            for p in in_range {
-                for k in 0..3 {
-                    // Expand AABB to contain afforded points
-                    if p[k] &lt; aabb.lo[k] {
-                        aabb.lo[k] = p[k];
-                    } else if aabb.hi[k] &lt; p[k] {
-                        aabb.hi[k] = p[k];
+        if rep[0].is_finite() {
+            // Representative point comes first
+            (0..3).for_each(|k| afforded[k].push(rep[k]));
+            // Don't include other points if the cell is small enough
+            if !sphere_contains(&rep, r_range.0.powi(2), &cell) {
+                for p in in_range {
+                    for k in 0..3 {
+                        // Expand AABB to contain afforded points
+                        if p[k] &lt; aabb.lo[k] {
+                            aabb.lo[k] = p[k];
+                        } else if aabb.hi[k] &lt; p[k] {
+                            aabb.hi[k] = p[k];
+                        }
+                        afforded[k].push(p[k]);
                     }
-                    afforded[k].push(p[k]);
                 }
             }
         }
+        // Update starts to match this region of afforded
+        starts.push(afforded[0].len());
+        aabbs.push(aabb);
+        return;
     }
-    // Update starts to match this region of afforded
-    starts.push(afforded[0].len());
-    aabbs.push(aabb);
-    return;
-}
 
-// Recursive case: splitting a cell
+    // Recursive case: splitting a cell
 
-// Compute the median plane of the cell
-let (lh, med_hi, _) = points
-    .select_nth_unstable_by(points.len() / 2, |a, b| {
-        a[k].partial_cmp(&b[k]).unwrap()
-    });
-let med_lo = lh
-    .iter()
-    .max_by(|a, b| a[k].partial_cmp(&b[k]).unwrap())
-    .unwrap();
-let test = (med_lo[k] + med_hi[k]) / 2.0;
-tests[i] = test;
+    // Compute the median plane of the cell
+    let (lh, med_hi, _) = points
+        .select_nth_unstable_by(points.len() / 2, |a, b| {
+            a[k].partial_cmp(&b[k]).unwrap()
+        });
+    let med_lo = lh
+        .iter()
+        .max_by(|a, b| a[k].partial_cmp(&b[k]).unwrap())
+        .unwrap();
+    let test = (med_lo[k] + med_hi[k]) / 2.0;
+    tests[i] = test;
 
-// Split the volumes
-let mut lo_range = in_range.clone();
-let mut hi_range = in_range;
+    // Split the volumes
+    let mut lo_range = in_range.clone();
+    let mut hi_range = in_range;
 
-let mut lo_vol = cell;
-lo_vol.hi[k] = test;
-let mut hi_vol = cell;
-hi_vol.lo[k] = test;
+    let mut lo_vol = cell;
+    lo_vol.hi[k] = test;
+    let mut hi_vol = cell;
+    hi_vol.lo[k] = test;
 
-// Compute the new afforded sets
-lo_range.retain(|p| intersects(&lo_vol, p, r_range.1.powi(2)));
-hi_range.retain(|p| intersects(&hi_vol, p, r_range.1.powi(2)));
+    // Compute the new afforded sets
+    lo_range.retain(|p| intersects(&lo_vol, p, r_range.1.powi(2)));
+    hi_range.retain(|p| intersects(&hi_vol, p, r_range.1.powi(2)));
 
-let (lhs, rhs) = points.split_at_mut(points.len() / 2);
-lo_range.extend(rhs.iter().filter(|p| p[k] &lt;= test + r_range.1));
-hi_range.extend(lhs.iter().filter(|p| p[k] &gt;= test - r_range.1));
+    let (lhs, rhs) = points.split_at_mut(points.len() / 2);
+    lo_range.extend(rhs.iter().filter(|p| p[k] &lt;= test + r_range.1));
+    hi_range.extend(lhs.iter().filter(|p| p[k] &gt;= test - r_range.1));
 
-// Recur for each half of the split
-capt_new_help(
-    lhs,
-    tests,
-    aabbs,
-    afforded,
-    starts,
-    (k + 1) % 3,
-    2 * i + 1,
-    r_range,
-    lo_range,
-    lo_vol,
-);
+    // Recur for each half of the split
+    capt_new_help(
+        lhs,
+        tests,
+        aabbs,
+        afforded,
+        starts,
+        (k + 1) % 3,
+        2 * i + 1,
+        r_range,
+        lo_range,
+        lo_vol,
+    );
 
-capt_new_help(
-    rhs,
-    tests,
-    aabbs,
-    afforded,
-    starts,
-    (k + 1) % 3,
-    2 * i + 2,
-    r_range,
-    hi_range,
-    hi_vol,
-);
+    capt_new_help(
+        rhs,
+        tests,
+        aabbs,
+        afforded,
+        starts,
+        (k + 1) % 3,
+        2 * i + 2,
+        r_range,
+        hi_range,
+        hi_vol,
+    );
 }</code></pre>
   </details>
   <h2>Filter feeders</h2>
