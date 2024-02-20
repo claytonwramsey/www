@@ -779,8 +779,64 @@ fn capt_new_help(
     );
 }</code></pre>
   </details>
+  <figure>
+    <img src="/assets/img/afftree/construct_time.svg" />
+  </figure>
+  <p>
+    Unfortunately, even with some extra engineering work, our construction times for the tree still
+    sucked. I even tried transforming the recursive construction procedure into a stack-based
+    iterative one. At the end of the day, the core problem is simply algorithmic: if the average
+    affordance-set size is \(a\), and there are \(n\) points, construction takes roughly \(O(k n
+    a)\) time for sufficiently large \(a\). In most cases, \(a\) grows with \(n\), so it could
+    perform as slowly as \(O(kn^2)\) in some clouds. For a cloud with a few hundred thousand points,
+    that's completely untenable.
+  </p>
   <h2>Filter feeders</h2>
+  <p>
+    The most natural soluution to our construction time problem is to reduce the size of our point
+    clouds. There are many ways to do this, and the simplest way is to just uniformly randomly
+    sample points from the cloud until we have the desired quantity. However, most methods provide
+    few guarantees about the quality of the sampled cloud. Ideally, we want to downsample the cloud
+    to reduce its density as much as possible; however, we can't downsample so much that we
+    hallucinate a gap in the cloud and produce an invalid plan. Accordiingly, we'll need a more
+    intelligent filtering scheme.
+  </p>
+  <p>
+    While we were thinking about filtering point clouds, we were also thinking about efficient
+    construction algorithms for the tree. One idea we had played with was implicit representation
+    for afforded sets. The hope was that we could store less data while constructing the tree and
+    filter out affordance sets in \(O(1)\) time. One such approach used segments of a space-filling
+    curve to represent sets of points, which would hopefully have allowed us to slice up affordance
+    sets much more efficiently.
+  </p>
+  <p>
+    Unfortunately for us, that approach never worked out, and so we were stuck with our bad
+    construction times. However, we still had the idea of space-filling curves on our mind when we
+    were thinking about filtering the point cloud. How could we use a space filling curve to
+    fiileter out point clouds more efficiently?
+  </p>
+  <p>
+    I'll start with a simple example. Suppose we have a list of points in one-dimensional space;
+    that is, a list of real numbers, and we want to filter it to reduce its density, but still
+    preserve the areas where points are in collision. In particular, we might want to make sure that
+    if some point \(p\) is removed, there exists another point \(p^*\) which was
+    <em>not</em> removed, such that \(\|p^* - p\|\) is less than some radius \(r_\text{filter}\).
+  </p>
   <h2>Into the C++ mines</h2>
+  <p>
+    I hate C++. This isn't a place for unhinged ranting about programming languages, but let it be
+    known that I do not write C++ willingly or lightly. However, the vector-accelerated motion
+    planner that I was developing for was written in C++, and there's no shot of it getting
+    rewritten in the near future. We all have better things to do. Instead, I got to reimplement all
+    the Rust prototype code in C++.
+  </p>
+  <p>
+    On the whole, it wasn't as bad as it could have been, but a small part of me dies inside every
+    time I have to read a template substantiation error message. My Rust implementation (not the
+    simplified version in this blog post) was polymorphic over data types and distance metrics, but
+    I only had to implement the C++ version for <code>float</code>s, <code>_mm256i</code>s, and the
+    \(L_2\) metric.
+  </p>
   <h2>The final scramble</h2>
   <h2>Victory laps</h2>
   <h2>Auslaut</h2>
