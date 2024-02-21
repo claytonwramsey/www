@@ -37,6 +37,7 @@
       </nav>
     </header>
     <h1>Making robots plan in real-time with SIMD</h1>
+    <div class="pubinfo">Clayton Ramsey - 2024-02-21</div>
     <p>
       I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
       and very stressful at the same time. I got to experiment with a lot of really cool things, but
@@ -565,7 +566,7 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
 }</code></pre>
   <h2>Under construction</h2>
   <figure>
-    <img src="/assets/img/afftree/construct_top.svg" style="width: 50%" />
+    <img src="/assets/img/afftree/construct_top.svg" style="width: 50%" class="night-invert" />
     <figcaption>
       At the first step of construction, the cell is partitioned by its median plane on one axis.
     </figcaption>
@@ -573,9 +574,9 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
   <figure>
     <div style="display: flex">
       <!-- cursed hack to make this lay out like I want it to -->
-      <img src="/assets/img/afftree/construct_left.svg" />
+      <img src="/assets/img/afftree/construct_left.svg" class="night-invert" />
       <div style="min-width: 50px"></div>
-      <img src="/assets/img/afftree/construct_right.svg" />
+      <img src="/assets/img/afftree/construct_right.svg" class="night-invert" />
     </div>
     <figcaption>
       This produces two new cells, each with half as many points. The affordance set is filtered
@@ -782,7 +783,7 @@ fn capt_new_help(
 }</code></pre>
   </details>
   <figure>
-    <img src="/assets/img/afftree/construct_time.svg" />
+    <img src="/assets/img/afftree/construct_time.svg" class="night-invert" />
   </figure>
   <p>
     Unfortunately, even with some extra engineering work, our construction times for the tree still
@@ -822,7 +823,45 @@ fn capt_new_help(
     that is, a list of real numbers, and we want to filter it to reduce its density, but still
     preserve the areas where points are in collision. In particular, we might want to make sure that
     if some point \(p\) is removed, there exists another point \(p^*\) which was
-    <em>not</em> removed, such that \(\|p^* - p\|\) is less than some radius \(r_\text{filter}\).
+    <em>not</em> removed, such that \(\|p^* - p\|\) is less than some radius \(r_\text{filter}\). In
+    that case, filtering our list of points would be easy: we sort the points in order, then remove
+    one of every adjacent pair \((p, q)\) if \(\|p - q\| \leq r_\text{filter}\).
+  </p>
+  <p>
+    With a bit of cleverness, we can generalize this approach to arbitrarily many dimensions. The
+    trick is to instead sort the points along a space-filling curve, which will place nearby points
+    approximately near each other when sorted.
+  </p>
+  <figure>
+    <img src="/assets/img/afftree/morton.svg" class="night-invert" />
+    <figcaption>Points on a 2D plane, colored by their position along a Morton curve.</figcaption>
+  </figure>
+  <p>
+    The best-known space-filling curve is the
+    <a href="https://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a>, but it's relatively
+    convoluted to compute. Instead, we used a
+    <a href="https://en.wikipedia.org/wiki/Z-order_curve">Morton curve</a> (also known as a Z-order
+    curve), because it's trivial to compute a point's position along a Morton curve using a
+    parallel-bits deposit instruction.
+  </p>
+  <pre class="rust"><code>use bitintr::Pdep;
+use std::ops::BitOr;
+
+/// Compute `p`'s position along the Morton curve filling `aabb`.
+fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
+    const MASK: u32 = 0b001_001_001_001_001_001_001_001_001_001;
+
+    p.iter()
+        .enumerate()
+        .map(|(k, x)| {
+            (((x - aabb.lo[k]) * 1024.0 / (aabb.hi[k] - aabb.lo[k])) as u32)
+                .pdep(MASK &lt;&lt; k)
+        })
+        .fold(0, BitOr::bitor)
+}</code></pre>
+  <p>
+    In practice, this yields some pretty great results! One filter pass can dramatically reduce the
+    size of a point cloud.
   </p>
   <h2>Into the C++ mines</h2>
   <p>
@@ -838,6 +877,12 @@ fn capt_new_help(
     simplified version in this blog post) was polymorphic over data types and distance metrics, but
     I only had to implement the C++ version for <code>float</code>, <code>_mm256i</code>, and the
     \(L_2\) metric.
+  </p>
+  <p>
+    We spent a little more engineering effort on construction and query times for the C++ code, in
+    part by taking advantage of some domain-specific knowledge. This let us eke out a little more
+    performance, so the Rust code is marginally slower, but not due to any differences in
+    programming languages.
   </p>
   <h2>The final scramble</h2>
   <h2>Victory laps</h2>
