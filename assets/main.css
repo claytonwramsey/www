@@ -2,7 +2,7 @@ body {
   margin: 15px auto;
   max-width: 800px;
   line-height: 1.6;
-  font-size: 20px;
+  font-size: 15px;
   padding: 0 10px;
   /* Use system fonts */
   font-family: system-ui, sans-serif;
@@ -30,7 +30,7 @@ img {
 }
 
 code {
-  font-size: 17px;
+  font-size: 15px;
 }
 
 nav {
