@@ -254,7 +254,7 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
     </p>
     <figure><img src="/assets/img/afftree/forward_error_cdf.svg" class="night-invert" /></figure>
     <p>
-      Looking from the cumulative distribution function above, we see that roughly 25% of points
+      Looking from the cumulative distribution function above, we see that roughly 20% of points
       have an error of over 10 cm. In the world of collision checking, that's enormous - any padding
       conservative enough to make this forward tree useful would make it impossible for a robot to
       find a plan.
@@ -314,8 +314,10 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     <p>
       When testing the error distribution for a forest, the results are less than impressive. We get
       diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
-      that. Even with 10 trees in the first, we're off by 0.16m more than 50% of the time. These
-      results are simply not good enough for collision-checking.
+      that. Even with 10 trees in the first, our maximum error could be as much as 20 cm. Even if
+      that error distrubtion were better, queries to these forests exhibit superlinear scaling with
+      the number of trees, since together they use so much memory that they can't all fit in the
+      cache.
     </p>
     <h2>A budget for affording</h2>
     <p>
@@ -834,7 +836,7 @@ fn capt_new_help(
     On the whole, it wasn't as bad as it could have been, but a small part of me dies inside every
     time I have to read a template substantiation error message. My Rust implementation (not the
     simplified version in this blog post) was polymorphic over data types and distance metrics, but
-    I only had to implement the C++ version for <code>float</code>s, <code>_mm256i</code>s, and the
+    I only had to implement the C++ version for <code>float</code>, <code>_mm256i</code>, and the
     \(L_2\) metric.
   </p>
   <h2>The final scramble</h2>
