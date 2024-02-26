@@ -315,7 +315,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     <p>
       When testing the error distribution for a forest, the results are less than impressive. We get
       diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
-      that. Even with 10 trees in the first, our maximum error could be as much as 20 cm. Even if
+      that. Even with 10 trees in the forest, our maximum error could be as much as 20 cm. Even if
       that error distrubtion were better, queries to these forests exhibit superlinear scaling with
       the number of trees, since together they use so much memory that they can't all fit in the
       cache.
@@ -851,6 +851,9 @@ use std::ops::BitOr;
 fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     const MASK: u32 = 0b001_001_001_001_001_001_001_001_001_001;
 
+    // the magic 1024 comes from the fact that MASK has 10 bits set,
+    // so we scale up the position of `p` along each axis to have 10 bits
+    // per dimension.
     p.iter()
         .enumerate()
         .map(|(k, x)| {
@@ -860,8 +863,22 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         .fold(0, BitOr::bitor)
 }</code></pre>
   <p>
+    The main downside to using the space-filling curve filter is that there are "cliffs" - regions
+    where moving a small amount in space dramatically changes your position on the space-filling
+    curve. To fix this, we can just filter the point cloud multiple times. Each time, we'll use a
+    different Morton curve (one for each permutation of dimensions) in the hopes that using
+    different filters will give us more opportunities to filter points.
+  </p>
+  <figure>
+    <img src="/assets/img/afftree/filter_strength.svg" class="night-invert" />
+  </figure>
+  <p>
     In practice, this yields some pretty great results! One filter pass can dramatically reduce the
-    size of a point cloud.
+    size of a point cloud, even at a small radius. In the plot above, I've run up to 6 different
+    filters over a point cloud of a bookshelf containing \(2^{16}\) points. Looking at the plot
+    above, we get some diminishing returns from filtering with more permutations. However, since the
+    construction performance is so superlinear, it's still worthwhile to do some extra filtering in
+    the hopes of reducing point cloud size a little further.
   </p>
   <h2>Into the C++ mines</h2>
   <p>
@@ -884,7 +901,83 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     performance, so the Rust code is marginally slower, but not due to any differences in
     programming languages.
   </p>
+  <p>
+    I spent a lot of time debugging quirky results. For reasons I still have yet to understand, the
+    SIMD queries performed <em>worse</em> on SIMD-parallel queries than they did on sequential
+    queries. However, this result exclusively ocurred on my latop. The solution? Simply run the
+    benchmarks on a different machine.
+  </p>
   <h2>The final scramble</h2>
+  <p>
+    What I've described so far was roughly the state of the project around two weeks before the
+    submission deadline. However, it takes more than a good idea to produce a good paper. We needed
+    serious benchmarks against serious competitors. Since the state of C++ software packaging is
+    practically nonexistent, this typically entailed vendoring the source code as a Git submodule,
+    patching it into the CMake build system, and praying that it would compile. Repeat for each
+    competitor and we've got a full set of benchmarks.
+  </p>
+  <p>
+    We wanted to benchmark against <a href="git@github.com:nvidia-isaac/nvblox.git">nvblox</a>, but
+    it was a nightmare to get it to compile and run on anything. I managed to obliterate my graphics
+    drivers twice while setting up the requisite CUDA drivers, and had to reinstall the OS from
+    scratch. In the end, we just gave up.
+  </p>
+  <h3>Software hell</h3>
+  <figure>
+    <img src="/assets/img/afftree/realsense_filtered_pc.png" class="night-invert" />
+    <figure>
+      A point cloud of a table in our lab. It took twelve hours to get this image and one paragraph
+      in our paper.
+    </figure>
+  </figure>
+  <p>
+    We also tried to get the planning system running on a real robot. The first hurdle was
+    exfiltrating a point cloud from the RealSense camera, which proved surprisingly difficult,
+    mostly because I believe that software was invented as some sort of cruel punishment for my
+    sins. We only managed to get the imaging stack working late around 3 A.M. on the night the paper
+    was due. In my experience, my productivity drops off dramatically around 10 P.M., so perhaps
+    that was only two hours of "real" work, but it was still far more difficult than getting a list
+    of points in the correct coordinate frame should be. Armed with our point cloud, we were able to
+    get real-enough demo results for the paper.
+  </p>
   <h2>Victory laps</h2>
-  <h2>Auslaut</h2>
+  <p>
+    Like many other venues, RSS has two different submission deadlines: the paper deadline and then
+    the supplemental materials submission a week later. This meant that we had enough time to try to
+    get an online planner running, hopefully to demonstrate camera-frequency planning. However, we
+    ran up against a new problem: we were planning <em>too fast</em>.
+  </p>
+  <p>
+    The heart of the issue was ROS's trajectory blender: by and large, it assumes that robots will
+    be moving slowly, and that new trajectories are provided only once every few seconds. However,
+    our planner could produce hundreds of plans per second with ease: at that frequency, the
+    trajectory blender could not keep up and so it yielded inconsistent, jerky motions.
+  </p>
+  <p>
+    We didnt't have time to fully fix the issue before the submission deadline, but a few days later
+    we managed to finally get things running. Our solution was to instead manually implement a
+    velocity controller for the robot and dodge the ROS interface entirely.
+  </p>
+  <figure>
+    <strong>TODO: GET A DEMO VIDEO!</strong>
+  </figure>
+  <p>
+    Eventually, we got the whole thing running! In the demo video above, the robot attempts to move
+    to a sequence of preset positions. At every single camera frame, we scan a point cloud, build an
+    environment, and then compute an entirely new plan from scratch - roughly a hundred times per
+    second. This means that we can insert arbitrary obstacles in the scene and it all "just works":
+    the robot magically dodges them all.
+  </p>
+  <h2>Terminus</h2>
+  <p>
+    The last few months of my degree has been a lot of work, but also a lot of fun! I originally
+    hadn't believed that I could get all this done in such a short time. I'll admit, I've sort of
+    impostor-syndromed myself: my advisor, Lydia, was very impressed with my work, but it feels to
+    me that my collaborators, Wil and Zak, did a lot of the "real" work. Now expectations are
+    higher, and I have to figure out how to make something this good <em>again</em>.
+  </p>
+  <p>
+    That being said, I'm still pretty excited for the future! I think this is a good first step for
+    my research, and it's opened up a lot of avenues for me.
+  </p>
 </html>
