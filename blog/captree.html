@@ -69,11 +69,11 @@
     </p>
     <figure style="display: flex">
       <div>
-        <img src="/assets/img/afftree/panda.png" />
+        <img src="/assets/img/captree/panda.png" />
         <figcaption>A Franka Emika Panda robot arm.</figcaption>
       </div>
       <div>
-        <img src="/assets/img/afftree/panda_sphere.png" />
+        <img src="/assets/img/captree/panda_sphere.png" />
         <figcaption>A spherical approximation of the Panda's geometry.</figcaption>
       </div>
     </figure>
@@ -108,7 +108,7 @@
       (\(y\)), and so on, until looping back around to dimension 0.
     </p>
     <figure>
-      <img src="/assets/img/afftree/kdt_partition.svg" class="night-invert" />
+      <img src="/assets/img/captree/kdt_partition.svg" class="night-invert" />
       <figcaption>The partitioned cells of a \(k\)-d tree.</figcaption>
     </figure>
     <p>
@@ -134,7 +134,7 @@
       explanation of it, but I'll try my own hand at an explanation as well.
     </p>
     <figure>
-      <img src="/assets/img/afftree/eytzinger.svg" class="night-invert" />
+      <img src="/assets/img/captree/eytzinger.svg" class="night-invert" />
       <figcaption>An illustration of the Eytzinger layout on a tree with 7 elements.</figcaption>
     </figure>
     <p>
@@ -229,7 +229,7 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
     </p>
     <figure>
       <img
-        src="/assets/img/afftree/forward_vs_kdt_query.svg"
+        src="/assets/img/captree/forward_vs_kdt_query.svg"
         alt="A 2D line plot titled 'Query performance of collision-checking structures.' 
       The x-axis is labeled as 'Number of points in cloud,' ranging from 0 to 60000, and the y-axis is labeled as 'Collision check time (ns)'. 
       There are three lines: 'k-d tree (kiddo)' in blue, 'forward tree, sequential' in green, and 'forward tree, SIMD' in green. 
@@ -250,7 +250,7 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
       real point cloud and measured the distribution of position error when selecting nearest
       neighbors.
     </p>
-    <figure><img src="/assets/img/afftree/forward_error_cdf.svg" class="night-invert" /></figure>
+    <figure><img src="/assets/img/captree/forward_error_cdf.svg" class="night-invert" /></figure>
     <p>
       Looking from the cumulative distribution function above, we see that roughly 20% of points
       have an error of over 10 cm. In the world of collision checking, that's enormous - any padding
@@ -308,7 +308,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
       I constructed a point cloud, randomly generated a bunch of query points, and tested those
       points for their distance to their nearest neighbor in the cloud.
     </p>
-    <figure><img src="/assets/img/afftree/forest_error.svg" class="night-invert" /></figure>
+    <figure><img src="/assets/img/captree/forest_error.svg" class="night-invert" /></figure>
     <p>
       When testing the error distribution for a forest, the results are less than impressive. We get
       diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
@@ -329,7 +329,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
       is less than or equal to \(r_{max}\).
     </p>
     <figure>
-      <img src="/assets/img/afftree/affordance_min.svg" class="night-invert" />
+      <img src="/assets/img/captree/affordance_min.svg" class="night-invert" />
       <figcaption>
         The cell containing \(d\) affords \(a\), \(c\), and \(e\) at radius \(r\), but not \(b\) or
         \(f\).
@@ -453,7 +453,7 @@ where
     radius.
   </p>
   <figure>
-    <img src="/assets/img/afftree/sort_affordance.svg" class="night-invert" />
+    <img src="/assets/img/captree/sort_affordance.svg" class="night-invert" />
     <figcaption>
       The cell affords 3 points at \(r_\text{max}\) that it doesn't afford at \(r_q\), so a query
       sphere of radius \(r_q\) wouldn't need to check collision against those points.
@@ -475,7 +475,7 @@ where
   </p>
   <h3>Shrinking down</h3>
   <figure>
-    <img src="/assets/img/afftree/rmin.svg" class="night-invert" />
+    <img src="/assets/img/captree/rmin.svg" class="night-invert" />
     <figcaption>
       The sphere centered on the representative point with radius \(r_\text{min}\) contains the
       entire cell, so all query spheres centered in this cell are in collision.
@@ -495,7 +495,7 @@ where
   </p>
   <h3>Bounding my boxes</h3>
   <figure>
-    <img src="/assets/img/afftree/aabb.svg" class="night-invert" />
+    <img src="/assets/img/captree/aabb.svg" class="night-invert" />
     <figcaption>
       The axis-aligned bounding box, in green, contains all points afforded by the cell.
     </figcaption>
@@ -563,7 +563,7 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
 }</code></pre>
   <h2>Under construction</h2>
   <figure>
-    <img src="/assets/img/afftree/construct_top.svg" style="width: 50%" class="night-invert" />
+    <img src="/assets/img/captree/construct_top.svg" style="width: 50%" class="night-invert" />
     <figcaption>
       At the first step of construction, the cell is partitioned by its median plane on one axis.
     </figcaption>
@@ -571,9 +571,9 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
   <figure>
     <div style="display: flex">
       <!-- cursed hack to make this lay out like I want it to -->
-      <img src="/assets/img/afftree/construct_left.svg" class="night-invert" />
+      <img src="/assets/img/captree/construct_left.svg" class="night-invert" />
       <div style="min-width: 50px"></div>
-      <img src="/assets/img/afftree/construct_right.svg" class="night-invert" />
+      <img src="/assets/img/captree/construct_right.svg" class="night-invert" />
     </div>
     <figcaption>
       This produces two new cells, each with half as many points. The affordance set is filtered
@@ -780,7 +780,7 @@ fn capt_new_help(
 }</code></pre>
   </details>
   <figure>
-    <img src="/assets/img/afftree/construct_time.svg" class="night-invert" />
+    <img src="/assets/img/captree/construct_time.svg" class="night-invert" />
   </figure>
   <p>
     Unfortunately, even with some extra engineering work, our construction times for the tree still
@@ -830,7 +830,7 @@ fn capt_new_help(
     approximately near each other when sorted.
   </p>
   <figure>
-    <img src="/assets/img/afftree/morton.svg" class="night-invert" />
+    <img src="/assets/img/captree/morton.svg" class="night-invert" />
     <figcaption>Points on a 2D plane, colored by their position along a Morton curve.</figcaption>
   </figure>
   <p>
@@ -867,7 +867,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     different filters will give us more opportunities to filter points.
   </p>
   <figure>
-    <img src="/assets/img/afftree/filter_strength.svg" class="night-invert" />
+    <img src="/assets/img/captree/filter_strength.svg" class="night-invert" />
   </figure>
   <p>
     In practice, this yields some pretty great results! One filter pass can dramatically reduce the
@@ -921,7 +921,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
   </p>
   <h3>Software hell</h3>
   <figure>
-    <img src="/assets/img/afftree/realsense_filtered_pc.png" class="night-invert" />
+    <img src="/assets/img/captree/realsense_filtered_pc.png" class="night-invert" />
     <figure>
       A point cloud of a table in our lab. It took twelve hours to get this image and one paragraph
       in our paper.
