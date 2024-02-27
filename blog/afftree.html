@@ -36,7 +36,7 @@
         <a href="/recipes.html">Recipes</a>
       </nav>
     </header>
-    <h1>Making robots plan in real-time with SIMD</h1>
+    <h1>Making robots plan in real-time with SIMD and Rust</h1>
     <div class="pubinfo">Clayton Ramsey - 2024-02-21</div>
     <p>
       I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting
@@ -59,27 +59,24 @@
       demonstrating dramatic speedups by using SIMD and precompilation for motion planning. However,
       their approach assumed that they had access to a primitive representation of the environment,
       which is rarely the case in reality. In many applications, robots must plan using their
-      observed sensor data - namely, pointclouds.
+      observed sensor data - namely, point clouds.
     </p>
     <p>
       In most sampling-based planning algorithms, such as RRT and PRM, collision checking is
       far-and-away the most commonly called (and therefore the most expensive) subroutine. This
       means that we have to develop methods for efficiently checking whether our robot is in
-      collision with a pointcloud.
+      collision with a point cloud.
     </p>
     <figure style="display: flex">
       <div>
-        <img src="/assets/img/afftree/ur5.png" />
-        <figcaption>A Universal Robots model UR-5e robot arm.</figcaption>
+        <img src="/assets/img/afftree/panda.png" />
+        <figcaption>A Franka Emika Panda robot arm.</figcaption>
       </div>
       <div>
-        <img src="/assets/img/afftree/ur5_ball.svg" />
-        <figcaption>A conservative spherical approximation of the UR-5e's geometry.</figcaption>
+        <img src="/assets/img/afftree/panda_sphere.png" />
+        <figcaption>A spherical approximation of the Panda's geometry.</figcaption>
       </div>
     </figure>
-    <strong
-      >TODO: use one of our own images instead of this (which I got from the UR-5 website)</strong
-    >
     <p>
       We can start by assuming that our robot can be modeled as a set of balls over some distance
       metric. Using the \(L^2\) distance metric, these balls are spheres, which meshes conveniently
@@ -92,7 +89,7 @@
     <h2>Review: \(k\)-d trees</h2>
     <p>
       There's a simple solution to our collision-checking problem using a nearest-neighbors data
-      structure. Given a set of points \(P\) in the pointcloud, construct a nearest-neighbor data
+      structure. Given a set of points \(P\) in the point cloud, construct a nearest-neighbor data
       structure over \(P\). Then, whenever we have to check whether some sphere with center \(x\)
       and radius \(r\) is in collision, we find the closest point \(p\) in \(P\) to \(x\), and check
       whether the distance from \(x\) to \(p\) is greater than \(r\).
@@ -226,7 +223,7 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
       At these scales, a \(k\)-d tree is the best competitor. Fortunately,
       <code><a href="https://github.com/sdd/kiddo">kiddo</a></code
       >, one of the fastest \(k\)-d tree implementations out there, is easy to install via Cargo.
-      I'll be using that as a rough baseline for pointcloud-collision-checking. I found that the
+      I'll be using that as a rough baseline for point cloud collision-checking. I found that the
       fastest results came from using <code>within_unsorted</code> on an
       <code>ImmutableKdTree</code>, so I'm using that as my baseline.
     </p>
@@ -250,7 +247,7 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
     </p>
     <p>
       Not only that, our approximate answer isn't even all that good. To test this, I collected a
-      real pointcloud and measured the distribution of position error when selecting nearest
+      real point cloud and measured the distribution of position error when selecting nearest
       neighbors.
     </p>
     <figure><img src="/assets/img/afftree/forward_error_cdf.svg" class="night-invert" /></figure>
@@ -316,7 +313,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
       When testing the error distribution for a forest, the results are less than impressive. We get
       diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
       that. Even with 10 trees in the forest, our maximum error could be as much as 20 cm. Even if
-      that error distrubtion were better, queries to these forests exhibit superlinear scaling with
+      that error distribution were better, queries to these forests exhibit superlinear scaling with
       the number of trees, since together they use so much memory that they can't all fit in the
       cache.
     </p>
@@ -464,7 +461,7 @@ where
   </figure>
   <p>
     The first idea we had for this was to sort all the points in each affordance set in descending
-    order of distance to the cell. That way, searches with small query radi would be able to
+    order of distance to the cell. That way, searches with small query radii would be able to
     terminate earlier: as soon as the collision-check found a point further from the cell than the
     query radius, the search could terminate immediately.
   </p>
@@ -597,7 +594,7 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
   </p>
   <p>
     Next, we recursively partition the tree, maintaining a candidate affordance set \(z\),
-    initialized as an empty set; and a candidate volume \(c\), intialized to the axis-aligned
+    initialized as an empty set; and a candidate volume \(c\), initialized to the axis-aligned
     bounding box containing all of \(\mathbb{R}^3\). Recursively, we partition \(P'\) by the
     following steps:
   </p>
@@ -796,12 +793,12 @@ fn capt_new_help(
   </p>
   <h2>Filter feeders</h2>
   <p>
-    The most natural soluution to our construction time problem is to reduce the size of our point
+    The most natural solution to our construction time problem is to reduce the size of our point
     clouds. There are many ways to do this, and the simplest way is to just uniformly randomly
     sample points from the cloud until we have the desired quantity. However, most methods provide
     few guarantees about the quality of the sampled cloud. Ideally, we want to downsample the cloud
     to reduce its density as much as possible; however, we can't downsample so much that we
-    hallucinate a gap in the cloud and produce an invalid plan. Accordiingly, we'll need a more
+    hallucinate a gap in the cloud and produce an invalid plan. Accordingly, we'll need a more
     intelligent filtering scheme.
   </p>
   <p>
@@ -815,8 +812,8 @@ fn capt_new_help(
   <p>
     Unfortunately for us, that approach never worked out, and so we were stuck with our bad
     construction times. However, we still had the idea of space-filling curves on our mind when we
-    were thinking about filtering the point cloud. How could we use a space filling curve to
-    fiileter out point clouds more efficiently?
+    were thinking about filtering the point cloud. How could we use a space filling curve to filter
+    out point clouds more efficiently?
   </p>
   <p>
     I'll start with a simple example. Suppose we have a list of points in one-dimensional space;
@@ -904,7 +901,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
   <p>
     I spent a lot of time debugging quirky results. For reasons I still have yet to understand, the
     SIMD queries performed <em>worse</em> on SIMD-parallel queries than they did on sequential
-    queries. However, this result exclusively ocurred on my latop. The solution? Simply run the
+    queries. However, this result exclusively ocurred on my laptop. The solution? Simply run the
     benchmarks on a different machine.
   </p>
   <h2>The final scramble</h2>
@@ -954,7 +951,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     trajectory blender could not keep up and so it yielded inconsistent, jerky motions.
   </p>
   <p>
-    We didnt't have time to fully fix the issue before the submission deadline, but a few days later
+    We didn't have time to fully fix the issue before the submission deadline, but a few days later
     we managed to finally get things running. Our solution was to instead manually implement a
     velocity controller for the robot and dodge the ROS interface entirely.
   </p>
@@ -978,6 +975,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
   </p>
   <p>
     That being said, I'm still pretty excited for the future! I think this is a good first step for
-    my research, and it's opened up a lot of avenues for me.
+    my research, and it's opened up a lot of avenues for me. There are a lot of applications for
+    fast planning out there, and I'm thinking that I can explore a few to get a full thesis.
   </p>
 </html>
