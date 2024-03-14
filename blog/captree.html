@@ -312,10 +312,14 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
     <p>
       When testing the error distribution for a forest, the results are less than impressive. We get
       diminishing returns at around 4 trees in the forest, with minimal gains from adding trees past
-      that. Even with 10 trees in the forest, our maximum error could be as much as 20 cm. Even if
-      that error distribution were better, queries to these forests exhibit superlinear scaling with
-      the number of trees, since together they use so much memory that they can't all fit in the
-      cache.
+      that. Even with 10 trees in the forest, our maximum error could be as much as 20 cm.
+    </p>
+    <figure><img src="/assets/img/captree/forest_throughput.svg" class="night-invert" /></figure>
+    <p>
+      Even if that error distribution were better, queries to these forests exhibit superlinear
+      scaling with the number of trees, since together they use so much memory that they can't all
+      fit in the cache. At around 10 trees, the SIMD performance of a forest is about the same as a
+      \(k\)-d tree, but as we discussed before, the error isn't good enough to justify using it.
     </p>
     <h2>A budget for affording</h2>
     <p>
@@ -561,6 +565,25 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
               &lt;= rsq
       })
 }</code></pre>
+  <p>
+    With that, we have the complete collision-checking logic for a CAPT. The process is simple:
+    classify a query sphere as belonging to a cell, then check whether the query sphere collides
+    with any points sufficiently close to the cell.
+  </p>
+  <figure><img src="/assets/img/captree/capt_throughput.svg" class="night-invert" /></figure>
+  <p>
+    To see how well this tree performs, I'm showing the results from a benchmark above. This plot
+    shows the relative throughput of various methods on a sequence of collision-checking queries.
+    These queries were recorded from a real motion planning problem, then I played the same sequence
+    of queries back with just the collision-checking to see how much each collision-checking
+    procedure took. All the numbers for this post were recorded on my laptop, though our paper's
+    benchmarks ran on a somewhat beefier desktop computer.
+  </p>
+  <p>
+    We see that the CAPT is only slightly slower than the naive forward-only tree. For some reason,
+    it slows down dramatically once there are enough points: this only occurs on my laptop, so I
+    suspect it has something to do with cache locality weirdness.
+  </p>
   <h2>Under construction</h2>
   <figure>
     <img src="/assets/img/captree/construct_top.svg" style="width: 50%" class="night-invert" />
