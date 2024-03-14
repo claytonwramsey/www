@@ -395,8 +395,8 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
 }</code></pre>
   <p>
     If we tried to parallelize collision-checking between our query spheres and afforded points like
-    we did in <code>first_pass</code>, we wouldn't actually see much perfomance benefit. I know this
-    because that's what I had originally tried, and it was hardly faster than the sequential
+    we did in <code>first_pass</code>, we wouldn't actually see much performance benefit. I know
+    this because that's what I had originally tried, and it was hardly faster than the sequential
     implementation. The heart of the problem is that gather instructions are comically slow on
     nearly all processors, so the CPU spends far more time waiting for memory to arrive than it does
     on churning through computations.
@@ -428,7 +428,7 @@ where
         for s in (start[l]..end[l]).step_by(L) {
             let mut distsq = Simd::splat(0.0);
             for (pt_k, aff_k) in pt.iter().zip(&t.afforded) {
-                // assume `affordances[k]` is sufficently long
+                // assume `affordances[k]` is sufficiently long
                 // for simplicity
                 let diff = pt_k - Simd::from_slice(&aff_k[s..]);
                 distsq += diff * diff;
