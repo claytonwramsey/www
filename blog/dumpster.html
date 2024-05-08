@@ -595,21 +595,9 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
       <li>We increment <code>COLLECTING_TAG</code> to 1.</li>
       <li><code>dfs</code> records that \(x\) has 2 unaccounted-for references at the start.</li>
       <li>
-<<<<<<< HEAD
         <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self
         reference in that slot. \(x\) now has 1 unaccounted-for reference.
         <figure><img src="/assets/img/dumpster/dash1.dot.svg" class="night-invert" /></figure>
-=======
-        <<<<<<< HEAD
-        <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self reference in that slot.
-        \(x\) now has 1 unaccounted-for reference.
-        <img src="/assets/img/dumpster/dash1.dot.svg" />
-        =======
-        <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self reference in that slot.
-        \(x\) now has 1 unaccounted-for reference.
-        <figure><img src="/assets/img/dumpster/dash1.dot.svg" class="night-invert" /></figure>
-        >>>>>>> 3512ae5 (add night inversion for some figures)
->>>>>>> 168c2ba (self-host mathjax + remove es6 polyfill)
       </li>
       <li value="4">
         A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to \(r\), then moving
@@ -1413,7 +1401,6 @@ def mark_dirty(allocation):
       one bug which only occurred after several thousand operations had completed, resulting in reference graphs that
       looked like this:
     </p>
-<<<<<<< HEAD
     <img src="/assets/img/dumpster/evil.dot.svg" />
     <p>The graph above was made by fuzzing my garbage collector, using the same approach as my benchmarks.</p>
     <figure><img src="/assets/img/dumpster/evil.dot.svg" class="night-invert" /></figure>
@@ -1421,14 +1408,5 @@ def mark_dirty(allocation):
       The graph above was made by fuzzing my garbage collector, using the same approach as my
       benchmarks.
     </p>
-=======
-    <<<<<<< HEAD
-    <img src="/assets/img/dumpster/evil.dot.svg" />
-    <p>The graph above was made by fuzzing my garbage collector, using the same approach as my benchmarks.</p>
-    =======
-    <figure><img src="/assets/img/dumpster/evil.dot.svg" class="night-invert" /></figure>
-    <p>The graph above was made by fuzzing my garbage collector, using the same approach as my benchmarks.</p>
-    >>>>>>> 3512ae5 (add night inversion for some figures)
->>>>>>> 168c2ba (self-host mathjax + remove es6 polyfill)
   </body>
 </html>
