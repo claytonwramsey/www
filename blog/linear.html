@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<!-- 
+  Hi! Thanks for checking out this website. 
+  I made it myself! 
+  This website was made by hand. 
+  I intentionally haven't minified anything so you can see how it all fits together.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="TODO" />
+    <meta name="keywords" content="rust" />
+
+    <title>Things linear types could do for you</title>
+
+    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/hljs.css" />
+    <link rel="icon" href="/assets/img/favicon.ico" />
+
+    <script src="/assets/js/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/blog">Blog</a>
+        <a href="/recipes">Recipes</a>
+      </nav>
+      <h1>Things linear types could do for you</h1>
+      <div class="pubinfo">Clayton Ramsey - 2024-05-09</div>
+    </header>
+    <h2>How it would work</h2>
+    <h2>Fine-grained lifetime management</h2>
+    <p>
+      I quite like the <code>Mutex</code> API in Rust, since it's pretty easy to manage critical sections by deciding
+      when to drop a <code>MutexGuard</code>. However, it's a little too easy to accidentally deadlock by forgetting
+      when to drop a <code>MutexGuard</code>.
+    </p>
+    <pre class="rust"><code>let mutex = std::sync::Mutex::new(());
+let guard1 = mutex.lock().unwrap();
+// do some other stuff...
+let guard2 = mutex.lock().unwrap();
+// oops! deadlocked!</code></pre>
+    <p>
+      The example above is a little silly, in that it's pretty easy to catch this one. More practically speaking, it's
+      common to accidentally forget to drop a <code>MutexGuard</code> at the exact instant it's no longer leading, which
+      can cause critical sections of code to be way longer than needed. This results in mysterious performance losses
+    </p>
+    <h2>Fallible destruction</h2>
+    <h2>Bonus round: adding effect systems</h2>
+    <h2>Some drawbacks</h2>
+  </body>
+</html>
