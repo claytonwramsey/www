@@ -11,7 +11,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="Clayton Ramsey" />
-    <meta name="description" content="TODO" />
+    <meta
+      name="description"
+      content="Systems programming and data structures meet to make instant collision-checking."
+    />
     <meta name="keywords" content="robots, Rust, SIMD" />
 
     <title>Making robots plan faster with SIMD and Rust</title>
@@ -174,7 +177,7 @@ where
         let tests = Simd::gather_or_default(tests, i);
         let cmp = points[k].simd_ge(tests).to_int().cast();
         let one = Simd::splat(1);
-        i = (i << one) + one + (cmp & one);
+        i = (i &lt;&lt; one) + one + (cmp & one);
         k = (k + 1) % 3;
     }
 
@@ -890,6 +893,11 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     correct coordinate frame should be. Armed with our point cloud, we were able to get real-enough demo results for the
     paper.
   </p>
+  <h3>Actually writing the thing</h3>
+  <p>
+    We ended up divvying up the work for the paper: I was mostly responsible for writing up the method, as well of some
+    of the analysis and results,
+  </p>
   <h2>Victory laps</h2>
   <p>
     Like many other venues, RSS has two different submission deadlines: the paper deadline and then the supplemental
@@ -916,6 +924,35 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
     preset positions. At every single camera frame, we scan a point cloud, build an environment, and then compute an
     entirely new plan from scratch - roughly a hundred times per second. This means that we can insert arbitrary
     obstacles in the scene and it all "just works": the robot magically dodges them all.
+  </p>
+  <h2>Reviewer 2 is real</h2>
+  <h2>Becoming a marketer</h2>
+  <blockquote>
+    I think you shoulg go to Japan
+    <footer>Email subject from my advisor, sent at 12:01 AM [sic]</footer>
+  </blockquote>
+  <p>
+    Very little of an academic's time is spent doing worthy research; instead, they mostly try to convince others that
+    their research is worth doing. For the entirety of April and May, my efforts have been mostly directed that way:
+    preparing materials and advertising my work.
+  </p>
+  <figure>
+    <img src="/assets/img/captree/teros.png" />
+    <figcaption>Me, presenting my poster at TEROS.</figcaption>
+  </figure>
+  <p>
+    I started out small with a poster presentation at <a href="https://teros-texas.github.io/">TEROS</a>, a small
+    symposium at Texas A&M. When I printed the poster, however, I picked the wrong version: I printed a PDF with
+    feedback attached as comments. I only found out that my poster was covered in yellow highlights when I arrived. It
+    was too late to fix, so I just didn't mention the highlighting to anyone else. In spite of this, I had a pretty fun
+    time there, and it seems like there were a handful of people interested in the work.
+  </p>
+  <p>
+    At my university, first-year Ph.D. students are given a $2500 grant for either conference travel or a laptop to be
+    spent in their first year. By March, I hadn't spent any of that grant money, since my current laptop was still
+    working correctly. Accordingly, I got the above email header from my advisor, Lydia -
+    <a href="https://2024.ieee-icra.org/">ICRA 2024</a> was in Yokohama, Japan this year, and I showed up at a workshop
+    with a trimmed-down version of my paper.
   </p>
   <h2>Terminus</h2>
   <p>
