@@ -38,47 +38,48 @@
       <h1>Blowing up my compile times for dubious benefits</h1>
       <div class="pubinfo">Clayton Ramsey - 2023-06-19</div>
     </header>
-    <p>The tree of useless optimization yields questionable fruit.</p>
-    <p>
-      For the last two years, I’ve been building a
-      <a href="https://github.com/claytonwramsey/fiddler">chess engine called Fiddler</a>. It’s not very good by chess
-      engine standards, but that’s not the point - I mostly work on it for funsies.
-    </p>
-    <p>
-      Right now, I’m reworking my move generator to more heavily use static, precomputed data rather than runtime
-      generation. Most recently, I’m moving from dynamically generating and heap-allocating the magic move generation
-      table to making it a statically allocated constant. Along the way, I’ll take this opportunity to explain how magic
-      move generation works, and hopefully have a little fun.
-    </p>
-    <p>
-      <strong>Update 2023-06-22:</strong> I’ve added a few updates to handle questions that people in the comments on
-      the
-      <a href="https://news.ycombinator.com/item?id=36399832">Orange Website</a>
-      found confusing.
-    </p>
-    <h2 id="a-crash-course-in-magic-moves">A crash course in magic moves</h2>
-    <p>
-      Chess engines are usually extremely high-performance pieces of software, and their move generators are some of the
-      most high-performance parts of them. Most move generators can generate hundreds of millions of moves, per core,
-      per second. Mine included!
-    </p>
-    <p>
-      The majority of moves are made by sliding pieces - the bishop, rook, and queen - so we’ll dedicate most of our
-      effort toward making that fast. The most naive approach would be to represent a board as an array of pieces, and
-      then, for each piece, iterate outward along a ray, adding moves until we encounter a blocker. The problem with
-      that approach is simply that it’s far too slow. In the worst case, finding the set of legal moves for a queen on
-      E4 would require 27 different array accesses - and that’s just the moves for one piece! We’re going to need a
-      different approach.
-    </p>
-    <h3 id="bitboards">Bitboards</h3>
-    <p>
-      We can start by representing the occupancy of a board using a
-      <em>bitboard</em>: a set of squares represented by a unique 64-bit integer. Convention dictates that the
-      least-significant bit should be set if the square A1 is occupied, the second-least-significant to represent B1,
-      and so on until the most significant bit which represents H8.
-    </p>
-    <p>Here’s a quick map displaying which bit in a bitboards corresponds to a square, indexed from the LSB:</p>
-    <pre class="text"><code>8 | 56 57 58 59 60 61 62 63
+    <main>
+      <p>The tree of useless optimization yields questionable fruit.</p>
+      <p>
+        For the last two years, I’ve been building a
+        <a href="https://github.com/claytonwramsey/fiddler">chess engine called Fiddler</a>. It’s not very good by chess
+        engine standards, but that’s not the point - I mostly work on it for funsies.
+      </p>
+      <p>
+        Right now, I’m reworking my move generator to more heavily use static, precomputed data rather than runtime
+        generation. Most recently, I’m moving from dynamically generating and heap-allocating the magic move generation
+        table to making it a statically allocated constant. Along the way, I’ll take this opportunity to explain how
+        magic move generation works, and hopefully have a little fun.
+      </p>
+      <p>
+        <strong>Update 2023-06-22:</strong> I’ve added a few updates to handle questions that people in the comments on
+        the
+        <a href="https://news.ycombinator.com/item?id=36399832">Orange Website</a>
+        found confusing.
+      </p>
+      <h2 id="a-crash-course-in-magic-moves">A crash course in magic moves</h2>
+      <p>
+        Chess engines are usually extremely high-performance pieces of software, and their move generators are some of
+        the most high-performance parts of them. Most move generators can generate hundreds of millions of moves, per
+        core, per second. Mine included!
+      </p>
+      <p>
+        The majority of moves are made by sliding pieces - the bishop, rook, and queen - so we’ll dedicate most of our
+        effort toward making that fast. The most naive approach would be to represent a board as an array of pieces, and
+        then, for each piece, iterate outward along a ray, adding moves until we encounter a blocker. The problem with
+        that approach is simply that it’s far too slow. In the worst case, finding the set of legal moves for a queen on
+        E4 would require 27 different array accesses - and that’s just the moves for one piece! We’re going to need a
+        different approach.
+      </p>
+      <h3 id="bitboards">Bitboards</h3>
+      <p>
+        We can start by representing the occupancy of a board using a
+        <em>bitboard</em>: a set of squares represented by a unique 64-bit integer. Convention dictates that the
+        least-significant bit should be set if the square A1 is occupied, the second-least-significant to represent B1,
+        and so on until the most significant bit which represents H8.
+      </p>
+      <p>Here’s a quick map displaying which bit in a bitboards corresponds to a square, indexed from the LSB:</p>
+      <pre class="text"><code>8 | 56 57 58 59 60 61 62 63
 7 | 48 49 50 51 52 53 54 55
 6 | 40 41 42 43 44 45 46 47
 5 | 32 33 34 35 36 37 38 39
@@ -88,66 +89,66 @@
 1 |  0  1  2  3  4  5  6  7
 --+------------------------
   |  A  B  C  D  E  F  G  H</code></pre>
-    <p>
-      For example, consider a board with a piece on B1, G3, and C7. B1 has index 1, G3 has index 22, and C7 has index
-      50, so the bitboard uniquely representing {B1, G3, C7} is \(2^1 + 2^{22} + 2^{50}\), which is equal to
-      1125899911036930.
-    </p>
-    <p>
-      We can use our bitboards to compute setwise operations in \(O(1)\) time. Here’s a short (but not exhaustive) list
-      of operations we can do:
-    </p>
-    <table>
-      <thead>
-        <tr class="header">
-          <th>Mathematical representation</th>
-          <th>Bitboard operation</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="odd">
-          <td>\(A \cup B\)</td>
-          <td><code>a | b</code></td>
-          <td></td>
-        </tr>
-        <tr class="even">
-          <td>\(A \cap B\)</td>
-          <td><code>a &amp; b</code></td>
-          <td></td>
-        </tr>
-        <tr class="odd">
-          <td>\(A \Delta B\)</td>
-          <td><code>a ^ b</code></td>
-          <td></td>
-        </tr>
-        <tr class="even">
-          <td>\(\bar A \)</td>
-          <td><code>!a</code></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-    <p>
-      <strong>Update 2023-06-22:</strong> I use Rust’s notation for <code>!a</code>. In C and C++, one would use
-      <code>~a</code> for the bitwise not operation.
-    </p>
-    <h3 id="building-a-lookup-table">Building a lookup table</h3>
-    <p>
-      In order to get an \(O(1)\) computation of sliding moves, we can use a lookup table to find precomputed values of
-      the set of legal moves given the starting square and occupancy bitboard of a board. There’s just one problem:
-      There are an enormous amount of possible occupancy maps, roughly \(\sum_{n=3}^{16} {64 \choose n}\) possible
-      occupancies containing at least two kings and a sliding piece, or about 700 trillion total boards. To store an
-      8-byte bitboard for every square and occupancy would require roughly 365 PB of data!
-    </p>
-    <p>
-      We can use a nice trick to reduce our data consumption, though. In our naive algorithm for sliding move
-      generation, we only needed to examine whether the squares that we wanted our piece to move to were occupied -
-      other squares not on the same ray were irrelevant. We can do the same: we can somehow extract out the relevant
-      occupancies for any square’s move generation.
-    </p>
-    <p>For example, these are the only relevant squares for the set of legal moves for a rook on E4:</p>
-    <pre class="text"><code>8 |  .  .  .  .  .  .  .  .
+      <p>
+        For example, consider a board with a piece on B1, G3, and C7. B1 has index 1, G3 has index 22, and C7 has index
+        50, so the bitboard uniquely representing {B1, G3, C7} is \(2^1 + 2^{22} + 2^{50}\), which is equal to
+        1125899911036930.
+      </p>
+      <p>
+        We can use our bitboards to compute setwise operations in \(O(1)\) time. Here’s a short (but not exhaustive)
+        list of operations we can do:
+      </p>
+      <table>
+        <thead>
+          <tr class="header">
+            <th>Mathematical representation</th>
+            <th>Bitboard operation</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd">
+            <td>\(A \cup B\)</td>
+            <td><code>a | b</code></td>
+            <td></td>
+          </tr>
+          <tr class="even">
+            <td>\(A \cap B\)</td>
+            <td><code>a &amp; b</code></td>
+            <td></td>
+          </tr>
+          <tr class="odd">
+            <td>\(A \Delta B\)</td>
+            <td><code>a ^ b</code></td>
+            <td></td>
+          </tr>
+          <tr class="even">
+            <td>\(\bar A \)</td>
+            <td><code>!a</code></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Update 2023-06-22:</strong> I use Rust’s notation for <code>!a</code>. In C and C++, one would use
+        <code>~a</code> for the bitwise not operation.
+      </p>
+      <h3 id="building-a-lookup-table">Building a lookup table</h3>
+      <p>
+        In order to get an \(O(1)\) computation of sliding moves, we can use a lookup table to find precomputed values
+        of the set of legal moves given the starting square and occupancy bitboard of a board. There’s just one problem:
+        There are an enormous amount of possible occupancy maps, roughly \(\sum_{n=3}^{16} {64 \choose n}\) possible
+        occupancies containing at least two kings and a sliding piece, or about 700 trillion total boards. To store an
+        8-byte bitboard for every square and occupancy would require roughly 365 PB of data!
+      </p>
+      <p>
+        We can use a nice trick to reduce our data consumption, though. In our naive algorithm for sliding move
+        generation, we only needed to examine whether the squares that we wanted our piece to move to were occupied -
+        other squares not on the same ray were irrelevant. We can do the same: we can somehow extract out the relevant
+        occupancies for any square’s move generation.
+      </p>
+      <p>For example, these are the only relevant squares for the set of legal moves for a rook on E4:</p>
+      <pre class="text"><code>8 |  .  .  .  .  .  .  .  .
 7 |  .  .  .  .  x  .  .  .
 6 |  .  .  .  .  x  .  .  .
 5 |  .  .  .  .  x  .  .  .
@@ -157,36 +158,36 @@
 1 |  .  .  .  .  .  .  .  .
 --+------------------------
   |  A  B  C  D  E  F  G  H</code></pre>
-    <p>
-      <strong>Update 2023-06-22</strong>: We can safely ignore those squares on the edge of the board because they
-      actually don’t affect what our rook can “see.” For instance, the rook will be able to to see H4 if F4 and G4 are
-      empty, but whether H4 is empty does not affect whether the rook can see H4. Once we have the set of squares the
-      rook can see, we can convert that to the set of squares the rook can move to by masking out all pieces of the same
-      color as the rook.
-    </p>
-    <p>
-      For each square, then, we only need to consider a small handful of occupied spots. All we need to do is store a
-      lookup for every
-      <code>(square, relevant_occupancy)</code> pair, which is far smaller than the previous requirement.
-    </p>
-    <p>
-      There are at most 9 relevant occupancy bits for a bishop and 12 bits for a rook, so the total memory requirement
-      for this lookup table is less than 2.4 MB. If we break out the single master lookup table into a unique lookup
-      table for each attacker type and starter square, we can get a smaller total memory consumption at only 861 kB.
-    </p>
-    <h3 id="where-the-magic-happens">Where the magic happens</h3>
-    <p>
-      However, we still have to be able to convert an occupancy bitboard into an index. What we really want to do is to
-      take our masked out bits and extract them into an index. On x86 architectures, the
-      <code>pext</code> instruction is exactly designed to do this, but if we want it to work on any architecture, we’ll
-      have to be a little more clever than that.
-    </p>
-    <p>
-      I’ll start with a magic example, and we’ll see if that can enlighten us. Suppose we want to extract the relevant
-      occupancy for a bishop on B2.
-    </p>
-    <p>Take the original masked occupancy bitboard, \(O\).</p>
-    <pre class="text"><code>8 |  .  .  .  .  .  .  .  .
+      <p>
+        <strong>Update 2023-06-22</strong>: We can safely ignore those squares on the edge of the board because they
+        actually don’t affect what our rook can “see.” For instance, the rook will be able to to see H4 if F4 and G4 are
+        empty, but whether H4 is empty does not affect whether the rook can see H4. Once we have the set of squares the
+        rook can see, we can convert that to the set of squares the rook can move to by masking out all pieces of the
+        same color as the rook.
+      </p>
+      <p>
+        For each square, then, we only need to consider a small handful of occupied spots. All we need to do is store a
+        lookup for every
+        <code>(square, relevant_occupancy)</code> pair, which is far smaller than the previous requirement.
+      </p>
+      <p>
+        There are at most 9 relevant occupancy bits for a bishop and 12 bits for a rook, so the total memory requirement
+        for this lookup table is less than 2.4 MB. If we break out the single master lookup table into a unique lookup
+        table for each attacker type and starter square, we can get a smaller total memory consumption at only 861 kB.
+      </p>
+      <h3 id="where-the-magic-happens">Where the magic happens</h3>
+      <p>
+        However, we still have to be able to convert an occupancy bitboard into an index. What we really want to do is
+        to take our masked out bits and extract them into an index. On x86 architectures, the
+        <code>pext</code> instruction is exactly designed to do this, but if we want it to work on any architecture,
+        we’ll have to be a little more clever than that.
+      </p>
+      <p>
+        I’ll start with a magic example, and we’ll see if that can enlighten us. Suppose we want to extract the relevant
+        occupancy for a bishop on B2.
+      </p>
+      <p>Take the original masked occupancy bitboard, \(O\).</p>
+      <pre class="text"><code>8 |  .  .  .  .  .  .  .  .
 7 |  .  .  .  .  .  .  .  .
 6 |  .  .  .  .  .  .  b5 .
 5 |  .  .  .  .  .  b4 .  .
@@ -196,57 +197,59 @@
 1 |  .  .  .  .  .  .  .  .
 --+------------------------
   |  A  B  C  D  E  F  G  H</code></pre>
-    <p>Observe that \(O = b_1 2^{10} + b_2 2^{19} + b_3 2^{28} + b_4 2^{37} + b_5 2^{46}\).</p>
-    <p>Now, multiply \(O\) by the magic number \(M = 2^{17} + 2^{25} + 2^{33} + 2^{41} + 2^{49}\).</p>
-    <p>
-      \[O * M = b_1 2^{59} + b_2 2^{60} + b_3 2^{61} + b_4 2^{62} + b_5 2^{63} + \text{garbage on other exponents}\]
-    </p>
-    <p>
-      Using simple bitwise masking, we can then manually retrieve those packed bits near the MSB to use as our index. We
-      can generate a set of 128 magic numbers (64 for bishops, 64 for rooks) which individually can be used to map each
-      square and occupancy to extract its bits, and then use that operation to retrieve a pre-computed set of moves in
-      constant time.
-    </p>
-    <p>
-      <em>Side note</em>: Most of the time, there are actually collisions when using magic numbers. Collisions occur
-      when our magic multiply doesn’t perfectly extract the relevant bits, but instead returns some other, bizarre
-      combination of our relevant bits as the index. However, so long as the collisions map the same final moveset,
-      that’s OK, so finding magics is actually pretty easy - brute force search works quite well.
-    </p>
-    <h2 id="getting-down-to-business">Getting down to business</h2>
-    <p>
-      Most engines both compute all their magic numbers as part of their startup routines. Before this week, I included
-      the magic numbers as static constants and computed the entire table of movesets at startup. However, due to the
-      limitations of Rust, I ended up using
-      <a href="https://docs.rs/once_cell/latest/once_cell/"><code>once_cell</code></a
-      >’s <code>Lazy</code> for initializing the move lookup table. This had the benefit of being really easy to
-      implement, but it also meant that every time move generation was required (i.e. millions of times per second) the
-      engine had to check whether the moves lookup table had already been loaded.
-    </p>
-    <p>
-      Now, I have to rewrite it from scratch, but in “hard” mode - to make all the constants known at compile time,
-      everything has to be written in a
-      <code>const</code> function. This means:
-    </p>
-    <ul>
-      <li>No allocations</li>
-      <li>No printing</li>
-      <li>No panicking</li>
-      <li>No for loops</li>
-      <li>No trait methods</li>
-    </ul>
-    <p>
-      Let’s get right to it by describing our data layout. We begin by implementing a
-      <code>Bitboard</code> by wrapping <code>u64</code>:
-    </p>
-    <pre class="rust"><code>#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+      <p>Observe that \(O = b_1 2^{10} + b_2 2^{19} + b_3 2^{28} + b_4 2^{37} + b_5 2^{46}\).</p>
+      <p>Now, multiply \(O\) by the magic number \(M = 2^{17} + 2^{25} + 2^{33} + 2^{41} + 2^{49}\).</p>
+      <p>
+        \[O * M = b_1 2^{59} + b_2 2^{60} + b_3 2^{61} + b_4 2^{62} + b_5 2^{63} + \text{garbage on other exponents}\]
+      </p>
+      <p>
+        Using simple bitwise masking, we can then manually retrieve those packed bits near the MSB to use as our index.
+        We can generate a set of 128 magic numbers (64 for bishops, 64 for rooks) which individually can be used to map
+        each square and occupancy to extract its bits, and then use that operation to retrieve a pre-computed set of
+        moves in constant time.
+      </p>
+      <p>
+        <em>Side note</em>: Most of the time, there are actually collisions when using magic numbers. Collisions occur
+        when our magic multiply doesn’t perfectly extract the relevant bits, but instead returns some other, bizarre
+        combination of our relevant bits as the index. However, so long as the collisions map the same final moveset,
+        that’s OK, so finding magics is actually pretty easy - brute force search works quite well.
+      </p>
+      <h2 id="getting-down-to-business">Getting down to business</h2>
+      <p>
+        Most engines both compute all their magic numbers as part of their startup routines. Before this week, I
+        included the magic numbers as static constants and computed the entire table of movesets at startup. However,
+        due to the limitations of Rust, I ended up using
+        <a href="https://docs.rs/once_cell/latest/once_cell/"><code>once_cell</code></a
+        >’s <code>Lazy</code> for initializing the move lookup table. This had the benefit of being really easy to
+        implement, but it also meant that every time move generation was required (i.e. millions of times per second)
+        the engine had to check whether the moves lookup table had already been loaded.
+      </p>
+      <p>
+        Now, I have to rewrite it from scratch, but in “hard” mode - to make all the constants known at compile time,
+        everything has to be written in a
+        <code>const</code> function. This means:
+      </p>
+      <ul>
+        <li>No allocations</li>
+        <li>No printing</li>
+        <li>No panicking</li>
+        <li>No for loops</li>
+        <li>No trait methods</li>
+      </ul>
+      <p>
+        Let’s get right to it by describing our data layout. We begin by implementing a
+        <code>Bitboard</code> by wrapping <code>u64</code>:
+      </p>
+      <pre class="rust"><code>#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Bitboard(u64);</code></pre>
-    <p>
-      For every square and sliding piece type, we’ll create a structure called an
-      <code>AttacksLookup</code>:
-    </p>
-    <pre class="rust"><code>/// A lookup table for generating attacks via magic bitboard for one piece type and square.
+      <p>
+        For every square and sliding piece type, we’ll create a structure called an
+        <code>AttacksLookup</code>:
+      </p>
+      <pre
+        class="rust"
+      ><code>/// A lookup table for generating attacks via magic bitboard for one piece type and square.
 struct AttacksLookup {
     /// A reference to this lookup&#39;s section of the magic attacks.
     table: &amp;&#39;static [Bitboard],
@@ -257,32 +260,35 @@ struct AttacksLookup {
     /// The shift to extract an index from a multiplied constant.
     shift: u8,
 }</code></pre>
-    <p>
-      In order for us to have a “ragged” moves-lookup table, we don’t have each
-      <code>AttacksLookup</code> own its attack set, since that would result in extremely inefficient space usage and an
-      enormous increase in what will already be a very large binary. Instead, we store <em>all</em>
-      of the moves-lookup tables in one giant array, and have each
-      <code>AttacksLookup</code> have a reference to its section of that array.
-    </p>
-    <p>
-      Let’s try to populate that array, staying mindful of our lack of for-loops. First, we’ll store our magic numbers:
-    </p>
-    <pre
-      class="rust"
-    ><code>/// A saved list of magic multiply numbers for rooks, indexed by the square they&#39;re used for.
+      <p>
+        In order for us to have a “ragged” moves-lookup table, we don’t have each
+        <code>AttacksLookup</code> own its attack set, since that would result in extremely inefficient space usage and
+        an enormous increase in what will already be a very large binary. Instead, we store <em>all</em>
+        of the moves-lookup tables in one giant array, and have each
+        <code>AttacksLookup</code> have a reference to its section of that array.
+      </p>
+      <p>
+        Let’s try to populate that array, staying mindful of our lack of for-loops. First, we’ll store our magic
+        numbers:
+      </p>
+      <pre
+        class="rust"
+      ><code>/// A saved list of magic multiply numbers for rooks, indexed by the square they&#39;re used for.
 const SAVED_ROOK_MAGICS: [u64; 64] = [
     /* 64 lines removed */
 ];</code></pre>
-    <p>
-      These magic numbers can be found offline via trial and error, but there are also public records of magic numbers.
-      For example, the Chess Programming wiki
-      <a href="https://www.chessprogramming.org/Best_Magics_so_far">keeps a record of magic numbers</a>.
-    </p>
-    <p>
-      Next, we need to know how much storage to allocate for all the rook moves. We do this by first storing a table of
-      how many entries are needed for each square to calculate our moves.
-    </p>
-    <pre class="rust"><code>/// Log-base-2 of the number of entries required in the moves-lookup table for each square.
+      <p>
+        These magic numbers can be found offline via trial and error, but there are also public records of magic
+        numbers. For example, the Chess Programming wiki
+        <a href="https://www.chessprogramming.org/Best_Magics_so_far">keeps a record of magic numbers</a>.
+      </p>
+      <p>
+        Next, we need to know how much storage to allocate for all the rook moves. We do this by first storing a table
+        of how many entries are needed for each square to calculate our moves.
+      </p>
+      <pre
+        class="rust"
+      ><code>/// Log-base-2 of the number of entries required in the moves-lookup table for each square.
 const ROOK_BITS: [u8; 64] = [
     12, 11, 11, 11, 11, 11, 11, 12, // rank 1
     11, 10, 10, 10, 10, 10, 10, 11, // 2
@@ -293,16 +299,16 @@ const ROOK_BITS: [u8; 64] = [
     10, 9, 9, 9, 9, 9, 9, 10, // 7
     11, 10, 10, 10, 10, 11, 10, 11, // 8
 ];</code></pre>
-    <p>
-      You may notice something odd happening on ranks 7 and 8: the number of bits required for some of the squares is 1
-      lower than their mask. This is intentional! As it turns out, certain magic numbers will yield just the right set
-      of hash collisions so that you can use half as many entries are there are occupancies. This saves about 18 kB of
-      data.
-    </p>
-    <p>The size of our table is just the sum of 2 to the power of the number of bits required for each square:</p>
-    <pre
-      class="rust"
-    ><code>/// Compute the number of entries in a magic-movegen table required to store every element, given
+      <p>
+        You may notice something odd happening on ranks 7 and 8: the number of bits required for some of the squares is
+        1 lower than their mask. This is intentional! As it turns out, certain magic numbers will yield just the right
+        set of hash collisions so that you can use half as many entries are there are occupancies. This saves about 18
+        kB of data.
+      </p>
+      <p>The size of our table is just the sum of 2 to the power of the number of bits required for each square:</p>
+      <pre
+        class="rust"
+      ><code>/// Compute the number of entries in a magic-movegen table required to store every element, given
 /// the number of bits required for each square.
 const fn table_size(bits_table: &amp;[u8; 64]) -&gt; usize {
     let mut i = 0;
@@ -313,14 +319,14 @@ const fn table_size(bits_table: &amp;[u8; 64]) -&gt; usize {
     }
     total
 }</code></pre>
-    <p>
-      We also need to construct the masks for each square.
-      <code>get_rook_masks</code> takes in a <code>Square</code> (hence the call to <code>transmute</code>) and builds
-      the relevant occupancy mask for the square.
-    </p>
-    <pre
-      class="rust"
-    ><code>/// The bitwise masks for extracting the relevant pieces for a rook&#39;s attacks in a board, indexed
+      <p>
+        We also need to construct the masks for each square.
+        <code>get_rook_masks</code> takes in a <code>Square</code> (hence the call to <code>transmute</code>) and builds
+        the relevant occupancy mask for the square.
+      </p>
+      <pre
+        class="rust"
+      ><code>/// The bitwise masks for extracting the relevant pieces for a rook&#39;s attacks in a board, indexed
 /// by the square occupied by the rook.
 const ROOK_MASKS: [Bitboard; 64] = {
     let mut masks = [Bitboard::EMPTY; 64];
@@ -344,13 +350,13 @@ const fn get_rook_mask(sq: Square) -&gt; Bitboard {
     // in the col mask or row mask, but not the piece to move
     Bitboard::new((row_mask | col_mask) &amp; !(1 &lt;&lt; sq as u64))
 }</code></pre>
-    <p>
-      We now have enough to actually build the full set of attacks. We do this via brute force: for every possible
-      occupancy, we calculate the set of legal moves, and then save the legal moves at the correct index.
-    </p>
-    <pre
-      class="rust"
-    ><code>/// The master table containing every attack that the rook can perform from every square under
+      <p>
+        We now have enough to actually build the full set of attacks. We do this via brute force: for every possible
+        occupancy, we calculate the set of legal moves, and then save the legal moves at the correct index.
+      </p>
+      <pre
+        class="rust"
+      ><code>/// The master table containing every attack that the rook can perform from every square under
 /// every occupancy.
 /// Borrowed by the individual [`AttacksLookup`]s in [`ROOK_LOOKUPS`].
 const ROOK_ATTACKS_TABLE: [Bitboard; table_size(&amp;ROOK_BITS)] = construct_magic_table(
@@ -402,14 +408,14 @@ const fn construct_magic_table&lt;const N: usize&gt;(
 
     table
 }</code></pre>
-    <details>
-      <summary>
-        <p>
-          <code>compute_magic_key</code> and the other helper functions called above can be implemented with some basic
-          drudgery.
-        </p>
-      </summary>
-      <pre class="rust"><code>/// Given some mask, create the occupancy [`Bitboard`] according to this index.
+      <details>
+        <summary>
+          <p>
+            <code>compute_magic_key</code> and the other helper functions called above can be implemented with some
+            basic drudgery.
+          </p>
+        </summary>
+        <pre class="rust"><code>/// Given some mask, create the occupancy [`Bitboard`] according to this index.
 ///
 /// `index` must be less than or equal to 2 ^ (number of ones in `mask`).
 /// This is equivalent to the parallel-bits-deposit (PDEP) instruction on x86 architectures.
@@ -481,15 +487,15 @@ const fn directional_attacks(
 const fn compute_magic_key(occupancy: Bitboard, magic: u64, shift: u8) -&gt; usize {
     (occupancy.as_u64().wrapping_mul(magic) &gt;&gt; shift) as usize
 }</code></pre>
-    </details>
-    <p><br /></p>
-    <p>
-      Lastly, we build each individual <code>AttacksLookup</code> with its references to
-      <code>ROOK_ATTACKS_TABLE</code>.
-    </p>
-    <pre
-      class="rust"
-    ><code>/// The necessary information for generatng attacks for rook, indexed b the square occupied by
+      </details>
+      <p><br /></p>
+      <p>
+        Lastly, we build each individual <code>AttacksLookup</code> with its references to
+        <code>ROOK_ATTACKS_TABLE</code>.
+      </p>
+      <pre
+        class="rust"
+      ><code>/// The necessary information for generatng attacks for rook, indexed b the square occupied by
 /// said rook.
 const ROOK_LOOKUPS: [AttacksLookup; 64] = construct_lookups(
     &amp;ROOK_BITS,
@@ -527,29 +533,29 @@ const fn construct_lookups(
         transmute(table)
     }
 }</code></pre>
-    <p>
-      In order to compute the moves for the rook, we work backwards, going from the
-      <code>AttacksLookup</code> into the table. For performance, we perform unchecked array accesses. We can prove
-      they’re always safe because <code>Square</code>s can only have values from 0 through 63, and we know our key
-      generation code is producing a low enough index to not go out of bounds.
-    </p>
-    <pre class="rust"><code>pub fn rook_moves(occupancy: Bitboard, sq: Square) -&gt; Bitboard {
+      <p>
+        In order to compute the moves for the rook, we work backwards, going from the
+        <code>AttacksLookup</code> into the table. For performance, we perform unchecked array accesses. We can prove
+        they’re always safe because <code>Square</code>s can only have values from 0 through 63, and we know our key
+        generation code is producing a low enough index to not go out of bounds.
+      </p>
+      <pre class="rust"><code>pub fn rook_moves(occupancy: Bitboard, sq: Square) -&gt; Bitboard {
     let magic_data = unsafe { ROOK_LOOKUPS.get_unchecked(sq as usize) };
     let key = compute_magic_key(occupancy &amp; magic_data.mask, magic_data.magic, magic_data.shift);
 
     unsafe { *magic_data.table.get_unchecked(key) }
 
 }</code></pre>
-    <p>
-      While you weren’t looking, I wrote some very similar code for writing the bishop moves-lookup table. In all, it’s
-      about 300 lines of code.
-    </p>
-    <h2 id="insert-rust-compiler-speed-joke-here">&lt;insert Rust compiler speed joke here&gt;</h2>
-    <p>
-      It’s now time to compile our code. Running <code>cargo build</code>, we get to wait about 30 seconds until we
-      encounter this beauty of an output:
-    </p>
-    <pre class="text"><code>~/C/fiddler (static_magic|✚2) $ cargo build
+      <p>
+        While you weren’t looking, I wrote some very similar code for writing the bishop moves-lookup table. In all,
+        it’s about 300 lines of code.
+      </p>
+      <h2 id="insert-rust-compiler-speed-joke-here">&lt;insert Rust compiler speed joke here&gt;</h2>
+      <p>
+        It’s now time to compile our code. Running <code>cargo build</code>, we get to wait about 30 seconds until we
+        encounter this beauty of an output:
+      </p>
+      <pre class="text"><code>~/C/fiddler (static_magic|✚2) $ cargo build
    Compiling fiddler v0.1.0 (/home/clayton/Chess/fiddler)
 note: erroneous constant used
    --&gt; src/base/movegen/magic.rs:328:6
@@ -656,36 +662,37 @@ note: some of the compiler flags provided by cargo are hidden
 query stack during panic:
 end of query stack
 error: could not compile `fiddler` (lib)</code></pre>
-    <p>
-      I accidentally found a compiler bug! I opened the issue for it
-      <a href="https://github.com/rust-lang/rust/issues/112748">here</a>. I don’t know the exact cause for it yet, but I
-      think it’s somehow related to constant evaluation. In any event, annotating <code>ROOK_ATTACKS_TABLE</code> with
-      <code>#[allow(long_running_const_eval)]</code> seems to fix it.
-    </p>
-    <p>
-      Running the compiler again, we find that our compile time has ballooned from about 3 seconds to 48 seconds. Almost
-      all of that time is spent on generating <code>ROOK_ATTACKS_TABLE</code>.
-    </p>
-    <p>
-      Interestingly enough, I wrote an exhaustive test of the magic table generation code, which does essentially the
-      same thing as generating the table, except at runtime, and I found that it ran in 0.00 seconds. I suspect that the
-      constant evaluator in Rust is just plain slow.
-    </p>
-    <h2 id="denouement">Denouement</h2>
-    <p>
-      Now that we’ve gotten the whole thing to compile, we can actually run a benchmark. In chess engines, the main
-      measure of engine quality is Elo, a relative measure of engine performance.
-    </p>
-    <p>
-      I threw the new version of Fiddler, with its compile-time generated lookup tables, against the older
-      dynamically-generated ones, and here are my results:
-    </p>
-    <pre class="text"><code>Score of fiddler_const_magic vs fiddler_dynamic_magic: 5278 - 5003 - 4271 [0.509]
+      <p>
+        I accidentally found a compiler bug! I opened the issue for it
+        <a href="https://github.com/rust-lang/rust/issues/112748">here</a>. I don’t know the exact cause for it yet, but
+        I think it’s somehow related to constant evaluation. In any event, annotating
+        <code>ROOK_ATTACKS_TABLE</code> with <code>#[allow(long_running_const_eval)]</code> seems to fix it.
+      </p>
+      <p>
+        Running the compiler again, we find that our compile time has ballooned from about 3 seconds to 48 seconds.
+        Almost all of that time is spent on generating <code>ROOK_ATTACKS_TABLE</code>.
+      </p>
+      <p>
+        Interestingly enough, I wrote an exhaustive test of the magic table generation code, which does essentially the
+        same thing as generating the table, except at runtime, and I found that it ran in 0.00 seconds. I suspect that
+        the constant evaluator in Rust is just plain slow.
+      </p>
+      <h2 id="denouement">Denouement</h2>
+      <p>
+        Now that we’ve gotten the whole thing to compile, we can actually run a benchmark. In chess engines, the main
+        measure of engine quality is Elo, a relative measure of engine performance.
+      </p>
+      <p>
+        I threw the new version of Fiddler, with its compile-time generated lookup tables, against the older
+        dynamically-generated ones, and here are my results:
+      </p>
+      <pre class="text"><code>Score of fiddler_const_magic vs fiddler_dynamic_magic: 5278 - 5003 - 4271 [0.509]
 ...      fiddler_const_magic playing White: 2766 - 2374 - 2136  [0.527] 7276
 ...      fiddler_const_magic playing Black: 2512 - 2629 - 2135  [0.492] 7276
 ...      White vs Black: 5395 - 4886 - 4271  [0.517] 14552
 Elo difference: 6.6 +/- 4.7, LOS: 99.7 %, DrawRatio: 29.3 %
 14566 of 30000 games finished.</code></pre>
-    <p>We get a whole 6 Elo points - equivalent to a 1% improvement in the engine. At least it’s not a regression!</p>
+      <p>We get a whole 6 Elo points - equivalent to a 1% improvement in the engine. At least it’s not a regression!</p>
+    </main>
   </body>
 </html>
