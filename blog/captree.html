@@ -40,13 +40,13 @@
       </nav>
     </header>
     <h1>Making robots plan in real-time with SIMD and Rust</h1>
-    <div class="pubinfo">Clayton Ramsey - 2024-02-21</div>
+    <div class="pubinfo">Clayton Ramsey - 2024-06-07</div>
     <main>
       <p>
-        I'm now wrapping up my first "real" research project of my my Ph.D., which is both exciting and very stressful
-        at the same time. I got to experiment with a lot of really cool things, but most of them didn't actually work.
-        I'm writing this blog post as a collection of the story behind the paper, where I get to explain all the things
-        I tried that didn't work out, as well as to share the untold story of the paper.
+        I'm now wrapping up the first "real" research project of my Ph.D., which is both exciting and very stressful at
+        the same time. I got to experiment with a lot of really cool things, but most of them didn't actually work. I'm
+        writing this blog post as a chance to explain all the things I tried that didn't work out, as well as to share
+        the untold story of the paper.
       </p>
       <p>
         Special thanks to my collaborators at the <a href="https://kavrakilab.org">Kavraki Lab</a>:
@@ -54,7 +54,8 @@
         advisor <a href="https://profiles.rice.edu/faculty/lydia-e-kavraki">Lydia Kavraki</a>.
       </p>
       <p>
-        If you want to skip straight to just reading the final paper, check it out on arXiV
+        If you want to skip straight to just reading the final paper (which we'll be presenting at
+        <a href="https://roboticsconference.org">Robotics: Science and Systems</a>) check it out on arXiV
         <a href="https://arxiv.org/abs/2406.02807">here</a>. Alternately, if you want to check out the code, take a look
         at the C++ implementation <a href="https://github.com/kavrakilab/vamp">here</a> or the Rust implementation
         <a href="https://github.com/claytonwramsey/captree">here</a>.
@@ -62,12 +63,13 @@
       <h2>The problem at hand</h2>
       <p>
         When we talk about <dfn>motion planning</dfn>, we refer to a relatively simple problem: given a start position
-        and an end position, find a continuous movement for a robot to move from the start to the end. There are
+        and an end position, find a safe, continuous movement for a robot to move from the start to the end. There are
         millions of variations on the problem setup (kinodynamic constraints! uncertainty! multiple robots! multi-modal
         actions! underactuation!) but all them look kind of similar if you squint hard enough. There are lots of
         algorithms for planning - optimization-based, controls-based, sampling-based, learning-based, and so on. In all
         these algorithms, especially in sampling-based planning, we need an efficient collision-checking routine for
-        determining if a robot's state is valid.
+        determining if a robot's state is valid, since the planning algorithm will perform thousands of collision-checks
+        for every plan.
       </p>
       <p>
         A few months ago, Wil and Zak (two postdocs in my lab) published a
@@ -88,22 +90,25 @@
       </figure>
       <p>
         We can start by assuming that our robot can be modeled as a set of balls over some distance metric. Using the
-        \(L^2\) distance metric, these balls are spheres, which meshes conveniently with sphere-hierarchy
-        representations of robot geometry. This lets us neatly reduce the problem of collision-checking all kinds of
-        robot geometries into one simple case: checking whether a some set of spheres collides with a set of points. In
-        addition to that, we would like to be able to do our collision checking in parallel at an instruction level to
-        radically improve our performance.
+        \(L^2\) norm, these balls are spheres, which meshes conveniently with sphere-hierarchy representations of robot
+        geometry. This lets us neatly reduce the problem of collision-checking all kinds of robot geometries into one
+        simple case: checking whether a some set of spheres collides with a set of points. In addition to that, we would
+        like to be able to do our collision checking in parallel at an instruction level to radically improve our
+        performance.
       </p>
       <h2>Review: \(k\)-d trees</h2>
       <p>
-        There's a simple solution to our collision-checking problem using a nearest-neighbors data structure. Given a
-        set of points \(P\) in the point cloud, construct a nearest-neighbor data structure over \(P\). Then, whenever
-        we have to check whether some sphere with center \(x\) and radius \(r\) is in collision, we find the closest
-        point \(p\) in \(P\) to \(x\), and check whether the distance from \(x\) to \(p\) is greater than \(r\).
+        There's a simple solution to our collision-checking problem using a
+        <a href="https://en.wikipedia.org/wiki/Nearest_neighbor_search">nearest-neighbors</a> data structure. Given a
+        point cloud represented as a set of points \(P\), construct a nearest-neighbor data structure over \(P\). Then,
+        whenever we have to check whether some robot sphere with center \(x\) and radius \(r\) is in collision, we find
+        the closest point \(p\) in \(P\) to \(x\), and check whether the distance from \(x\) to \(p\) is greater than
+        \(r\).
       </p>
       <p>
-        The canonical approach to computing nearest-neighbors is a \(k\)-d tree - a class of space partitioning tree.
-        There are many formulations, but I'll use a median-partitioning tree in this case.
+        The canonical approach to computing nearest-neighbors is a
+        <a href="https://en.wikipedia.org/wiki/K-d_tree">\(k\)-d tree</a> - a class of space partitioning tree. There
+        are many formulations, but I'll use a median-partitioning tree in this case.
       </p>
       <p>
         At each branch of a \(k\)-d tree, we split the the space into two sub-volumes, each containing the same number
@@ -126,7 +131,8 @@
         These are very nice data structures, but they suffer from two core issues for our application: first, \(k\)-d
         trees have extremely poor cache locality due to the fact that they jump around everywhere during a search.
         Second, this approach is not at all amenable to SIMD parallelism, which typically requires some amount of
-        branchlessness. How do we make something which is similarly performant without the same limitations?
+        branchlessness. How do we make something which is similarly performant (or better!) without the same
+        limitations?
       </p>
       <h2>Being stupid faster</h2>
       <p>
@@ -146,7 +152,8 @@
         <code>tests</code> for convenience), and for some branch-point at index \(i\), the left child will be at
         position \(2i + 1\), while the right child will be at position \(2i + 2\). If we assume that the number of
         points in the tree is a power of 2, and that the tree is perfectly balanced, we can create an extremely
-        efficient method for the first pass through the tree.
+        efficient method for the first pass through the tree. If the number of points is not a power of two, we can just
+        pad the point cloud with points at \(\infty\).
       </p>
       <pre class="rust"><code>struct ForwardTree {
     /// contains 2^p - 1 tests
@@ -195,7 +202,11 @@ where
 
     i - Simd::splat(tests.len())
 }</code></pre>
-      <p>The above code does the exact same thing as <code>first_pass</code>, but this time in parallel.</p>
+      <p>
+        The above code does the exact same thing as <code>first_pass</code>, but this time in parallel across a set of
+        <code>L</code> different robot spheres. This means we can get a speedup of up to <code>L</code> times on
+        whole-robot collision checks.
+      </p>
       <p>
         Once we've extracted the identifier for our approximate-nearest-neighbor, we can do a quick test for whether
         it's in collision by computing the distance to the center of the query sphere.
@@ -214,8 +225,8 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
 }</code></pre>
       <p>
         Of course, we can also do our collision checking in a SIMD parallel manner; however, the resulting code would be
-        rather verbose and not very interesting, since we'll need to throw that code away shortly. I'll skip ahead to
-        the good part, which is the performance results.
+        rather verbose and not very interesting. Since we'll need to throw that code away shortly anyway, I'll skip
+        ahead to the good part, which is the performance results.
       </p>
       <p>
         At these scales, a \(k\)-d tree is the best competitor. Fortunately,
@@ -238,7 +249,9 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
       </figure>
       <p>
         We see that this single-pass approach blows a normal \(k\)-d tree out of the water, yielding enormous speedups
-        in query time from hundreds of nanoseconds to only about 10 ns. However, this comparison isn't really fair:
+        in query time from hundreds of nanoseconds to only about 10 ns. Sadly, the SIMD addition is only a modest
+        improvement - this is because gather instructions are very slow on my laptop's processor. On other machines,
+        there's usually a more appreciable performance improvement. This comparison also isn't really fair:
         <code>kiddo</code> is giving us an exact answer to whether we're in collision, while our forward tree is only
         returning an approximate answer.
       </p>
@@ -318,12 +331,12 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
       <h2>A budget for affording</h2>
       <p>
         Let's briefly take stock of the situation. Using our forward tree, we can quickly classify a query point as
-        belonging to a single unit cell. We know that for any fixed cell and radius of a test-sphere, there is a finite
-        set of points which are close enough to collide with at least one point in the cell. If we're targeting a
-        particular robot, we also know \(r_{max}\), the maximum radius of a sphere on the robot. If we trust that we'll
-        never do a collision check for a sphere larger than \(r_{max}\), then any query point in a given cell can only
-        ever collide with a fixed set of points in the cloud: namely, the set of points whose distance to the cell is
-        less than or equal to \(r_{max}\).
+        belonging to a single unit cell. We know that for any fixed cell and radius of a test-sphere, there is a fixed
+        set of points in \(P\) which are close enough to collide with at least one point in the cell. If we're targeting
+        a particular robot, we also know \(r_{max}\), the maximum radius of a sphere on the robot. If we trust that
+        we'll never do a collision check for a sphere larger than \(r_{max}\), then any query point in a given cell can
+        only ever collide with a fixed set of points in the cloud: namely, the set of points whose distance to the cell
+        is less than or equal to \(r_{max}\).
       </p>
       <figure>
         <img src="/assets/img/captree/affordance_min.svg" class="night-invert" />
@@ -339,7 +352,7 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
         Using our knowledge of \(r_{max}\), we can annotate each leaf of our forward-tree with the list of all afforded
         points. Then, when checking for collision, we can traverse this list of afforded points and test for collision
         against any of them. This allows us to convert our approximate-nearest-neighbor guess into a completely accurate
-        range-nearest-neighbors query. I currently call the resulting structure an
+        range-nearest-neighbors query without . I currently call the resulting structure an
         <dfn>collision-affording point tree</dfn>, or <dfn>CAPT</dfn> for short.
       </p>
       <p>
@@ -478,7 +491,8 @@ where
         I decided to take advantage of this to reduce the peak affordance size. We already accept that we know
         \(r_\text{max}\), so why not also provide a minimum radius \(r_\text{min}\)? If a sphere of radius
         \(r_\text{min}\) collides with a point, then any other query sphere with the same center should also collide, no
-        matter what.
+        matter what. For the small cells, then, we can throw away all other points except the representative point of
+        the cell and store only a single point in its afforded set.
       </p>
       <h3>Bounding my boxes</h3>
       <figure>
@@ -489,8 +503,7 @@ where
         There's one last notable case where the search spends a lot of time needlessly checking for collisions. Cells
         near the edge of a cluster are often long and skinny, with one tip of the cell being very close to the cluster
         and the other tip extending far out into space. Those long, skinny cells often take up the majority of the free
-        space in the environment, meaning most of our queries will actually be against a cell which is mostly taken up
-        by free space.
+        space in the environment, meaning most of our queries will actually be against a cell which is mostly empty.
       </p>
       <p>
         We'd like to be able to filter out queries which aren't in collision as fast as possible, ideally skipping the
@@ -498,8 +511,8 @@ where
         possibility for improvement: what if we just didn't check the spheres in the "empty" part of the cell?
       </p>
       <p>
-        To do this, we an axis-aligned bounding box (AABB) containing the affordance set for each cell. If we're lucky,
-        the AABB will often be much smaller than its cell.
+        To do this, we construct an axis-aligned bounding box (AABB) containing the affordance set for each cell. If
+        we're lucky, the AABB will often be much smaller than its cell.
       </p>
       <pre class="rust"><code>struct Capt {
     /// contains n - 1 elements
@@ -519,8 +532,8 @@ struct Aabb {
 }
 </code></pre>
       <p>
-        Then, when querying, we'll determine whether some query sphere intersects the AABB. If it doesn't, then we know
-        that the sphere is not in collision, and can quickly avoid checking it.
+        Then, when querying, we can cheaply detect whether a query sphere intersects the AABB. If it doesn't, then we
+        know that the sphere is not in collision, and can avoid later expensive steps in collision-checking.
       </p>
       <pre class="rust"><code>fn intersects(aabb: &Aabb, center: &[f32; 3], rsq: f32) -&gt; bool {
     aabb.lo
@@ -548,15 +561,16 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
       <p>
         With that, we have the complete collision-checking logic for a CAPT. The process is simple: classify a query
         sphere as belonging to a cell, then check whether the query sphere collides with any points sufficiently close
-        to the cell.
+        to the cell. This step can also be parallelized using SIMD by batching collision checks with a set of afforded
+        points in a cell; however, I'm not including the sample code for that since it's quite complicated.
       </p>
       <figure><img src="/assets/img/captree/capt_throughput.svg" class="night-invert" /></figure>
       <p>
         To see how well this tree performs, I'm showing the results from a benchmark above. This plot shows the relative
         throughput of various methods on a sequence of collision-checking queries. These queries were recorded from a
         real motion planning problem, then I played the same sequence of queries back with just the collision-checking
-        to see how much each collision-checking procedure took. All the numbers for this post were recorded on my
-        laptop, though our paper's benchmarks ran on a somewhat beefier desktop computer.
+        to see how much each collision-checking procedure took. All the numbers for the Rust implementation were
+        recorded on my laptop, though our paper's benchmarks ran on a somewhat beefier desktop computer.
       </p>
       <p>
         We see that the CAPT is only slightly slower than the naive forward-only tree. For some reason, it slows down
@@ -588,14 +602,14 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
         construction procedure is much like that of a normal \(k\)-d tree.
       </p>
       <p>
-        We start out given some list of \(n\) points \(P\), in our point cloud. Since our Eytzinger-layout-based search
+        We start out given some list of \(n\) points \(P\), our point cloud. Since our Eytzinger-layout-based search
         procedure requires \(n\) to be a power of two, we compute \(n'\), which is the next power of two after \(n\),
         and then pad \(P\) to length \(n'\) with points at \(\left<\infty,\infty,\infty\right>\) to produce \(P'\).
       </p>
       <p>
         Next, we recursively partition the tree, maintaining a candidate affordance set \(z\), initialized as an empty
         set; and a candidate volume \(c\), initialized to the axis-aligned bounding box containing all of
-        \(\mathbb{R}^3\). Recursively, we partition \(P'\) by the following steps:
+        \(\mathbb{R}^3\). We partition \(P'\) by the following steps:
       </p>
       <ol>
         <li>Compute the median plane for the current cell.</li>
@@ -880,9 +894,9 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       </p>
       <p>
         On the whole, it wasn't as bad as it could have been, but a small part of me dies inside every time I have to
-        read a template substantiation error message. My Rust implementation (not the simplified version in this blog
-        post) was polymorphic over data types, but I only had to implement the C++ version for
-        <code>float</code> and <code>_mm256i</code>, which made things easier.
+        read a template instantiation error message. My Rust implementation (not the simplified version in this blog
+        post) was polymorphic over dimension, but I only had to implement the C++ version for \(k=3\), which made things
+        easier.
       </p>
       <p>
         We spent a little more engineering effort on construction and query times for the C++ code, in part by taking
@@ -892,12 +906,12 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <p>
         I spent a lot of time debugging quirky results. For reasons I still have yet to understand, the SIMD queries
         performed <em>worse</em> on SIMD-parallel queries than they did on sequential queries. However, this result
-        exclusively ocurred on the C++ implementation on my laptop. The solution? Simply run the benchmarks on a
-        different machine.
+        exclusively ocurred on the C++ implementation on my laptop - no other machines. The solution? Simply run the
+        benchmarks on a different machine.
       </p>
       <h2>The final scramble</h2>
       <figure>
-        <img src="/assets/img/captree/throughput_fig.png" />
+        <img src="/assets/img/captree/throughput_fig.png" class="night-invert" />
         <figcaption>Collision-checking throughput performance in the C++ implementation.</figcaption>
       </figure>
       <p>
@@ -967,11 +981,8 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       </p>
       <p>
         For the final benchmarks, instead of using my laptop, we used a much beefier computer with a Ryzen 9 7950X,
-        which accounts for the biggest difference in empirical performance. We were actually quite surprised by our
-        results - we weren't expecting to be that far ahead. In particular, OctoMaps were extremely slow for
-        collision-checking, which means that the default point cloud representation in robotics has probably been
-        ruining planning times for the last ten years. <code>kiddo</code> deserves some kudos, too - it's probably the
-        fastest \(k\)-d tree out there.
+        which accounts for the biggest difference in empirical performance compared to the earlier plots. We were
+        actually quite surprised by our results - we weren't expecting to be that far ahead.
       </p>
       <p>
         Our target conference was <a href="https://roboticsconference.org"><cite>Robotics: Science and Systems</cite></a
@@ -990,7 +1001,7 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <figure>
         <img src="/assets/img/captree/realsense_filtered_pc.png" class="night-invert" />
         <figure>
-          A point cloud of a table in our lab. It took twelve hours to get this image and one paragraph in our paper.
+          A point cloud of a table in our lab. It took painfully long to get this image and one paragraph in our paper.
         </figure>
       </figure>
       <p>
@@ -1010,10 +1021,9 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         <em>too fast</em>.
       </p>
       <p>
-        The heart of the issue was ROS's trajectory blender: by and large, it assumes that robots will be moving slowly,
-        and that new trajectories are provided only once every few seconds. However, our planner could produce hundreds
-        of plans per second with ease: at that frequency, the trajectory blender could not keep up and so it yielded
-        inconsistent, jerky motions.
+        The heart of the issue was ROS's trajectory blender: by and large, it assumes new trajectories are provided only
+        once every few seconds. However, our planner could produce hundreds of plans per second with ease: at that
+        frequency, the trajectory blender could not keep up and so it yielded inconsistent, jerky motions.
       </p>
       <p>
         We didn't have time to fully fix the issue before the submission deadline, but a few days later we managed to
@@ -1051,18 +1061,14 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         knew, but there was one major hiccup - our proof of correctness. From our filtering method, we knew that if any
         point \(p\) was removed from a point cloud, we would leave a point \(p'\) such that \(\|p - p'\| \leq
         r_\text{filter}\). From that, we derived a proof that this filter wouldn't produce gaps (based on the dispersion
-        of the point cloud), and from there on we proved that the whole pipeline was correct. However, we practically
-        hallucinated our definition of dispersion as we drafted the paper and so there were maybe ten people on the
-        planet who would have had a chance at understanding what we claimed at all.
+        of the point cloud), and from there on we proved that the whole pipeline was correct. However, we didn't explain
+        which definition of dispersion we were using, and so there were maybe ten people on the planet who would have
+        had a chance at understanding what we claimed at all.
       </p>
       <p>
         The reviewers rightfully called us out on such nonsense, and thankfully, there is a definition of dispersion
         which does make this proof work (see LaValle, <cite>Planning Algorithms</cite>, sec. 5.2.3), so we got away with
-        our slightly deranged results.
-      </p>
-      <p>
-        One reviewer didn't seem to catch this issue. In fact, they didn't seem to catch much at all, given that they
-        wrote about three sentences. But apparently that's just how reviews go sometimes.
+        it in the end.
       </p>
       <h2>Becoming a marketer</h2>
       <blockquote>
@@ -1106,9 +1112,9 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <p>
         ICRA was my first conference, and I thought it was pretty cool! I got to see a lot of really exciting work from
         across the field, and it seems like a number of people were also excited about my work. To be completely honest,
-        I also I also found that the oral presentations were simply not worth it - it's too easy to zone out, and it's
-        never at the right amount of detail. Instead, the best place to hang out is in the poster presentation area,
-        because you can talk directly to the authors and get a much better sense of their work.
+        I also found that the oral presentations were simply not worth it - it's too easy to zone out, and it's never at
+        the right amount of detail. Instead, the best place to hang out is in the poster presentation area, because you
+        can talk directly to the authors and get a much better sense of their work.
       </p>
       <p>
         The last major bit of marketing was of course this blog post; though, to be honest, it's more for my personal

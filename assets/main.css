@@ -33,10 +33,6 @@ img {
   fill: currentColor !important;
 }
 
-code {
-  font-size: 15px;
-}
-
 nav {
   font-size: 25px;
   a {
@@ -105,7 +101,7 @@ figcaption {
     font-size: 45px;
   }
 
-  code {
+  pre {
     font-size: 25px;
   }
 
