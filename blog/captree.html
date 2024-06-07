@@ -896,6 +896,10 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         different machine.
       </p>
       <h2>The final scramble</h2>
+      <figure>
+        <img src="/assets/img/captree/throughput_fig.png" />
+        <figcaption>Collision-checking throughput performance in the C++ implementation.</figcaption>
+      </figure>
       <p>
         What I've described so far was roughly the state of the project around two weeks before the submission deadline.
         However, it takes more than a good idea to produce a good paper. We needed serious benchmarks against serious
@@ -911,6 +915,49 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         \(k\)-d trees would prove that our SIMD and cache-efficiency efforts actually did something. We benchmarked
         against a handful of others, but this blog post is far too long for me to go into detail about all of them.
       </p>
+      <figure>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Collision-Checker</th>
+              <th scope="col">Filter</th>
+              <th scope="col">Build</th>
+              <th scope="col">Plan</th>
+              <th scope="col">Simplification</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>OctoMap</td>
+              <td rowspan="3">2.9</td>
+              <td>120.9</td>
+              <td>78.9</td>
+              <td>23.3</td>
+              <td>220.9</td>
+            </tr>
+            <tr>
+              <td>nanoflann</td>
+              <td>0.3</td>
+              <td>15.5</td>
+              <td>7.8</td>
+              <td>26.7</td>
+            </tr>
+            <tr>
+              <td>CAPT</td>
+              <td>5.9</td>
+              <td>0.5</td>
+              <td>0.2</td>
+              <td><strong>9.5</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption>
+          Mean simulated planning times for the UR-5 robot in milliseconds. For details, refer to the
+          <a href="https://arxiv.org/abs/2406.02807">paper</a>,
+        </figcaption>
+      </figure>
       <p>
         When hooked up to a full motion planner, we found that we could get speedups by multiple orders of magnitude.
         Planning times fell from the order of tens to hundreds of milliseconds using an OctoMap down to
@@ -918,10 +965,6 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         the way to a completed plan in <strong>under sixteen milliseconds</strong>. That means that sixty-hertz online
         planning times are possible!
       </p>
-      <figure>
-        <img src="/assets/img/captree/throughput_fig.png" />
-        <figcaption>Collision-checking throughput performance in the C++ implementation.</figcaption>
-      </figure>
       <p>
         For the final benchmarks, instead of using my laptop, we used a much beefier computer with a Ryzen 9 7950X,
         which accounts for the biggest difference in empirical performance. We were actually quite surprised by our
