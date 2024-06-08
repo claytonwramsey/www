@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Clayton's blog</title>
-    <link>https://www.claytonwramsey.com/blog.html</link>
+    <link>https://www.claytonwramsey.com/blog</link>
     <description>Clayton's personal blog.</description>
     <language>en-us</language>
     <pubDate>Fri, 06 Oct 09:44:00 CST</pubDate>
@@ -15,7 +15,7 @@
 
     <item>
         <title>Making robots plan faster with SIMD and Rust</title>
-        <link>https://www.claytonwramsey.com/blog/captree.html</link>
+        <link>https://www.claytonwramsey.com/blog/captree</link>
         <description>Systems programming and data structures meet to make instant collision-checking.</description>
         <pubDate>Sat, 08 Jun 2024 10:00 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/captree.html</guid>
@@ -24,7 +24,7 @@
 
     <item>
         <title>Things I learned from teaching</title>
-        <link>https://www.claytonwramsey.com/blog/learned-from-teaching.html</link>
+        <link>https://www.claytonwramsey.com/blog/learned-from-teaching</link>
         <description>This spring, I taught an undergraduate class on chess engines. I probably learned more than any of my students.</description>
         <pubDate>Wed, 05 Dec 2023 14:44 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/learned-from-teaching.html</guid>
@@ -33,7 +33,7 @@
 
     <item>
         <title>Writing my own damn HTML</title>
-        <link>https://www.claytonwramsey.com/blog/own-html.html</link>
+        <link>https://www.claytonwramsey.com/blog/own-html</link>
         <description>The future of the web doesn't have to be webapp frameworks and cookie prompts.</description>
         <pubDate>Sat, 07 Oct 2023 14:51 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/own-html.html</guid>
@@ -42,7 +42,7 @@
 
     <item>
         <title>One line of code cost me 9.2% of my matches</title>
-        <link>https://www.claytonwramsey.com/blog/sixty-four-elo.html</link>
+        <link>https://www.claytonwramsey.com/blog/sixty-four-elo</link>
         <description>I can either write a hundred lines of code for one or two Elo or find one or two wrong lines of code for a hundred Elo. Such is life.</description>
         <pubDate>Thur, 21 Sep 2023 09:00 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/sixty-four-elo.html</guid>
@@ -51,7 +51,7 @@
 
     <item>
         <title>I built a garbage collector for a language that doesn't need one</title>
-        <link>https://www.claytonwramsey.com/blog/dumpster.html</link>
+        <link>https://www.claytonwramsey.com/blog/dumpster</link>
         <description>If carcinization happens when languages evolve to be more like Rust, then what do you call it when Rust evolves to be more like Java? Caffeination?</description>
         <pubDate>Tue, 14 Aug 2023 09:00 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/dumpster.html</guid>
@@ -60,7 +60,7 @@
 
     <item>
         <title>Blowing up my compile times for dubious benefits</title>
-        <link>https://www.claytonwramsey.com/blog/fiddler-const-magic.html</link>
+        <link>https://www.claytonwramsey.com/blog/fiddler-const-magic</link>
         <description>The tree of useless optimization yields questionable fruit.</description>
         <pubDate>Tue, 20 Jun 2023 09:00 CST</pubDate>
         <guid>https://www.claytonwramsey.com/blog/fiddler-const-magic.html</guid>
