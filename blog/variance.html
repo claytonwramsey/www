@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<!-- 
+  Hi! Thanks for checking out this website. 
+  I made it myself! 
+  This website was made by hand. 
+  I intentionally haven't minified anything so you can see how it all fits together.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="A useful bit of inference yields spooky action at a distance." />
+    <meta name="keywords" content="Rust" />
+
+    <title>Variance breaks Rust's rules</title>
+
+    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/hljs.css" />
+    <link rel="icon" href="/assets/img/favicon.ico" />
+
+    <script src="/assets/js/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/cv">CV</a>
+        <a href="/blog">Blog</a>
+        <a href="/recipes">Recipes</a>
+      </nav>
+    </header>
+    <h1>Variance breaks Rust's rules</h1>
+    <div class="pubinfo">Clayton Ramsey - 2024-06-11</div>
+    <main>
+      <p>
+        A useful bit of inference yields spooky action at a distance. Steve Klabnik, one of the key contributors to the
+        Rust project, wrote what he calls <dfn>Rust's Golden Rule</dfn>:
+      </p>
+      <blockquote>
+        Whenever the body of a function contradicts the function's signature, the signature takes precedence; the
+        signature is right and the body is wrong.
+        <footer>
+          Steve Klabnik,
+          <a href="https://steveklabnik.com/writing/rusts-golden-rule/"><cite>Rust's Golden Rule</cite></a>
+        </footer>
+      </blockquote>
+      <p>
+        I think we can extend this rule to get an overall philosophy for Rust:
+        <strong>all compilation-relevant information must be stored in the signature of a type</strong>. In other words,
+        any changes to the body of a function or the contents of a structure which don't also violate the signature
+        should also not break compilation.
+      </p>
+      <p>
+        There are unfortunately a lot of exceptions to this rule, usually on the fuzzy edges of Rust where systems
+        interact. Auto-traits are the biggest one, especially <code>Send</code> and <code>Sync</code>, as well as
+        mutability. But there's one case which I think is quite egregious, but very few people ever interact with it.
+      </p>
+      <h2>Variance</h2>
+      <p>Quick: what's the difference between these two structures?</p>
+      <pre class="rust"><code>struct Foo&lt;T&gt;(*const T);
+struct Bar&lt;T&gt;(*mut T);</code></pre>
+      <p>
+        Other than their fields, they've got the same signature, so we would like to think that they have the same
+        semantics. The problem is that's not true in Rust:
+      </p>
+    </main>
+  </body>
+</html>
