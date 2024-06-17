@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="/assets/hljs.css" />
     <link rel="icon" href="/assets/img/favicon.ico" />
 
-    <script id="MathJax-script" async src="/assets/js/mathjax/tex-mml-chtml.js"></script>
     <script src="/assets/js/highlight.min.js"></script>
 
     <script>
@@ -93,12 +92,26 @@
   |  A  B  C  D  E  F  G  H</code></pre>
       <p>
         For example, consider a board with a piece on B1, G3, and C7. B1 has index 1, G3 has index 22, and C7 has index
-        50, so the bitboard uniquely representing {B1, G3, C7} is \(2^1 + 2^{22} + 2^{50}\), which is equal to
-        1125899911036930.
+        50, so the bitboard uniquely representing {B1, G3, C7} is
+        <math
+          ><mrow
+            ><msup><mn>2</mn><mn>1</mn></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>22</mn></mrow></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>50</mn></mrow></msup
+            ></mrow
+          ></math
+        >, which is equal to 1125899911036930.
       </p>
       <p>
-        We can use our bitboards to compute setwise operations in \(O(1)\) time. Here’s a short (but not exhaustive)
-        list of operations we can do:
+        We can use our bitboards to compute setwise operations in
+        <math
+          ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math
+        >
+        time. Here’s a short (but not exhaustive) list of operations we can do:
       </p>
       <table>
         <thead>
@@ -110,22 +123,40 @@
         </thead>
         <tbody>
           <tr class="odd">
-            <td>\(A \cup B\)</td>
+            <td>
+              <math
+                ><mrow><mi>A</mi><mo>&#x0222A;</mo><mi>B</mi></mrow></math
+              >
+            </td>
             <td><code>a | b</code></td>
             <td></td>
           </tr>
           <tr class="even">
-            <td>\(A \cap B\)</td>
+            <td>
+              <math
+                ><mrow><mi>A</mi><mo>&#x02229;</mo><mi>B</mi></mrow></math
+              >
+            </td>
             <td><code>a &amp; b</code></td>
             <td></td>
           </tr>
           <tr class="odd">
-            <td>\(A \Delta B\)</td>
+            <td>
+              <math
+                ><mrow><mi>A</mi><mi>&#x00394;</mi><mi>B</mi></mrow></math
+              >
+            </td>
             <td><code>a ^ b</code></td>
             <td></td>
           </tr>
           <tr class="even">
-            <td>\(\bar A \)</td>
+            <td>
+              <math
+                ><mrow
+                  ><mover><mi>A</mi><mo stretchy="true">&#x000AF;</mo></mover></mrow
+                ></math
+              >
+            </td>
             <td><code>!a</code></td>
             <td></td>
           </tr>
@@ -137,11 +168,27 @@
       </p>
       <h3 id="building-a-lookup-table">Building a lookup table</h3>
       <p>
-        In order to get an \(O(1)\) computation of sliding moves, we can use a lookup table to find precomputed values
-        of the set of legal moves given the starting square and occupancy bitboard of a board. There’s just one problem:
-        There are an enormous amount of possible occupancy maps, roughly \(\sum_{n=3}^{16} {64 \choose n}\) possible
-        occupancies containing at least two kings and a sliding piece, or about 700 trillion total boards. To store an
-        8-byte bitboard for every square and occupancy would require roughly 365 PB of data!
+        In order to get an
+        <math
+          ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math
+        >
+        computation of sliding moves, we can use a lookup table to find precomputed values of the set of legal moves
+        given the starting square and occupancy bitboard of a board. There’s just one problem: There are an enormous
+        amount of possible occupancy maps, roughly
+        <math
+          ><mrow
+            ><msubsup
+              ><mo>&#x02211;</mo><mrow><mi>n</mi><mo>&#x0003D;</mo><mn>3</mn></mrow
+              ><mrow><mn>16</mn></mrow></msubsup
+            ><mrow
+              ><mo minsize="2.047em" maxsize="2.047em">&#x00028;</mo
+              ><mfrac linethickness="0"><mn>64</mn><mi>n</mi></mfrac
+              ><mo minsize="2.047em" maxsize="2.047em">&#x00029;</mo></mrow
+            ></mrow
+          ></math
+        >
+        possible occupancies containing at least two kings and a sliding piece, or about 700 trillion total boards. To
+        store an 8-byte bitboard for every square and occupancy would require roughly 365 PB of data!
       </p>
       <p>
         We can use a nice trick to reduce our data consumption, though. In our naive algorithm for sliding move
@@ -188,7 +235,12 @@
         I’ll start with a magic example, and we’ll see if that can enlighten us. Suppose we want to extract the relevant
         occupancy for a bishop on B2.
       </p>
-      <p>Take the original masked occupancy bitboard, \(O\).</p>
+      <p>
+        Take the original masked occupancy bitboard,
+        <math
+          ><mrow><mi>O</mi></mrow></math
+        >.
+      </p>
       <pre class="text"><code>8 |  .  .  .  .  .  .  .  .
 7 |  .  .  .  .  .  .  .  .
 6 |  .  .  .  .  .  .  b5 .
@@ -199,10 +251,77 @@
 1 |  .  .  .  .  .  .  .  .
 --+------------------------
   |  A  B  C  D  E  F  G  H</code></pre>
-      <p>Observe that \(O = b_1 2^{10} + b_2 2^{19} + b_3 2^{28} + b_4 2^{37} + b_5 2^{46}\).</p>
-      <p>Now, multiply \(O\) by the magic number \(M = 2^{17} + 2^{25} + 2^{33} + 2^{41} + 2^{49}\).</p>
       <p>
-        \[O * M = b_1 2^{59} + b_2 2^{60} + b_3 2^{61} + b_4 2^{62} + b_5 2^{63} + \text{garbage on other exponents}\]
+        Observe that
+        <math
+          ><mrow
+            ><mi>O</mi><mo>&#x0003D;</mo><msub><mi>b</mi><mn>1</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>10</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>2</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>19</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>3</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>28</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>4</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>37</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>5</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>46</mn></mrow></msup
+            ></mrow
+          ></math
+        >.
+      </p>
+      <p>
+        Now, multiply
+        <math
+          ><mrow><mi>O</mi></mrow></math
+        >
+        by the magic number
+        <math
+          ><mrow
+            ><mi>M</mi><mo>&#x0003D;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>17</mn></mrow></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>25</mn></mrow></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>33</mn></mrow></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>41</mn></mrow></msup
+            ><mo>&#x0002B;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>49</mn></mrow></msup
+            ></mrow
+          ></math
+        >.
+      </p>
+      <p>
+        <math xmlns="" display="block"
+          ><mrow
+            ><mi>O</mi><mo>&#x0002A;</mo><mi>M</mi><mo>&#x0003D;</mo><msub><mi>b</mi><mn>1</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>59</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>2</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>60</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>3</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>61</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>4</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>62</mn></mrow></msup
+            ><mo>&#x0002B;</mo><msub><mi>b</mi><mn>5</mn></msub
+            ><msup
+              ><mn>2</mn><mrow><mn>63</mn></mrow></msup
+            ><mo>&#x0002B;</mo><mtext>garbage&#x000A0;on&#x000A0;other&#x000A0;exponents</mtext></mrow
+          ></math
+        >
       </p>
       <p>
         Using simple bitwise masking, we can then manually retrieve those packed bits near the MSB to use as our index.

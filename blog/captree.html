@@ -25,7 +25,6 @@
     <link rel="icon" href="/assets/img/favicon.ico" />
 
     <script src="/assets/js/highlight.min.js"></script>
-    <script id="MathJax-script" async src="/assets/js/mathjax/tex-mml-chtml.js"></script>
 
     <script>
       hljs.highlightAll();
@@ -93,55 +92,115 @@
       </figure>
       <p>
         We can start by assuming that our robot can be modeled as a set of balls over some distance metric. Using the
-        \(L^2\) norm, these balls are spheres, which meshes conveniently with sphere-hierarchy representations of robot
+        <math>
+          <msup>
+            <mi>L</mi>
+            <mn>2</mn>
+          </msup>
+        </math>
+        norm, these balls are spheres, which meshes conveniently with sphere-hierarchy representations of robot
         geometry. This lets us neatly reduce the problem of collision-checking all kinds of robot geometries into one
         simple case: checking whether a some set of spheres collides with a set of points. In addition to that, we would
         like to be able to do our collision checking in parallel at an instruction level to radically improve our
         performance.
       </p>
-      <h2>Review: \(k\)-d trees</h2>
+      <h2>
+        Review:
+        <math><mi>k</mi></math
+        >-d trees
+      </h2>
       <p>
         There's a simple solution to our collision-checking problem using a
         <a href="https://en.wikipedia.org/wiki/Nearest_neighbor_search">nearest-neighbors</a> data structure. Given a
-        point cloud represented as a set of points \(P\), construct a nearest-neighbor data structure over \(P\). Then,
-        whenever we have to check whether some robot sphere with center \(x\) and radius \(r\) is in collision, we find
-        the closest point \(p\) in \(P\) to \(x\), and check whether the distance from \(x\) to \(p\) is greater than
-        \(r\).
+        point cloud represented as a set of points <math><mi>P</mi></math
+        >, construct a nearest-neighbor data structure over <math><mi>P</mi></math
+        >. Then, whenever we have to check whether some robot sphere with center
+        <math>
+          <mi>x</mi>
+        </math>
+        and radius
+        <math>
+          <mi>r</mi>
+        </math>
+        is in collision, we find the closest point
+        <math>
+          <mi>p</mi>
+        </math>
+        in
+        <math>
+          <mi>P</mi>
+        </math>
+        to <math><mi>x</mi></math
+        >, and check whether the distance from
+        <math>
+          <mi>x</mi>
+        </math>
+        to
+        <math>
+          <mi>p</mi>
+        </math>
+        is greater than
+        <math><mi>r</mi></math
+        >.
       </p>
       <p>
         The canonical approach to computing nearest-neighbors is a
-        <a href="https://en.wikipedia.org/wiki/K-d_tree">\(k\)-d tree</a> - a class of space partitioning tree. There
-        are many formulations, but I'll use a median-partitioning tree in this case.
+        <a href="https://en.wikipedia.org/wiki/K-d_tree"
+          ><math><mi>k</mi></math
+          >-d tree</a
+        >
+        - a class of space partitioning tree. There are many formulations, but I'll use a median-partitioning tree in
+        this case.
       </p>
       <p>
-        At each branch of a \(k\)-d tree, we split the the space into two sub-volumes, each containing the same number
-        of points, based on the median value along one dimension. For instance, if we wanted to split the points \(\{(2,
-        3), (4, 4)\}\) along the first dimension, we'd choose a split value of 3, and if we were splitting along the
-        second dimension, we'd choose a split of 3.5. For efficiency, we'll have our tree split first on dimension 0
-        (\(x\)), then dimension 1 (\(y\)), and so on, until looping back around to dimension 0.
+        At each branch of a
+        <math><mi>k</mi></math
+        >-d tree, we split the the space into two sub-volumes, each containing the same number of points, based on the
+        median value along one dimension. For instance, if we wanted to split the points
+        <math
+          ><mrow
+            ><mo form="prefix" stretchy="false">{</mo><mo form="prefix" stretchy="false">(</mo><mn>2</mn
+            ><mo separator="true">,</mo><mn>3</mn><mo form="postfix" stretchy="false">)</mo><mo separator="true">,</mo
+            ><mo form="prefix" stretchy="false">(</mo><mn>4</mn><mo separator="true">,</mo><mn>4</mn
+            ><mo form="postfix" stretchy="false">)</mo><mo form="postfix" stretchy="false">}</mo></mrow
+          ></math
+        >
+        along the first dimension, we'd choose a split value of 3, and if we were splitting along the second dimension,
+        we'd choose a split of 3.5. For efficiency, we'll have our tree split first on dimension 0 (<math
+          ><mi>x</mi></math
+        >), then dimension 1 (<math><mi>y</mi></math
+        >), and so on, until looping back around to dimension 0.
       </p>
       <figure>
         <img src="/assets/img/captree/kdtree.png" />
-        <figcaption>The partitioned cells of a \(k\)-d tree.</figcaption>
+        <figcaption>
+          The partitioned cells of a
+          <math><mi>k</mi></math
+          >-d tree.
+        </figcaption>
       </figure>
       <p>
         When querying the nearest neighbor, we first do a quick binary search of the tree to find a candidate closest
         point. Next, we perform a branch-and-bound search of every other subtree, escaping early if the test point is
         further from a volume from the candidate-closest point. I'm staying light on the exact details here, since the
-        point of this article is not to explain how \(k\)-d trees work.
+        point of this article is not to explain how
+        <math><mi>k</mi></math
+        >-d trees work.
       </p>
       <p>
-        These are very nice data structures, but they suffer from two core issues for our application: first, \(k\)-d
-        trees have extremely poor cache locality due to the fact that they jump around everywhere during a search.
+        These are very nice data structures, but they suffer from two core issues for our application: first,
+        <math><mi>k</mi></math
+        >-d trees have extremely poor cache locality due to the fact that they jump around everywhere during a search.
         Second, this approach is not at all amenable to SIMD parallelism, which typically requires some amount of
         branchlessness. How do we make something which is similarly performant (or better!) without the same
         limitations?
       </p>
       <h2>Being stupid faster</h2>
       <p>
-        We can start by noticing a neat quirk of the first pass on a \(k\)-d tree: the first downward pass can be done
-        completely branchlessly and in a very cache-friendly way. To do so, we'll need to bring out a special data
-        layout for trees, called an Eytzinger layout. This
+        We can start by noticing a neat quirk of the first pass on a
+        <math><mi>k</mi></math
+        >-d tree: the first downward pass can be done completely branchlessly and in a very cache-friendly way. To do
+        so, we'll need to bring out a special data layout for trees, called an Eytzinger layout. This
         <a href="https://algorithmica.org/en/eytzinger">Algorithmica article</a> gives a beautiful explanation of it,
         but I'll try my own hand at an explanation as well.
       </p>
@@ -152,11 +211,19 @@
       <p>
         In an Eytzinger layout, we implicitly describe the location of each branch in the tree by its location in a
         buffer. We store all the tests in some array (let's call it
-        <code>tests</code> for convenience), and for some branch-point at index \(i\), the left child will be at
-        position \(2i + 1\), while the right child will be at position \(2i + 2\). If we assume that the number of
-        points in the tree is a power of 2, and that the tree is perfectly balanced, we can create an extremely
-        efficient method for the first pass through the tree. If the number of points is not a power of two, we can just
-        pad the point cloud with points at \(\infty\).
+        <code>tests</code> for convenience), and for some branch-point at index <math><mi>i</mi></math
+        >, the left child will be at position
+        <math
+          ><mrow><mn>2</mn><mi>i</mi><mo>+</mo></mrow
+          ><mrow><mn>1</mn></mrow></math
+        >, while the right child will be at position
+        <math
+          ><mrow><mn>2</mn><mi>i</mi><mo>+</mo></mrow
+          ><mrow><mn>2</mn></mrow></math
+        >. If we assume that the number of points in the tree is a power of 2, and that the tree is perfectly balanced,
+        we can create an extremely efficient method for the first pass through the tree. If the number of points is not
+        a power of two, we can just pad the point cloud with points at <math><mi>∞</mi></math
+        >.
       </p>
       <pre class="rust"><code>struct ForwardTree {
     /// contains 2^p - 1 tests
@@ -232,11 +299,13 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
         ahead to the good part, which is the performance results.
       </p>
       <p>
-        At these scales, a \(k\)-d tree is the best competitor. Fortunately,
-        <code><a href="https://github.com/sdd/kiddo">kiddo</a></code
-        >, one of the fastest \(k\)-d tree implementations out there, is easy to install via Cargo. I'll be using that
-        as a rough baseline for point cloud collision-checking. I found that the fastest results came from using
-        <code>within_unsorted</code> on an <code>ImmutableKdTree</code>, so I'm using that as my baseline.
+        At these scales, a
+        <math><mi>k</mi></math
+        >-d tree is the best competitor. Fortunately, <code><a href="https://github.com/sdd/kiddo">kiddo</a></code
+        >, one of the fastest <math><mi>k</mi></math
+        >-d tree implementations out there, is easy to install via Cargo. I'll be using that as a rough baseline for
+        point cloud collision-checking. I found that the fastest results came from using <code>within_unsorted</code> on
+        an <code>ImmutableKdTree</code>, so I'm using that as my baseline.
       </p>
       <figure>
         <img
@@ -251,12 +320,13 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
         />
       </figure>
       <p>
-        We see that this single-pass approach blows a normal \(k\)-d tree out of the water, yielding enormous speedups
-        in query time from hundreds of nanoseconds to only about 10 ns. Sadly, the SIMD addition is only a modest
-        improvement - this is because gather instructions are very slow on my laptop's processor. On other machines,
-        there's usually a more appreciable performance improvement. This comparison also isn't really fair:
-        <code>kiddo</code> is giving us an exact answer to whether we're in collision, while our forward tree is only
-        returning an approximate answer.
+        We see that this single-pass approach blows a normal
+        <math><mi>k</mi></math
+        >-d tree out of the water, yielding enormous speedups in query time from hundreds of nanoseconds to only about
+        10 ns. Sadly, the SIMD addition is only a modest improvement - this is because gather instructions are very slow
+        on my laptop's processor. On other machines, there's usually a more appreciable performance improvement. This
+        comparison also isn't really fair: <code>kiddo</code> is giving us an exact answer to whether we're in
+        collision, while our forward tree is only returning an approximate answer.
       </p>
       <p>
         Not only that, our approximate answer isn't even all that good. To test this, I collected a real point cloud and
@@ -275,9 +345,9 @@ fn forward_coll(t: &ForwardTree, point: &[f32; 3], rsq: f32) -&gt; bool {
       </p>
       <p>
         This is not a new idea, per se: random forests are pretty well known in the ML community. The core concept is
-        this: we make \(T\) different trees. Each tree is randomly different somehow, yielding typically incorrect
-        errors. We can then take the best result from each tree for a (hopefully) dramatic improvement in result
-        quality.
+        this: we make <math><mi>T</mi></math> different trees. Each tree is randomly different somehow, yielding
+        typically incorrect errors. We can then take the best result from each tree for a (hopefully) dramatic
+        improvement in result quality.
       </p>
       <pre class="rust"><code>struct RandomTree {
     tests: Box&lt;[f32]&gt;,
@@ -328,35 +398,70 @@ fn first_pass_rand(tests: &[f32], mut x: u32, point: &[f32; 3]) -> usize {
       <p>
         Even if that error distribution were better, queries to these forests exhibit superlinear scaling with the
         number of trees, since together they use so much memory that they can't all fit in the cache. At around 10
-        trees, the SIMD performance of a forest is about the same as a \(k\)-d tree, but as we discussed before, the
-        error isn't good enough to justify using it.
+        trees, the SIMD performance of a forest is about the same as a
+        <math><mi>k</mi></math
+        >-d tree, but as we discussed before, the error isn't good enough to justify using it.
       </p>
       <h2>A budget for affording</h2>
       <p>
         Let's briefly take stock of the situation. Using our forward tree, we can quickly classify a query point as
         belonging to a single unit cell. We know that for any fixed cell and radius of a test-sphere, there is a fixed
-        set of points in \(P\) which are close enough to collide with at least one point in the cell. If we're targeting
-        a particular robot, we also know \(r_{max}\), the maximum radius of a sphere on the robot. If we trust that
-        we'll never do a collision check for a sphere larger than \(r_{max}\), then any query point in a given cell can
-        only ever collide with a fixed set of points in the cloud: namely, the set of points whose distance to the cell
-        is less than or equal to \(r_{max}\).
+        set of points in
+        <math>
+          <mi>P</mi>
+        </math>
+        which are close enough to collide with at least one point in the cell. If we're targeting a particular robot, we
+        also know
+        <math
+          ><msub><mi>r</mi><mtext>max</mtext></msub></math
+        >, the maximum radius of a sphere on the robot. If we trust that we'll never do a collision check for a sphere
+        larger than
+        <math
+          ><msub><mi>r</mi><mtext>max</mtext></msub></math
+        >, then any query point in a given cell can only ever collide with a fixed set of points in the cloud: namely,
+        the set of points whose distance to the cell is less than or equal to
+        <math
+          ><msub><mi>r</mi><mtext>max</mtext></msub></math
+        >.
       </p>
       <figure>
         <img src="/assets/img/captree/affordance_min.svg" class="night-invert" />
         <figcaption>
-          The cell containing \(d\) affords \(a\), \(c\), and \(e\) at radius \(r\), but not \(b\) or \(f\).
+          The cell containing <math><mi>d</mi></math> affords <math><mi>a</mi></math
+          >, <math><mi>c</mi></math
+          >, and <math><mi>e</mi></math> at radius <math><mi>r</mi></math
+          >, but not <math><mi>b</mi></math> or <math><mi>f</mi></math
+          >.
         </figcaption>
       </figure>
       <p>
-        Let's call those points <dfn>afforded</dfn>; that is, for a given cell \(C\) and a radius \(r\), \(C\) affords
-        \(p\) if there exists a point \(x \in C\) such that \(\|p - x\| \leq r\).
+        Let's call those points <dfn>afforded</dfn>; that is, for a given cell <math><mi>c</mi></math> and a radius
+        <math><mi>r</mi></math
+        >, <math><mi>c</mi></math> affords
+        <math>
+          <mi>p</mi>
+        </math>
+        if there exists a point
+        <math
+          ><mrow><mi>x</mi><mo>∈</mo></mrow
+          ><mrow><mi>C</mi></mrow></math
+        >
+        such that
+        <math
+          ><mrow><mi>‖</mi><mi>p</mi><mo>−</mo></mrow
+          ><mrow><mi>x</mi><mi>‖</mi><mo>≤</mo></mrow
+          ><mrow><mi>r</mi></mrow></math
+        >.
       </p>
       <p>
-        Using our knowledge of \(r_{max}\), we can annotate each leaf of our forward-tree with the list of all afforded
-        points. Then, when checking for collision, we can traverse this list of afforded points and test for collision
-        against any of them. This allows us to convert our approximate-nearest-neighbor guess into a completely accurate
-        range-nearest-neighbors query without . I currently call the resulting structure an
-        <dfn>collision-affording point tree</dfn>, or <dfn>CAPT</dfn> for short.
+        Using our knowledge of
+        <math
+          ><msub><mi>r</mi><mtext>max</mtext></msub></math
+        >, we can annotate each leaf of our forward-tree with the list of all afforded points. Then, when checking for
+        collision, we can traverse this list of afforded points and test for collision against any of them. This allows
+        us to convert our approximate-nearest-neighbor guess into a completely accurate range-nearest-neighbors query
+        without . I currently call the resulting structure an <dfn>collision-affording point tree</dfn>, or
+        <dfn>CAPT</dfn> for short.
       </p>
       <p>
         Now, instead of storing a single point for each leaf of the tree, we'll store a list of points which might be in
@@ -460,8 +565,18 @@ where
       <figure>
         <img src="/assets/img/captree/sort_affordance.svg" class="night-invert" />
         <figcaption>
-          The cell affords 3 points at \(r_\text{max}\) that it doesn't afford at \(r_q\), so a query sphere of radius
-          \(r_q\) wouldn't need to check collision against those points.
+          The cell affords 3 points at
+          <math
+            ><msub><mi>r</mi><mtext>max</mtext></msub></math
+          >
+          that it doesn't afford at
+          <math
+            ><msub><mi>r</mi><mi>q</mi></msub></math
+          >, so a query sphere of radius
+          <math
+            ><msub><mi>r</mi><mi>q</mi></msub></math
+          >
+          wouldn't need to check collision against those points.
         </figcaption>
       </figure>
       <p>
@@ -473,7 +588,15 @@ where
       <p>
         This was good for query performance, but came at a significant cost in tree construction time. I'll explain the
         details of construction later in this post, but for now, know that this measure put construction times into the
-        worst-case regime of \(O(n^2 \log n)\) for trees containing \(n\) points. This is far too much time when \(n\)
+        worst-case regime of
+        <math
+          ><mrow
+            ><mi>O</mi><mo form="prefix" stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup
+            ><mrow><mi>log</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow><mi>n</mi
+            ><mo form="postfix" stretchy="false">)</mo></mrow
+          ></math
+        >
+        for trees containing <math><mi>n</mi></math> points. This is far too much time when <math><mi>n</mi></math>
         is measured in thousands; in some of my tests it took 30 seconds to construct the tree on large point clouds. In
         the end, I had to nix this feature for performance.
       </p>
@@ -481,8 +604,11 @@ where
       <figure>
         <img src="/assets/img/captree/rmin.svg" class="night-invert" />
         <figcaption>
-          The sphere centered on the representative point with radius \(r_\text{min}\) contains the entire cell, so all
-          query spheres centered in this cell are in collision.
+          The sphere centered on the representative point with radius
+          <math
+            ><msub><mi>r</mi><mtext>min</mtext></msub></math
+          >
+          contains the entire cell, so all query spheres centered in this cell are in collision.
         </figcaption>
       </figure>
       <p>
@@ -492,10 +618,18 @@ where
       </p>
       <p>
         I decided to take advantage of this to reduce the peak affordance size. We already accept that we know
-        \(r_\text{max}\), so why not also provide a minimum radius \(r_\text{min}\)? If a sphere of radius
-        \(r_\text{min}\) collides with a point, then any other query sphere with the same center should also collide, no
-        matter what. For the small cells, then, we can throw away all other points except the representative point of
-        the cell and store only a single point in its afforded set.
+        <math
+          ><msub><mi>r</mi><mtext>max</mtext></msub></math
+        >, so why not also provide a minimum radius
+        <math
+          ><msub><mi>r</mi><mtext>min</mtext></msub></math
+        >? If a sphere of radius
+        <math
+          ><msub><mi>r</mi><mtext>min</mtext></msub></math
+        >
+        collides with a point, then any other query sphere with the same center should also collide, no matter what. For
+        the small cells, then, we can throw away all other points except the representative point of the cell and store
+        only a single point in its afforded set.
       </p>
       <h3>Bounding my boxes</h3>
       <figure>
@@ -602,31 +736,116 @@ fn capt_collides(t: &Capt, point: &[f32; 3], rsq: f32) -&gt; bool {
       <p>
         After all this, I still haven't explained how these trees are constructed. Efficiently constructing a CAPT is
         nontrivial, since the brute-force approach to affordance set construction is a total non-starter. Luckily, the
-        construction procedure is much like that of a normal \(k\)-d tree.
+        construction procedure is much like that of a normal
+        <math><mi>k</mi></math
+        >-d tree.
       </p>
       <p>
-        We start out given some list of \(n\) points \(P\), our point cloud. Since our Eytzinger-layout-based search
-        procedure requires \(n\) to be a power of two, we compute \(n'\), which is the next power of two after \(n\),
-        and then pad \(P\) to length \(n'\) with points at \(\left<\infty,\infty,\infty\right>\) to produce \(P'\).
+        We start out given some list of <math><mi>n</mi></math> points <math><mi>P</mi></math
+        >, our point cloud. Since our Eytzinger-layout-based search procedure requires <math><mi>n</mi></math> to be a
+        power of two, we compute
+        <math
+          ><msup><mi>n</mi><mo lspace="0em" rspace="0em" class="tml-prime">′</mo></msup></math
+        >, which is the next power of two after <math><mi>n</mi></math
+        >, and then pad
+        <math>
+          <mi>P</mi>
+        </math>
+        to length
+        <math
+          ><msup><mi>n</mi><mo lspace="0em" rspace="0em" class="tml-prime">′</mo></msup></math
+        >
+        with points at
+        <math
+          ><mrow
+            ><mo fence="true" form="prefix">⟨</mo><mi>∞</mi><mo separator="true">,</mo><mi>∞</mi
+            ><mo separator="true">,</mo><mi>∞</mi><mo fence="true" form="postfix">⟩</mo></mrow
+          ></math
+        >
+        to produce
+        <math
+          ><mrow
+            ><msup><mi>P</mi><mi>&#x02032;</mi></msup></mrow
+          ></math
+        >.
       </p>
       <p>
-        Next, we recursively partition the tree, maintaining a candidate affordance set \(z\), initialized as an empty
-        set; and a candidate volume \(c\), initialized to the axis-aligned bounding box containing all of
-        \(\mathbb{R}^3\). We partition \(P'\) by the following steps:
+        Next, we recursively partition the tree, maintaining a candidate affordance set <math><mi>z</mi></math
+        >, initialized as an empty set; and a candidate volume <math><mi>c</mi></math
+        >, initialized to the axis-aligned bounding box containing all of
+        <math
+          ><msup><mi>ℝ</mi><mn>3</mn></msup></math
+        >. We partition
+        <math
+          ><mrow
+            ><msup><mi>P</mi><mi>&#x02032;</mi></msup></mrow
+          ></math
+        >
+        by the following steps:
       </p>
       <ol>
         <li>Compute the median plane for the current cell.</li>
         <li>
-          Split the cell by the median plane into two smaller cells, \(c_1\) and \(c_2\). Split the points in the cell
-          into two subsets: those below the median plane and those above the median plane; call them \(P_1\) and
-          \(P_2\).
+          Split the cell by the median plane into two smaller cells,
+          <math
+            ><msub><mi>c</mi><mn>1</mn></msub></math
+          >
+          and
+          <math
+            ><msub><mi>c</mi><mn>2</mn></msub></math
+          >. Split the points in the cell into two subsets: those below the median plane and those above the median
+          plane; call them
+          <math
+            ><msub><mi>P</mi><mn>1</mn></msub></math
+          >
+          and
+          <math
+            ><msub><mi>P</mi><mn>2</mn></msub></math
+          >.
         </li>
         <li>
-          Construct new affordance sets \(z_1\) and \(z_2\), such that \(z_1 = z \cup P_2\) and \(z_2 = z \cup P_1\).
+          Construct new affordance sets
+          <math
+            ><msub><mi>z</mi><mn>1</mn></msub></math
+          >
+          and
+          <math
+            ><msub><mi>z</mi><mn>2</mn></msub></math
+          >, such that
+          <math
+            ><mrow
+              ><msub><mi>z</mi><mn>1</mn></msub
+              ><mo>&#x0003D;</mo><mi>z</mi><mo>&#x0222A;</mo><msub><mi>P</mi><mn>2</mn></msub></mrow
+            ></math
+          >
+          and
+          <math
+            ><mrow
+              ><msub><mi>z</mi><mn>2</mn></msub
+              ><mo>&#x0003D;</mo><mi>z</mi><mo>&#x0222A;</mo><msub><mi>P</mi><mn>1</mn></msub></mrow
+            ></math
+          >.
         </li>
         <li>
-          Filter out all points in \(z_1\) which are not afforded by \(c_1\) at radius \(r_\text{max}\). Do the same for
-          \(z_2\) and \(c_1\).
+          Filter out all points in
+          <math
+            ><msub><mi>z</mi><mn>1</mn></msub></math
+          >
+          which are not afforded by
+          <math
+            ><msub><mi>c</mi><mn>1</mn></msub></math
+          >
+          at radius
+          <math
+            ><msub><mi>r</mi><mtext>max</mtext></msub></math
+          >. Do the same for
+          <math
+            ><msub><mi>z</mi><mn>2</mn></msub></math
+          >
+          and
+          <math
+            ><msub><mi>c</mi><mn>1</mn></msub></math
+          >.
         </li>
         <li>Recursively repeat this process for both partitioned cells until each cell contains only one point.</li>
       </ol>
@@ -795,10 +1014,24 @@ fn capt_new_help(
       <p>
         Unfortunately, even with some extra engineering work, our construction times for the tree still sucked. I even
         tried transforming the recursive construction procedure into a stack-based iterative one. At the end of the day,
-        the core problem is simply algorithmic: if the average affordance-set size is \(a\), and there are \(n\) points,
-        construction takes roughly \(O(k n a)\) time for sufficiently large \(a\). In most cases, \(a\) grows with
-        \(n\), so it could perform as slowly as \(O(kn^2)\) in some clouds. For a cloud with a few hundred thousand
-        points, that's completely untenable.
+        the core problem is simply algorithmic: if the average affordance-set size is <math><mi>a</mi></math
+        >, and there are <math><mi>n</mi></math> points, construction takes roughly
+        <math
+          ><mrow
+            ><mi>O</mi><mo stretchy="false">&#x00028;</mo><mi>k</mi><mi>n</mi><mi>a</mi
+            ><mo stretchy="false">&#x00029;</mo></mrow
+          ></math
+        >
+        time for sufficiently large <math><mi>a</mi></math
+        >. In most cases, <math><mi>a</mi></math> grows with <math><mi>n</mi></math
+        >, so it could perform as slowly as
+        <math
+          ><mrow
+            ><mi>O</mi><mo stretchy="false">&#x00028;</mo><mi>k</mi><msup><mi>n</mi><mn>2</mn></msup
+            ><mo stretchy="false">&#x00029;</mo></mrow
+          ></math
+        >
+        in some clouds. For a cloud with a few hundred thousand points, that's completely untenable.
       </p>
       <h2>Filter feeders</h2>
       <p>
@@ -812,9 +1045,12 @@ fn capt_new_help(
       <p>
         While we were thinking about filtering point clouds, we were also thinking about efficient construction
         algorithms for the tree. One idea we had played with was implicit representation for afforded sets. The hope was
-        that we could store less data while constructing the tree and filter out affordance sets in \(O(1)\) time. One
-        such approach used segments of a space-filling curve to represent sets of points, which would hopefully have
-        allowed us to slice up affordance sets much more efficiently.
+        that we could store less data while constructing the tree and filter out affordance sets in
+        <math
+          ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math
+        >
+        time. One such approach used segments of a space-filling curve to represent sets of points, which would
+        hopefully have allowed us to slice up affordance sets much more efficiently.
       </p>
       <p>
         Unfortunately for us, that approach never worked out, and so we were stuck with our bad construction times.
@@ -824,11 +1060,44 @@ fn capt_new_help(
       <p>
         I'll start with a simple example. Suppose we have a list of points in one-dimensional space; that is, a list of
         real numbers, and we want to filter it to reduce its density, but still preserve the areas where points are in
-        collision. In particular, we might want to make sure that if some point \(p\) is removed, there exists another
-        point \(p^*\) which was
-        <em>not</em> removed, such that \(\|p^* - p\|\) is less than some radius \(r_\text{filter}\). In that case,
-        filtering our list of points would be easy: we sort the points in order, then remove one of every adjacent pair
-        \((p, q)\) if \(\|p - q\| \leq r_\text{filter}\).
+        collision. In particular, we might want to make sure that if some point
+        <math>
+          <mi>p</mi>
+        </math>
+        is removed, there exists another point
+        <math
+          ><mrow
+            ><msup><mi>p</mi><mo>&#x0002A;</mo></msup></mrow
+          ></math
+        >
+        which was <em>not</em> removed, such that
+        <math
+          ><mrow
+            ><mo fence="false" stretchy="false">&#x02016;</mo><msup><mi>p</mi><mo>&#x0002A;</mo></msup
+            ><mo>&#x02212;</mo><mi>p</mi><mo fence="false" stretchy="false">&#x02016;</mo></mrow
+          ></math
+        >
+        is less than some radius
+        <math
+          ><mrow
+            ><msub><mi>r</mi><mtext>filter</mtext></msub></mrow
+          ></math
+        >. In that case, filtering our list of points would be easy: we sort the points in order, then remove one of
+        every adjacent pair
+        <math
+          ><mrow
+            ><mo stretchy="false">&#x00028;</mo><mi>p</mi><mo>&#x0002C;</mo><mi>q</mi
+            ><mo stretchy="false">&#x00029;</mo></mrow
+          ></math
+        >
+        if
+        <math
+          ><mrow
+            ><mo fence="false" stretchy="false">&#x02016;</mo><mi>p</mi><mo>&#x02212;</mo><mi>q</mi
+            ><mo fence="false" stretchy="false">&#x02016;</mo><mo>&#x02264;</mo
+            ><msub><mi>r</mi><mtext>filter</mtext></msub></mrow
+          ></math
+        >.
       </p>
       <p>
         With a bit of cleverness, we can generalize this approach to arbitrarily many dimensions. The trick is to
@@ -876,17 +1145,33 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <p>
         In practice, this yields some pretty great results! One filter pass can dramatically reduce the size of a point
         cloud, even at a small radius. In the plot above, I've run up to 6 different filters over a point cloud of a
-        bookshelf containing \(2^{16}\) points. Looking at the plot above, we get some diminishing returns from
-        filtering with more permutations. However, since the construction performance is so superlinear, it's still
-        worthwhile to do some extra filtering in the hopes of reducing point cloud size a little further.
+        bookshelf containing
+        <math
+          ><mrow
+            ><msup
+              ><mn>2</mn><mrow><mn>16</mn></mrow></msup
+            ></mrow
+          ></math
+        >
+        points. Looking at the plot above, we get some diminishing returns from filtering with more permutations.
+        However, since the construction performance is so superlinear, it's still worthwhile to do some extra filtering
+        in the hopes of reducing point cloud size a little further.
       </p>
       <p>
         We also played around a little bit with scaling dimensions of the Morton filter. We started by stretching and
-        transforming the space such that the region \([0, 2^{32})\) gets mapped to the AABB containing all the points in
-        the point cloud. Since the filter removes some points on the edge of that AABB, we tried shrinking the AABB to
-        fit the new sparsified point cloud for the next iteration of the filter, and we also tried leaving it as-is. For
-        reasons I can neither explain nor comprehend, the most effective way was to take an average of the two AABBs to
-        produce the best filtering results.
+        transforming the space such that the region
+        <math
+          ><mrow
+            ><mo stretchy="false">[</mo><mn>0</mn><mo>&#x0002C;</mo
+            ><msup
+              ><mn>2</mn><mrow><mn>32</mn></mrow></msup
+            ><mo stretchy="false">&#x00029;</mo></mrow
+          ></math
+        >
+        gets mapped to the AABB containing all the points in the point cloud. Since the filter removes some points on
+        the edge of that AABB, we tried shrinking the AABB to fit the new sparsified point cloud for the next iteration
+        of the filter, and we also tried leaving it as-is. For reasons I can neither explain nor comprehend, the most
+        effective way was to take an average of the two AABBs to produce the best filtering results.
       </p>
       <h2>Into the C++ mines</h2>
       <p>
@@ -898,8 +1183,10 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <p>
         On the whole, it wasn't as bad as it could have been, but a small part of me dies inside every time I have to
         read a template instantiation error message. My Rust implementation (not the simplified version in this blog
-        post) was polymorphic over dimension, but I only had to implement the C++ version for \(k=3\), which made things
-        easier.
+        post) was polymorphic over dimension, but I only had to implement the C++ version for
+        <math
+          ><mrow><mi>k</mi><mo>&#x0003D;</mo><mn>3</mn></mrow></math
+        >, which made things easier.
       </p>
       <p>
         We spent a little more engineering effort on construction and query times for the C++ code, in part by taking
@@ -925,12 +1212,14 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
         compile. Repeat for each competitor and we've got a full set of benchmarks.
       </p>
       <p>
-        We really cared about a few main competitors: <a href="https://octomap.github.io/">OctoMaps</a> and \(k\)-d
-        trees (in the C++ implementation <a href="https://github.com/jlblancoc/nanoflann">nanoflann</a> and
+        We really cared about a few main competitors: <a href="https://octomap.github.io/">OctoMaps</a> and
+        <math><mi>k</mi></math
+        >-d trees (in the C++ implementation <a href="https://github.com/jlblancoc/nanoflann">nanoflann</a> and
         <a href="https://github.com/UNC-Robotics/nigh">Nigh</a>). OctoMaps are a big deal in the planning world, and
         tend to be the most common off-the-shelf environment representation for point clouds, while comparing against
-        \(k\)-d trees would prove that our SIMD and cache-efficiency efforts actually did something. We benchmarked
-        against a handful of others, but this blog post is far too long for me to go into detail about all of them.
+        <math><mi>k</mi></math
+        >-d trees would prove that our SIMD and cache-efficiency efforts actually did something. We benchmarked against
+        a handful of others, but this blog post is far too long for me to go into detail about all of them.
       </p>
       <figure>
         <table>
@@ -1062,11 +1351,28 @@ fn morton_index(p: &[f32; 3], aabb: &Aabb) -> u32 {
       <p>
         About a month after we submitted the paper, we got reviews back. Most of the remarks were things we already
         knew, but there was one major hiccup - our proof of correctness. From our filtering method, we knew that if any
-        point \(p\) was removed from a point cloud, we would leave a point \(p'\) such that \(\|p - p'\| \leq
-        r_\text{filter}\). From that, we derived a proof that this filter wouldn't produce gaps (based on the dispersion
-        of the point cloud), and from there on we proved that the whole pipeline was correct. However, we didn't explain
-        which definition of dispersion we were using, and so there were maybe ten people on the planet who would have
-        had a chance at understanding what we claimed at all.
+        point
+        <math>
+          <mi>p</mi>
+        </math>
+        was removed from a point cloud, we would leave a point
+        <math
+          ><mrow
+            ><msup><mi>p</mi><mi>&#x02032;</mi></msup></mrow
+          ></math
+        >
+        such that
+        <math
+          ><mrow
+            ><mo fence="false" stretchy="false">&#x02016;</mo><mi>p</mi><mo>&#x02212;</mo
+            ><msup><mi>p</mi><mi>&#x02032;</mi></msup
+            ><mo fence="false" stretchy="false">&#x02016;</mo><mo>&#x02264;</mo
+            ><msub><mi>r</mi><mtext>filter</mtext></msub></mrow
+          ></math
+        >. From that, we derived a proof that this filter wouldn't produce gaps (based on the dispersion of the point
+        cloud), and from there on we proved that the whole pipeline was correct. However, we didn't explain which
+        definition of dispersion we were using, and so there were maybe ten people on the planet who would have had a
+        chance at understanding what we claimed at all.
       </p>
       <p>
         The reviewers rightfully called us out on such nonsense, and thankfully, there is a definition of dispersion

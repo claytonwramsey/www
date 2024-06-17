@@ -23,8 +23,6 @@
     <link rel="stylesheet" type="text/css" href="/assets/main.css" />
     <link rel="stylesheet" href="/assets/hljs.css" />
     <link rel="icon" href="/assets/img/favicon.ico" />
-
-    <script id="MathJax-script" async src="/assets/js/mathjax/tex-mml-chtml.js"></script>
     <script src="/assets/js/highlight.min.js"></script>
 
     <script>
@@ -148,11 +146,13 @@ x.0.set(Rc::clone(&amp;x));
       </p>
       <ol type="1">
         <li>
-          An allocation graph \(G = (V, E, r)\) is a directed graph with a root node \(r \in V\) whose indegree is zero.
+          An allocation graph <math ><mrow><mi>G</mi><mo>&#x0003D;</mo><mo stretchy="false">&#x00028;</mo><mi>V</mi><mo>&#x0002C;</mo><mi>E</mi><mo>&#x0002C;</mo><mi>r</mi><mo stretchy="false">&#x00029;</mo></mrow></math> is a directed graph with a root node <math ><mrow><mi>r</mi><mo>&#x02208;</mo><mi>V</mi></mrow></math> whose indegree is zero.
         </li>
         <li>
-          A node \(v\) in an allocation graph is said to be <em>accessible</em> if and only if there exists a path from
-          \(r\) to \(v\) in the graph.
+          A node <math ><mrow><mi>v</mi></mrow></math> in an allocation graph is said to be <em>accessible</em> if and only if there exists a path from
+          <math>
+  <mi>r</mi>
+</math> to <math ><mrow><mi>v</mi></mrow></math> in the graph.
         </li>
       </ol>
       <p>
@@ -163,18 +163,18 @@ x.0.set(Rc::clone(&amp;x));
         to free that allocation. Note that the indegree of a node is precisely equal to the reference count of its
         corresponding allocation.
       </p>
-      <p>I’ll roughly outline our approach to determining whether some node \(n: \neq r\) is accessible.</p>
+      <p>I’ll roughly outline our approach to determining whether some node <math ><mrow><mi>n</mi><mi>:</mi><mo>&#x02260;</mo><mi>r</mi></mrow></math> is accessible.</p>
       <ol type="1">
         <li>
-          Find \(W\), the set of all descendants of \(n\). Construct the subgraph \(H\) of \(G\) whose vertex set is
-          \(W\), preserving all edges connecting nodes in \(W\).
+          Find <math ><mrow><mi>W</mi></mrow></math>, the set of all descendants of <math><mi>n</mi></math>. Construct the subgraph <math ><mrow><mi>H</mi></mrow></math> of <math ><mrow><mi>G</mi></mrow></math> whose vertex set is
+          <math ><mrow><mi>W</mi></mrow></math>, preserving all edges connecting nodes in <math ><mrow><mi>W</mi></mrow></math>.
         </li>
         <li>
-          Find the set of nodes \(A \subseteq W\) for which the indegree of each \(a \in A\) in \(H\) is
-          <em>not</em> equal to its indegree in \(G\).
+          Find the set of nodes <math ><mrow><mi>A</mi><mo>&#x02286;</mo><mi>W</mi></mrow></math> for which the indegree of each <math ><mrow><mi>a</mi><mo>&#x02208;</mo><mi>A</mi></mrow></math> in <math ><mrow><mi>H</mi></mrow></math> is
+          <em>not</em> equal to its indegree in <math ><mrow><mi>G</mi></mrow></math>.
         </li>
-        <li>For each \(a \in A\), mark it and its descendants as accessible.</li>
-        <li>If and only if \(n\) was marked as accessible, it is accessible.</li>
+        <li>For each <math ><mrow><mi>a</mi><mo>&#x02208;</mo><mi>A</mi></mrow></math>, mark it and its descendants as accessible.</li>
+        <li>If and only if <math><mi>n</mi></math> was marked as accessible, it is accessible.</li>
       </ol>
       <p>Here’s a serpentine implementation in pseudocode, if that’s what you prefer.</p>
       <pre class="py"><code>def is_accessible(n):
@@ -204,7 +204,7 @@ def mark(a, reachable):
         reachable.add(a)
         for (_, b) in a.edges():
             mark(b, reachable)</code></pre>
-      <p>It should be pretty clear to see that <code>is_accessible</code> runs in \(O(|V| + |E|)\) time.</p>
+      <p>It should be pretty clear to see that <code>is_accessible</code> runs in <math ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mo stretchy="false">&#x0007C;</mo><mi>V</mi><mo stretchy="false">&#x0007C;</mo><mo>&#x0002B;</mo><mo stretchy="false">&#x0007C;</mo><mi>E</mi><mo stretchy="false">&#x0007C;</mo><mo stretchy="false">&#x00029;</mo></mrow></math> time.</p>
       <h3 id="reference-counting-with-extra-steps">Reference counting with extra steps</h3>
       <p>
         Our single-threaded <code>Gc</code> will behave much like an <code>Rc</code>, but with some minor details
@@ -407,16 +407,16 @@ struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer 
     </p>
     <h3 id="amortizing">Amortizing</h3>
     <p>
-      What’s that, you say? You need your reference operations to work in \(O(1)\) time? Why are programmers these days
+      What’s that, you say? You need your reference operations to work in <math ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math> time? Why are programmers these days
       so picky?
     </p>
     <p>
-      Luckily, it isn’t too hard to make our garbage-collection efforts terminate in average-case \(O(1)\) time. Instead
+      Luckily, it isn’t too hard to make our garbage-collection efforts terminate in average-case <math ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math> time. Instead
       of calling
       <code>collect</code> directly, we’ll just punt the allocation, which may be inaccessible, into a set of “dirty”
-      allocations. In my code, I call that set a dumpster. Then, once every \(|E|\) times an allocation is dropped,
-      we’ll go through the whole dumpster and collect them all in \(O(|E|)\) time. Amortized across all allocations,
-      that’s technically \(O(1)\), enabled by the same accounting wizardry that makes array-backed lists useful and that
+      allocations. In my code, I call that set a dumpster. Then, once every <math ><mrow><mo stretchy="false">&#x0007C;</mo><mi>E</mi><mo stretchy="false">&#x0007C;</mo></mrow></math> times an allocation is dropped,
+      we’ll go through the whole dumpster and collect them all in <math ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mo stretchy="false">&#x0007C;</mo><mi>E</mi><mo stretchy="false">&#x0007C;</mo><mo stretchy="false">&#x00029;</mo></mrow></math> time. Amortized across all allocations,
+      that’s technically <math ><mrow><mi>O</mi><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo></mrow></math>, enabled by the same accounting wizardry that makes array-backed lists useful and that
       caused the 2008 financial crisis.
     </p>
     <p>
@@ -432,24 +432,28 @@ struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer 
     </p>
     <p>
       However, even if only one thread is collecting, we can still run into some nasty concurrency issues. Let’s imagine
-      that we have 2 allocations, \(a\) and \(b\), plus the imaginary “root” allocation \(r\), where \(a\) can only be
-      accessed from \(r\) and \(b\) can only be accessed from \(a\).
+      that we have 2 allocations, <math><mi>a</mi></math> and <math><mi>b</mi></math>, plus the imaginary “root” allocation <math>
+  <mi>r</mi>
+</math>, where <math><mi>a</mi></math> can only be
+      accessed from <math>
+  <mi>r</mi>
+</math> and <math><mi>b</mi></math> can only be accessed from <math><mi>a</mi></math>.
     </p>
     <figure><img src="/assets/img/dumpster/chain2.dot.svg" class="night-invert" /></figure>
     <p>
-      Now, consider performing a depth-first search starting from \(a\). First, we record that \(a\) has 1
+      Now, consider performing a depth-first search starting from <math><mi>a</mi></math>. First, we record that <math><mi>a</mi></math> has 1
       unaccounted-for-reference in
-      <code>counts</code>. Then, we move on to looking at \(b\) because it’s one of \(a\)’s children.
+      <code>counts</code>. Then, we move on to looking at <math><mi>b</mi></math> because it’s one of <math><mi>a</mi></math>’s children.
     </p>
     <p>
-      However, between when we record \(a\)’s reference count and examine \(b\), another malicious thread mutates \(b\),
-      adding a back-reference from \(b\) to \(a\).
+      However, between when we record <math><mi>a</mi></math>’s reference count and examine <math><mi>b</mi></math>, another malicious thread mutates <math><mi>b</mi></math>,
+      adding a back-reference from <math><mi>b</mi></math> to <math><mi>a</mi></math>.
     </p>
     <figure><img src="/assets/img/dumpster/onecycle.dot.svg" class="night-invert" /></figure>
     <p>
-      Then, the depth-first search will return to \(a\), decrement the number of unaccounted references, and assume that
-      all incoming references to \(a\) and \(b\) were totally accounted for (and therefore inaccessible). Then the
-      garbage collector would happily destroy \(a\) and \(b\)’s allocations, leaving a dangling reference to the heap,
+      Then, the depth-first search will return to <math><mi>a</mi></math>, decrement the number of unaccounted references, and assume that
+      all incoming references to <math><mi>a</mi></math> and <math><mi>b</mi></math> were totally accounted for (and therefore inaccessible). Then the
+      garbage collector would happily destroy <math><mi>a</mi></math> and <math><mi>b</mi></math>’s allocations, leaving a dangling reference to the heap,
       potentially causing a use-after-free or other gnarly memory errors.
     </p>
     <h3 id="resolving-concurrency">Resolving concurrency</h3>
@@ -462,7 +466,7 @@ struct ErasedPtr([usize; 2]);              // used as a reconstructible pointer 
     <p>
       We’d like to have an approach that only needs to achieve mutual exclusion over a small subset of all allocations
       if at all possible. To do so, let’s take a closer look at our concurrency problem: we can see that we only really
-      get erroneous results when another thread mutates the subgraph \(H\) as we interact with it. The solution is quite
+      get erroneous results when another thread mutates the subgraph <math ><mrow><mi>H</mi></mrow></math> as we interact with it. The solution is quite
       clever - we tag every
       <code>Gc</code> with a special number, which I’ll call a collecting tag.
     </p>
@@ -509,7 +513,9 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
       </p>
       <p>
         Let’s return to our broken example to show how this modification fixes it. We return to our reference graph with
-        \(a\) pointing to \(b\) and \(r\) pointing to \(a\). Since every
+        <math><mi>a</mi></math> pointing to <math><mi>b</mi></math> and <math>
+  <mi>r</mi>
+</math> pointing to <math><mi>a</mi></math>. Since every
         <code>Gc</code> must be annotated with a tag, let’s say they’re all tagged with 0.
       </p>
       <img src="/assets/img/dumpster/chain2labeled.dot.svg" />
@@ -519,39 +525,67 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
       </p>
       <img src="/assets/img/dumpster/onecyclelabeled.dot.svg" />
       <p>
-        Now, when <code>dfs</code> visits the edge pointing from \(b\) to \(a\), it sees that the reference is labeled
-        with a tag of 1, and therefore both \(b\) and \(a\) must be accessible - no accidental early deallocations here.
+        Now, when <code>dfs</code> visits the edge pointing from <math><mi>b</mi></math> to <math><mi>a</mi></math>, it sees that the reference is labeled
+        with a tag of 1, and therefore both <math><mi>b</mi></math> and <math><mi>a</mi></math> must be accessible - no accidental early deallocations here.
       </p>
       <h3 id="moving-in-and-out">Moving in and out</h3>
       <p>
         We might hope that tagging the pointers is sufficient to prevent all concurrency bugs. However, this is sadly
         not enough. To show why, we’ll begin with an example.
       </p>
-      <p>First, let’s imagine an allocation called \(x\), which contains two optional references to itself.</p>
+      <p>First, let’s imagine an allocation called <math>
+  <mi>x</mi>
+</math>, which contains two optional references to itself.</p>
       <pre class="rust"><code>struct X {
     x1: Mutex&lt;Option&lt;Gc&lt;X&gt;&gt;&gt;,
     x2: Mutex&lt;Option&lt;Gc&lt;X&gt;&gt;&gt;,
 }</code></pre>
       <p>
         At the start of our example, there will be only one <code>Gc</code>
-        pointing from inside \(x\) to itself, and the other slot that can hold a
-        <code>Gc</code> will be empty. \(x\) is accessible directly from the root allocation \(r\), and all existing
-        references are tagged with 0. For the sake of clarity, I’ll draw the arrow representing the first slot in \(x\)
+        pointing from inside <math>
+  <mi>x</mi>
+</math> to itself, and the other slot that can hold a
+        <code>Gc</code> will be empty. <math>
+  <mi>x</mi>
+</math> is accessible directly from the root allocation <math>
+  <mi>r</mi>
+</math>, and all existing
+        references are tagged with 0. For the sake of clarity, I’ll draw the arrow representing the first slot in <math>
+  <mi>x</mi>
+</math>
         with a solid line and the second slot with a dashed line.
       </p>
       <img src="/assets/img/dumpster/dash0.dot.svg" />
-      <p>Now, let’s have <code>dfs</code> begin, starting at \(x\).</p>
+      <p>Now, let’s have <code>dfs</code> begin, starting at <math>
+  <mi>x</mi>
+</math>.</p>
       <ol type="1">
         <li>We increment <code>COLLECTING_TAG</code> to 1.</li>
-        <li><code>dfs</code> records that \(x\) has 2 unaccounted-for references at the start.</li>
+        <li><code>dfs</code> records that <math>
+  <mi>x</mi>
+</math> has 2 unaccounted-for references at the start.</li>
         <li>
-          <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self reference in that slot.
-          \(x\) now has 1 unaccounted-for reference.
+          <code>dfs</code> visits the <math>
+  <mi>x</mi>
+</math>’s first slot and tags the currently-existing self reference in that slot.
+          <math>
+  <mi>x</mi>
+</math> now has 1 unaccounted-for reference.
           <img src="/assets/img/dumpster/dash1.dot.svg" />
         </li>
         <li value="4">
-          A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to \(r\), then moving
-          the original <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s second slot.
+          A malicious thread intervenes, first moving the <code>Gc</code> from <math>
+  <mi>x</mi>
+</math>’s first slot to <math>
+  <mi>r</mi>
+</math>, then moving
+          the original <code>Gc</code> which connected <math>
+  <mi>r</mi>
+</math> to <math>
+  <mi>x</mi>
+</math> into <math>
+  <mi>x</mi>
+</math>’s second slot.
     <p>
       Lastly, whenever we encounter a <code>Gc</code> during the <code>dfs</code> process, we’ll check its tag. If the
       tag is equal to the current value of <code>COLLECTING_TAG</code>, that means the <code>Gc</code> was created after
@@ -561,7 +595,9 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
     </p>
     <p>
       Let’s return to our broken example to show how this modification fixes it. We return to our reference graph with
-      \(a\) pointing to \(b\) and \(r\) pointing to \(a\). Since every
+      <math><mi>a</mi></math> pointing to <math><mi>b</mi></math> and <math>
+  <mi>r</mi>
+</math> pointing to <math><mi>a</mi></math>. Since every
       <code>Gc</code> must be annotated with a tag, let’s say they’re all tagged with 0.
     </p>
     <figure><img src="/assets/img/dumpster/chain2labeled.dot.svg" class="night-invert" /></figure>
@@ -571,39 +607,67 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
     </p>
     <figure><img src="/assets/img/dumpster/onecyclelabeled.dot.svg" class="night-invert" /></figure>
     <p>
-      Now, when <code>dfs</code> visits the edge pointing from \(b\) to \(a\), it sees that the reference is labeled
-      with a tag of 1, and therefore both \(b\) and \(a\) must be accessible - no accidental early deallocations here.
+      Now, when <code>dfs</code> visits the edge pointing from <math><mi>b</mi></math> to <math><mi>a</mi></math>, it sees that the reference is labeled
+      with a tag of 1, and therefore both <math><mi>b</mi></math> and <math><mi>a</mi></math> must be accessible - no accidental early deallocations here.
     </p>
     <h3 id="moving-in-and-out">Moving in and out</h3>
     <p>
       We might hope that tagging the pointers is sufficient to prevent all concurrency bugs. However, this is sadly not
       enough. To show why, we’ll begin with an example.
     </p>
-    <p>First, let’s imagine an allocation called \(x\), which contains two optional references to itself.</p>
+    <p>First, let’s imagine an allocation called <math>
+  <mi>x</mi>
+</math>, which contains two optional references to itself.</p>
     <pre class="rust"><code>struct X {
     x1: Mutex&lt;Option&lt;Gc&lt;X&gt;&gt;&gt;,
     x2: Mutex&lt;Option&lt;Gc&lt;X&gt;&gt;&gt;,
 }</code></pre>
     <p>
       At the start of our example, there will be only one <code>Gc</code>
-      pointing from inside \(x\) to itself, and the other slot that can hold a
-      <code>Gc</code> will be empty. \(x\) is accessible directly from the root allocation \(r\), and all existing
-      references are tagged with 0. For the sake of clarity, I’ll draw the arrow representing the first slot in \(x\)
+      pointing from inside <math>
+  <mi>x</mi>
+</math> to itself, and the other slot that can hold a
+      <code>Gc</code> will be empty. <math>
+  <mi>x</mi>
+</math> is accessible directly from the root allocation <math>
+  <mi>r</mi>
+</math>, and all existing
+      references are tagged with 0. For the sake of clarity, I’ll draw the arrow representing the first slot in <math>
+  <mi>x</mi>
+</math>
       with a solid line and the second slot with a dashed line.
     </p>
     <figure><img src="/assets/img/dumpster/dash0.dot.svg" class="night-invert" /></figure>
-    <p>Now, let’s have <code>dfs</code> begin, starting at \(x\).</p>
+    <p>Now, let’s have <code>dfs</code> begin, starting at <math>
+  <mi>x</mi>
+</math>.</p>
     <ol type="1">
       <li>We increment <code>COLLECTING_TAG</code> to 1.</li>
-      <li><code>dfs</code> records that \(x\) has 2 unaccounted-for references at the start.</li>
+      <li><code>dfs</code> records that <math>
+  <mi>x</mi>
+</math> has 2 unaccounted-for references at the start.</li>
       <li>
-        <code>dfs</code> visits the \(x\)’s first slot and tags the currently-existing self
-        reference in that slot. \(x\) now has 1 unaccounted-for reference.
+        <code>dfs</code> visits the <math>
+  <mi>x</mi>
+</math>’s first slot and tags the currently-existing self
+        reference in that slot. <math>
+  <mi>x</mi>
+</math> now has 1 unaccounted-for reference.
         <figure><img src="/assets/img/dumpster/dash1.dot.svg" class="night-invert" /></figure>
       </li>
       <li value="4">
-        A malicious thread intervenes, first moving the <code>Gc</code> from \(x\)’s first slot to \(r\), then moving
-        the original <code>Gc</code> which connected \(r\) to \(x\) into \(x\)’s second slot.
+        A malicious thread intervenes, first moving the <code>Gc</code> from <math>
+  <mi>x</mi>
+</math>’s first slot to <math>
+  <mi>r</mi>
+</math>, then moving
+        the original <code>Gc</code> which connected <math>
+  <mi>r</mi>
+</math> to <math>
+  <mi>x</mi>
+</math> into <math>
+  <mi>x</mi>
+</math>’s second slot.
 
           <pre class="rust"><code>fn do_evil(r_to_x: Gc&lt;X&gt;) {
     let z = std::mem::take(&amp;mut *r_to_x.x1.lock().unwrap());
@@ -612,11 +676,21 @@ impl &lt;T: Collectable + Send + Sync + ?Sized&gt; Gc&lt;T&gt; {
         <figure><img src="/assets/img/dumpster/dash2.dot.svg" class="night-invert" /></figure>
       </li>
       <li value="5">
-        <code>dfs</code> continues, now visiting the second slot in \(x\). Seeing another reference to \(x\), we
+        <code>dfs</code> continues, now visiting the second slot in <math>
+  <mi>x</mi>
+</math>. Seeing another reference to <math>
+  <mi>x</mi>
+</math>, we
         decrement the number of unaccounted-for references to 0.
       </li>
       <li>
-        <code>dfs</code> found no ancestors of \(x\) with unaccounted-for ancestors, so we free \(x\). However, \(x\) is
+        <code>dfs</code> found no ancestors of <math>
+  <mi>x</mi>
+</math> with unaccounted-for ancestors, so we free <math>
+  <mi>x</mi>
+</math>. However, <math>
+  <mi>x</mi>
+</math> is
         still accessible!
       </li>
     </ol>
@@ -665,15 +739,17 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
           referent is accessible.
         </li>
         <li>
-          Due to (1), if <code>dfs</code> marked some allocation \(a\) as inaccessible, it must have only visited
-          <code>Gc</code>s pointing to \(a\) which existed before <code>dfs</code> began.
+          Due to (1), if <code>dfs</code> marked some allocation <math><mi>a</mi></math> as inaccessible, it must have only visited
+          <code>Gc</code>s pointing to <math><mi>a</mi></math> which existed before <code>dfs</code> began.
         </li>
         <li>
-          Weakening the statement from (2), if <code>dfs</code> marked some allocation \(a\) as inaccessible, it must
-          have only visited <code>Gc</code>s pointing to \(a\) which existed when \(a\)’s reference count was recorded.
+          Weakening the statement from (2), if <code>dfs</code> marked some allocation <math><mi>a</mi></math> as inaccessible, it must
+          have only visited <code>Gc</code>s pointing to <math><mi>a</mi></math> which existed when <math><mi>a</mi></math>’s reference count was recorded.
         </li>
         <li>
-          <code>dfs</code> never visits a <code>Gc</code> while it points from the root allocation \(r\) to any other
+          <code>dfs</code> never visits a <code>Gc</code> while it points from the root allocation <math>
+  <mi>r</mi>
+</math> to any other
           allocation.
         </li>
         <li>
@@ -681,33 +757,41 @@ struct GcBox&lt;T: Collectable + Send + Sync + ?Sized&gt; {
           reference count was recorded in order to mark it as inaccessible.
         </li>
         <li>
-          Due to (4) and (5), if \(a\) is marked as inaccesssible, any
-          <code>Gc</code> which at any point connected \(r\) to \(a\) must have been moved to connect another node (not
-          \(r\)) to \(a\).
+          Due to (4) and (5), if <math><mi>a</mi></math> is marked as inaccesssible, any
+          <code>Gc</code> which at any point connected <math>
+  <mi>r</mi>
+</math> to <math><mi>a</mi></math> must have been moved to connect another node (not
+          <math>
+  <mi>r</mi>
+</math>) to <math><mi>a</mi></math>.
         </li>
         <li>
           Due to (6), there is no lifetime <code>'x</code> which can borrow against a <code>Gc</code> pointing from
-          \(r\) to \(a\) and last between when <code>dfs</code> first visits \(a\) and when it last visits \(a\).
+          <math>
+  <mi>r</mi>
+</math> to <math><mi>a</mi></math> and last between when <code>dfs</code> first visits <math><mi>a</mi></math> and when it last visits <math><mi>a</mi></math>.
         </li>
         <li>
-          The final <code>Gc</code> to move into \(a\) before <code>dfs</code> must have been moved while another borrow
+          The final <code>Gc</code> to move into <math><mi>a</mi></math> before <code>dfs</code> must have been moved while another borrow
           against a
           <code>Gc</code>
-          pointing from \(r\) to \(a\) existed. Let the lifetime of that borrow be
+          pointing from <math>
+  <mi>r</mi>
+</math> to <math><mi>a</mi></math> existed. Let the lifetime of that borrow be
           <code>'y</code>.
         </li>
         <li>
           Because <code>'y</code> lasts longer than the final move, <code>'y</code> can be extended to last arbitrarily
-          long, even until after <code>dfs</code> has finished visiting every <code>Gc</code> pointing to \(a\).
+          long, even until after <code>dfs</code> has finished visiting every <code>Gc</code> pointing to <math><mi>a</mi></math>.
         </li>
         <li>
-          Due to (7), <code>'y</code> must not have existed before <code>dfs</code> first visited \(a\). Therefore, if
-          \(a\) is erroneously marked as inaccessible, a <code>Gc</code> pointing to \(a\) must have been dereferenced
+          Due to (7), <code>'y</code> must not have existed before <code>dfs</code> first visited <math><mi>a</mi></math>. Therefore, if
+          <math><mi>a</mi></math> is erroneously marked as inaccessible, a <code>Gc</code> pointing to <math><mi>a</mi></math> must have been dereferenced
           to generate a borrow with lifetime <code>'y</code>.
         </li>
         <li>
-          If a <code>Gc</code> pointing to \(a\) was dereferenced before the last time <code>dfs</code> visited a
-          <code>Gc</code> pointing to \(a\), then <code>dfs</code> would have observed that \(a\)’s tag had changed.
+          If a <code>Gc</code> pointing to <math><mi>a</mi></math> was dereferenced before the last time <code>dfs</code> visited a
+          <code>Gc</code> pointing to <math><mi>a</mi></math>, then <code>dfs</code> would have observed that <math><mi>a</mi></math>’s tag had changed.
           Therefore, if an allocation was erroneously marked as inaccessible, it must have been marked as accessible.
           Therefore no allocations were ever erroneously marked as inacessible by <code>dfs</code>. QED.
         </li>
