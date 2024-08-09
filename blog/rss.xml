@@ -14,6 +14,14 @@
     <atom:link href="https://claytonwramsey.com/blog/rss.xml" rel="self" type="application/rss_xml"/>
 
     <item>
+        <title>Reflections on a year of grad school</title>
+        <link>https://claytonwramsey.com/blog/first-year</link>
+        <description>I'm no wiser than last year, but at least I know a few more things.</description>
+        <pubDate>Fri, 16 Aug 2024 10:00 CST</pubDate>
+        <guid>https://claytonwramsey.com/blog/first-yearguid>
+        <author>Clayton Ramsey</author>
+    </item>
+    <item>
         <title>Making robots plan faster with SIMD and Rust</title>
         <link>https://claytonwramsey.com/blog/captree</link>
         <description>Systems programming and data structures meet to make instant collision-checking.</description>
