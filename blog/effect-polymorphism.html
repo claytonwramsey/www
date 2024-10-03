@@ -43,6 +43,24 @@
         TL;DR: Local programmer is inconvenienced by error-handling boiler plate, writes uninformed article about
         experimental programming language features. More at 11.
       </p>
+      <p>
+        I've encountered lots of pain points when dependency-inverting things, especially when working with combinators.
+        Most recently, I've been thinking about how I might expose Python bindings for a
+        <a href="https://github.com/claytonwramsey/rumple">half-baked motion planning library</a> I'm building. The
+        chief problem is that I want users to provide their own configuration spaces, samplers, robots, and collision
+        checkers. If those are implemented in Python, they can throw an exception at any time, yielding an error in the
+        corresponding PyO3 API. The problem is that all of my functions which might call into that behavior doesn't
+        return an error - what am I to do?
+      </p>
+      <p>
+        I'm not the only one with this sort of problem!
+        <a href="https://without.boats/blog/the-problem-of-effects/">boats</a> has been writing about this for nearly
+        five years, and
+        <a href="https://stackoverflow.com/questions/63798662">handling iterators of results is still a pain</a>. As the
+        <code>async</code> story for Rust has improved, we've seen similar results on the pain (or lack thereof) of
+        <a href="https://morestina.net/blog/1686/rust-async-is-colored">function coloring in Rust</a>. In short,
+        crossing control-flow boundaries in statically typed languages is painful and difficult.
+      </p>
       <h2>Dependency inversion</h2>
       <p>
         For the sake of this post, I'll refer to <dfn>dependency inversion</dfn> as the practice of taking a subroutine
@@ -202,7 +220,7 @@ fn qux() can Bar {
 }</code></pre>
       <p>
         We can add some texture by letting effects also call procedures which go all the way up to their handlers. The
-        handler can choose resume, returning execution to the effect caller, or to
+        handler can choose to resume, returning execution to the effect caller, or to
         <code>break</code>, escaping from the handler to the scope outside the handler.
       </p>
       <pre class="rust"><code>effect GetWidget {
@@ -262,8 +280,86 @@ fn main() {
     }
 }</code></pre>
       <h2>Effects can model lots of kinds of functions</h2>
-      <h2>Aside: Exceptions are a trivial case of effects</h2>
-      <h2>Fixing my python issues at last</h2>
+      <p>
+        We can model many language features as special cases as effects. In fact, the handling the effect
+        <code>Fail</code> in the example above is equivalent to a <code>try</code>-<code>catch</code> statement with
+        checked exceptions!
+      </p>
+      <p>
+        <code>unsafe</code> is also pretty trivially an effect - any function which is unsafe can have the
+        <code>Unsafe</code> effect, while any <code>unsafe</code> block desugars to a handler. If you added effects to
+        the original Rust language, it might be possible to integrate them in a backward-compatible way into the
+        language.
+      </p>
+      <p>
+        The same applies for <code>async</code>, I/O, and allocations. If you squint hard enough, you might be able to
+        imagine a case where interior mutability is a sort of effect handler too. Surprisingly enough,
+        <code>const</code> isn't really an effect, but non-<code>const</code> code is! Non-<code>const</code> code can
+        call <code>const</code> functions, but not the other way around, so running at runtime is the effect. I suppose
+        you could alternately come up with "contravariant" effects, by which any function with contravariant effect
+        <math
+          ><msup><mi>E</mi><mo lspace="0em" rspace="0em" class="tml-prime">′</mo></msup></math
+        >
+        may only call functions which also have the effect
+        <math
+          ><msup><mi>E</mi><mo lspace="0em" rspace="0em" class="tml-prime">′</mo></msup></math
+        >. Then <code>const</code> would be one such contravariant effect, but, honestly, it's not worth the hassle.
+      </p>
+      <h2>Effect polymorphism comes in</h2>
+      <p>
+        In the same way that a function could be polymorphic over types (as with generics), why not have functions be
+        polymorphic over <em>effects</em>? If we return to our original example of <code>my_sum</code>, we can fold all
+        the possible versions of <code>my_sum</code> from
+        <math>
+          <msup>
+            <mn>2</mn>
+            <mi>n</mi>
+          </msup>
+        </math>
+        variants to just one.
+      </p>
+      <pre class="rust"><code>trait MagicNumber {
+    effect Effect;
+    fn magic_number(x: u32) -> u32 can Self::Effect;
+}
+
+fn my_sum&lt;N: MagicNumber&gt;() -> u32 can N::Effect {
+    let mut total = 0;
+    for i in 0..10 {
+        total += N::magic_number(i);
+    }
+    total
+}</code></pre>
+      <p>
+        I'm pretty happy with this! There's very little ceremony involved, and we get to express vastly more things than
+        we could before!
+      </p>
+      <p>Of course, once we have something like this system, there are a lot of obvious questions:</p>
+      <ul>
+        <li>Is there a complement to <code>type _ = impl Trait</code> for effects?</li>
+        <li>How should effects compose?</li>
+        <li>Can we treat effects like data?</li>
+        <li>Can we do introspection or reflection on effects?</li>
+        <li>Can we do dynamic-dispatch on effects at runtime?</li>
+        <li>If Rust also got linear types, how would they compose with cancellation in effect handlers?</li>
+      </ul>
+      <p>For now, though, it would be really nice to just write code which is polymorphic over its effects.</p>
+      <h2>I'm no closer to fixing my Python issues</h2>
+      <p>
+        It's one thing to muse about a solution to my problem and another thing entirely to actually solve it. As much
+        as I would like to go completely down the rabbit hole and implement a dream language with algebraic effects,
+        linear types, trait-based polymorphism, and zero-cost abstraction, I also have to get my projects done some time
+        this century.
+      </p>
+      <p>
+        There's been a lot of ink spilled about efficiently compiling algebraic effects, but at the time of writing
+        there's no mainstream programming language that does so. <a href="https://github.com/koka-lang/koka">Koka</a> is
+        probably the closest thing that we have to such a language, but it's admittedly not production-ready.
+      </p>
+      <p>
+        For now, I will probably end up just making code that has weird effects panic. It's not the best choice, but
+        it's good enough for now.
+      </p>
     </main>
   </body>
 </html>
