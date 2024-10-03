@@ -61,6 +61,12 @@
         <a href="https://morestina.net/blog/1686/rust-async-is-colored">function coloring in Rust</a>. In short,
         crossing control-flow boundaries in statically typed languages is painful and difficult.
       </p>
+      <p>
+        First off, a disclaimer: I am more interested in programming language theory than the average joe, but I'm still
+        not an expert. I've only read a little bit on the topic of algebraic effects, so I may get some things wrong -
+        I'm a roboticist, not a category theorist. The purpose of this article is not so much to propose a novel
+        contribution as to draw attention to a common problem and an elegant solution.
+      </p>
       <h2>Dependency inversion</h2>
       <p>
         For the sake of this post, I'll refer to <dfn>dependency inversion</dfn> as the practice of taking a subroutine
