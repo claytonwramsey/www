@@ -12,7 +12,7 @@
     <meta charset="UTF-8" />
     <meta name="author" content="Clayton Ramsey" />
     <meta name="description" content="" />
-    <meta name="keywords" content="reflection, phd" />
+    <meta name="keywords" content="rust, effects" />
     <link rel="canonical" href="https://claytonwramsey.com/blog/effect-polymorphism" />
 
     <title>Effect polymorphism fixes dependency inversion</title>
@@ -36,7 +36,7 @@
         <a href="/recipes">Recipes</a>
       </nav>
       <h1>Effect polymorphism fixes dependency inversion</h1>
-      <div class="pubinfo">Clayton Ramsey - 2024-10-02</div>
+      <div class="pubinfo">Clayton Ramsey - 2024-10-05</div>
     </header>
     <main>
       <p>
@@ -49,8 +49,8 @@
         <a href="https://github.com/claytonwramsey/rumple">half-baked motion planning library</a> I'm building. The
         chief problem is that I want users to provide their own configuration spaces, samplers, robots, and collision
         checkers. If those are implemented in Python, they can throw an exception at any time, yielding an error in the
-        corresponding PyO3 API. The problem is that all of my functions which might call into that behavior doesn't
-        return an error - what am I to do?
+        corresponding PyO3 API. The problem is that all of my functions which might call into that behavior don't return
+        an error - what am I to do?
       </p>
       <p>
         I'm not the only one with this sort of problem!
@@ -112,8 +112,8 @@ trait MagicNumber {
       </p>
       <ul>
         <li>
-          Panic! Whenever <code>magic_number</code> encounter's an error state, we can just crash the program. This
-          works fine until you are woken up at 3 A.M. with calls about your broken website.
+          Panic! Whenever <code>magic_number</code> encounters an error state, we can just crash the program. This works
+          fine until you are woken up at 3 A.M. with calls about your broken website.
         </li>
         <li>
           Panic, but gracefully. Whatever top-level code calls <code>my_sum</code> can catch the panic using
@@ -154,8 +154,9 @@ trait TryMagicNumber {
     unsafe fn try_unsafe_magic_number(x: u32) -> Result&lt;u32, Self::Error&gt;;
 }</code></pre>
       <p>
-        Now imagine if we wanted to make a version of <code>magic_number</code> that worked via dynamic-dispatch, so
-        we'd make a new object-safe trait for that too. Then we'd need to make even more traits for every version of it!
+        Now imagine if we wanted to make a version of <code>magic_number</code> that worked via dynamic-dispatch. To do
+        so, we'd have to make a new trait <code>ObjectMagicNumber</code>, since <code>MagicNumber</code> is not
+        object-safe. Then we'd need to make even more traits for every version of it!
       </p>
       <pre class="rust"><code>trait ObectMagicNumber {
     fn object_magic_number(&self, x: u32) -> u32;
@@ -215,8 +216,8 @@ fn qux() can Bar {
       <p>
         To avoid the
         <a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function">function coloring</a>
-        problem, we'll also allow for <code>handle</code> clauses, with allow a function without an effect to call a
-        function with an effect.
+        problem, we'll also allow for <code>handle</code> clauses, which allow a function <em>without</em> an effect to
+        call a function <em>with</em> an effect.
       </p>
       <pre clas="rust"><code>fn baz2() {
     handle Bar {} {
@@ -287,7 +288,7 @@ fn main() {
 }</code></pre>
       <h2>Effects can model lots of kinds of functions</h2>
       <p>
-        We can model many language features as special cases as effects. In fact, the handling the effect
+        We can model many language features as special cases pf effects. In fact, the handling the effect
         <code>Fail</code> in the example above is equivalent to a <code>try</code>-<code>catch</code> statement with
         checked exceptions!
       </p>
@@ -365,6 +366,10 @@ fn my_sum&lt;N: MagicNumber&gt;() -> u32 can N::Effect {
       <p>
         For now, I will probably end up just making code that has weird effects panic. It's not the best choice, but
         it's good enough for now.
+      </p>
+      <p>
+        Thanks to <a href="https://aedancullen.com/">Aedan</a>, <a href="https://shreyasminocha.me/">Shreyas</a>, and
+        <a href="https://wisha.page/">Wisha</a> for reviewing this post!
       </p>
     </main>
   </body>

@@ -13,6 +13,16 @@
     <webMaster>claytonwramsey@gmail.com (Clayton Ramsey)</webMaster>
     <atom:link href="https://claytonwramsey.com/blog/rss.xml" rel="self" type="application/rss_xml"/>
 
+
+    <item>
+        <title>Effect polymorphism fixes dependency inversion</title>
+        <link>https://claytonwramsey.com/blog/effect-polymorphism</link>
+        <description>Local programmer is inconvenienced by error-handling boiler plate, writes uninformed article about experimental programming language features. More at 11.</description>
+        <pubDate>Sat, 05 Oct 2024 18:22 CST</pubDate>
+        <guid>https://claytonwramsey.com/blog/effect-polymorphism</guid>
+        <author>Clayton Ramsey</author>
+    </item>
+
     <item>
         <title>Reflections on a year of grad school</title>
         <link>https://claytonwramsey.com/blog/first-year</link>
