@@ -20,6 +20,11 @@ code {
     overflow-x: auto;
 }
 
+a:hover {
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: 2px;
+}
+
 /* Change color in night mode */
 @media (prefers-color-scheme: dark) {
     body {
