@@ -1,0 +1,98 @@
+<!doctype html>
+
+<!--
+  Hi! Thanks for checking out this website.
+  I made it myself!
+  This website was made by hand.
+  I intentionally haven't minified anything so you can see how it all fits together.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="rust, effects" />
+    <link rel="canonical" href="https://claytonwramsey.com/blog/simd-wordle" />
+
+    <title>Solving 100,000,000 Wordle problems per second</title>
+
+    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/hljs.css" />
+
+    <link rel="icon" href="/assets/img/favicon.ico" />
+    <script src="/assets/js/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/cv">CV</a>
+        <a href="/blog">Blog</a>
+        <a href="/recipes">Recipes</a>
+      </nav>
+      <h1>Solving 100,000,000 Wordle problems per second</h1>
+      <div class="pubinfo">Clayton Ramsey - 2024-11-21</div>
+    </header>
+    <main>
+      <p>The naive implementation would look something like this:</p>
+      <pre class="Rust"><code></code></pre>
+      <section><h2>The simplest approach</h2></section>
+      <section>
+        <h2>A little less naive</h2>
+        <p>
+          Were I writing standard application code, I think this would have been a reasonable place to stop. It requires
+          a few assumptions, but they are mostly reasonable, and the code is in my opinion quite readable.
+        </p>
+        <p>
+          <emph>Note:</emph> Were I wearing my software-engineer hat, I would be a lot more systematic about enforcing
+          invariants for all my types. However, this is only a blog post, and so I play fast and loose with my code
+          quality for sake of brevity.
+        </p>
+      </section>
+      <section>
+        <h2>Packing it all down</h2>
+        <p>
+          In the previous step, each <code>Word</code> was exactly 5 bytes. Often, if we pack our data into a single
+          integer, we can get some big performance improvements, but the 3-byte overhead of a <code>u64</code> seems a
+          little too big. Is there a better way?
+        </p>
+        <p>
+          Well, maybe. We'll have to start with another restrictive assumption. Previously, we allowed any letter in a
+          word to be a byte, so all values of a <code>u8</code> were fair game. In our dataset, however, we find that
+          every word is a lowercase alphabetical string. This takes the number of possible characters from 255 to 26.
+          Doing a little bit of math, the minimum data needed to represent 5 26-letter words is
+          <math
+            ><mrow
+              ><mn>5</mn
+              ><mrow><mspace width="0.1667em"></mspace><mi>log</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow
+              ><mn>26</mn></mrow
+            ></math
+          >
+          bits, or just over 23.5 bits. This is a good sign - that means we can represent each word as a
+          <code>u32</code>.
+        </p>
+        <p>
+          It's actually even better than that. We only need 5 bits to represent each letter, so a packed array of 5
+          words is only 25 bits. To get down to the theoretical minimum of 24 bits, we'd need to do
+          multiplies-and-modulos to pack or extract each letter, but when representing each letter as its own
+          independent bits, we can use (much faster) bitshift and masking operations.
+        </p>
+        <p>But enough talking! Let's get to the code. Let's start by redefining our <code>Word</code>s.</p>
+        <pre class="Rust"><code>type Word = u32;</code></pre>
+        <p>
+          This is a packed representation, so for a word <code>w</code>, to get the <code>i</code>-th letter of
+          <code>w</code>, we can unpack it with a bit-shift and mask: <code>w[i] = (w >> (5 * i)) & 0b11111</code>
+        </p>
+      </section>
+      <section><h2>Multiple data, multiple problems</h2></section>
+      <section>
+        <h2>Turbo-parallelism</h2>
+      </section>
+    </main>
+  </body>
+</html>
