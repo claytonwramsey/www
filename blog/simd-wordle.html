@@ -39,19 +39,329 @@
       <div class="pubinfo">Clayton Ramsey - 2024-11-21</div>
     </header>
     <main>
-      <p>The naive implementation would look something like this:</p>
-      <pre class="Rust"><code></code></pre>
-      <section><h2>The simplest approach</h2></section>
+      <section>
+        <h2>What even is Wordle?</h2>
+        <p>
+          In case you lived under a rock around 3 years ago, Wordle is a little word-guessing game developed by
+          <a href="https://www.powerlanguage.co.uk/">Josh Wardle</a>. The goal is to guess a five-letter English word by
+          sampling different words. Every time you give a guess, you receive a <dfn>grade</dfn>, which is an assignment
+          of five colors to the letters in your guess.
+        </p>
+        <p>
+          Given some guess
+          <math
+            ><mrow><mi>w</mi></mrow></math
+          >
+          and solution word
+          <math
+            ><mrow><mi>s</mi></mrow></math
+          >, the grade
+          <math
+            ><mrow><mi>g</mi></mrow></math
+          >
+          for letter
+          <math
+            ><mrow><mi>i</mi></mrow></math
+          >
+          of a guess is defined as follows:
+        </p>
+        <ul>
+          <li>
+            If
+            <math
+              ><mrow
+                ><msub><mi>w</mi><mi>i</mi></msub
+                ><mo>&#x0003D;</mo><msub><mi>s</mi><mi>i</mi></msub></mrow
+              ></math
+            >,
+            <math
+              ><mrow
+                ><msub><mi>g</mi><mi>i</mi></msub></mrow
+              ></math
+            >
+            is green.
+          </li>
+          <li>
+            If
+            <math
+              ><mrow
+                ><msub><mi>w</mi><mi>i</mi></msub
+                ><mo>&#x02260;</mo><msub><mi>s</mi><mi>i</mi></msub></mrow
+              ></math
+            >
+            and there is another letter
+            <math
+              ><mrow
+                ><msub><mi>s</mi><mi>j</mi></msub
+                ><mo>&#x0003D;</mo><msub><mi>w</mi><mi>i</mi></msub></mrow
+              ></math
+            >, <em>and</em>
+            <math
+              ><mrow
+                ><msub><mi>s</mi><mi>j</mi></msub></mrow
+              ></math
+            >
+            has not matched with an earlier letter
+            <math
+              ><mrow
+                ><msub
+                  ><mi>w</mi><mrow><mo>&#x0003C;</mo><mi>i</mi></mrow></msub
+                ></mrow
+              ></math
+            >, then
+            <math
+              ><mrow
+                ><msub><mi>g</mi><mi>i</mi></msub></mrow
+              ></math
+            >
+            is yellow.
+          </li>
+          <li>
+            Otherwise,
+            <math
+              ><mrow
+                ><msub><mi>g</mi><mi>i</mi></msub></mrow
+              ></math
+            >
+            is black.
+          </li>
+        </ul>
+        <p>
+          The yellow cases are the trickiest part. Here's an example: if we guessed <code>roses</code> against the
+          solution <code>horse</code>, we would find that the <code>h</code> is black, since it appears nowhere in the
+          solution. The <code>o</code> would be green, since it perfectly matches up between the guess and the solution,
+          but <code>s</code> will be more complex. The first <code>s</code> in <code>roses</code> would be yellow, since
+          it matches with the fourth letter of <code>horse</code>, but the second would be black, as there are no more
+          <code>s</code> left for it to match in <code>horse</code> after satisfying the first <code>s</code>.
+        </p>
+        <p>
+          Lots of people like to go with an unconditional first two guesses - for instance, no matter the puzzle, my
+          brother always opens with <code>trace</code> and <code>lions</code>. A natural question: given knowledge of
+          the possible set of solutions <math><mi>S</mi></math> and the set of legal guesses
+          <math><mi>W</mi><mo>⊇</mo><mi>S</mi></math
+          >, what is the best unconditional opener?
+        </p>
+        <p>
+          In practice, it is actually quite difficult to answer this, as doing so would require evaluating every
+          possible sequence of guesses, which would take enormous amounts of time. However, we can approximate the
+          quality of an opener using entropy: every time we play an opener, we're given a pair of grades. There are only
+          so many words which satisfy those grades. Given that we've received some grade <math><mi>g</mi></math> for our
+          word <math><mi>w</mi></math
+          >, let
+          <math
+            ><mrow
+              ><msub><mi>c</mi><mi>g</mi></msub
+              ><mo form="prefix" stretchy="false">(</mo><mi>w</mi><mo form="postfix" stretchy="false">)</mo></mrow
+            ></math
+          >
+          be number of possible remaining words which could have given the grade. Then the expected remaining entropy
+          after guessing <math><mi>w</mi></math> is the average of
+          <math
+            ><mrow
+              ><msub><mi>c</mi><mi>g</mi></msub
+              ><mo form="prefix" stretchy="false">(</mo><mi>w</mi><mo form="postfix" stretchy="false">)</mo
+              ><mrow><mspace width="0.1667em"></mspace><mi>log</mi><mo>⁡</mo><mspace width="0.1667em"></mspace></mrow
+              ><msub><mi>c</mi><mi>g</mi></msub
+              ><mo form="prefix" stretchy="false">(</mo><mi>w</mi><mo form="postfix" stretchy="false">)</mo></mrow
+            ></math
+          >
+          for every possible grade <math><mi>g</mi></math
+          >.
+        </p>
+        <p>
+          To keep things simple, I won't go into the gritty details of why this is so good. There are a billion other
+          articles on it, so go look up your favorite one if you'd like to learn more about the main. The rest of this
+          article will be focused on pure performance engineering. In order to calculate the expected remaining
+          information for every possible opener, we'll have to construct a grade for every combination of an opener and
+          the true word. Wordle canonically has 12947 words with 2309 possible solutions, so that means we'd have to
+          compute up to
+          <math
+            ><mrow><mn>12947</mn><mo>*</mo></mrow
+            ><mrow><mn>12946</mn><mi>/</mi><mn>2</mn><mo>*</mo></mrow
+            ><mrow><mn>2309</mn></mrow></math
+          >
+          total grades, or about 193 billion grades total. For the rest of this article, we're going to focus on
+          churning through grade computation as fast as possible, in the hopes of getting out our optimal opener.
+        </p>
+      </section>
+      <section>
+        <h2>The simplest approach</h2>
+        <p>
+          I'll start off with a naive implementation of a grader to give a baseline for our future improvements. The
+          simplest approach is to take two passes through the solution. On the first pass, we make note of all green
+          letters in the grade, and write down any unmatched letters in the solution. On the second pass, we travel
+          through the guessed word and mark any letters of the guess whcih correspond to an unmatched letter as yellow.
+          To be fully general, we could store each word as a <code>&str</code>, each color as one member of an
+          <code>enum</code>, and then give grades as a <code>Vec&lt;Color&gt;</code>. To store the set of unmatched
+          letters, the most general version would be a <code>HashMap&lt;char, usize&gt;</code>.
+        </p>
+        <pre class="Rust"><code>use std::collections::HashMap;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Color {
+    Black,
+    Yellow,
+    Green,
+}
+
+type Word = str;
+type Grade = Vec&lt;Color&gt;;
+
+fn grade(w: &Word, sol: &Word) -> Grade {
+    assert_eq!(w.len(), sol.len());
+    let mut bank: HashMap&lt;char, usize&gt; = HashMap::new();
+    let mut grade = Vec::with_capacity(w.len());
+
+    for (wc, sc) in w.chars().zip(sol.chars()) {
+        if wc == sc {
+            grade.push(Color::Green);
+        } else {
+            grade.push(Color::Black);
+            *bank.entry(sc).or_default() += 1;
+        }
+    }
+
+
+    for (wc, g) in w.chars().zip(&mut grade) {
+        if let Some(c) = bank.get_mut(&wc) {
+            if *c > 0 && *g == Color::Black {
+                *c -= 1;
+                *g = Color::Yellow;
+            }
+        }
+    }
+
+    grade
+}</code></pre>
+        <p>
+          Without even running this code, it should be apparent that it's quite slow. Creating a
+          <code>HashMap</code> and a <code>Vec</code> for every single grading means calling multiple allocations at
+          each cycle, which is always disastrous for hot loops. Because of this, I won't even try to use it to calculate
+          the best two-word opener. Instead, I'll do my comparisons of grading speed on a slightly smaller task:
+          calculating the best single-word opener.
+        </p>
+        <p>
+          To do this calculation, we'll need to compute the entropy after each possible opening guess, meaning we'll
+          need to grade
+          <math>
+            <mrow>
+              <mn>2309</mn>
+              <mo>*</mo>
+            </mrow>
+            <mrow>
+              <mn>12947</mn>
+            </mrow>
+          </math>
+          words, or about 29 million.
+        </p>
+        <p>Without further ado, here are my results:</p>
+        <table>
+          <tr>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Speedup</th>
+          </tr>
+          <table>
+            <tr>
+              <th>Method</th>
+              <th>Runtime (best 1 word)</th>
+              <th>Average grading time</th>
+              <th>Speedup</th>
+            </tr>
+            <tr>
+              <td>Naive</td>
+              <td>3.86s</td>
+              <td>129ns</td>
+              <td>1x 🏅</td>
+            </tr>
+          </table>
+        </table>
+        <p>
+          And, if you care, the best unconditional single-word opener is <code>soare</code>, with an expected remaining
+          information of 5.29 bits in the puzzle. For reference, the 2309 possible solutions to a Wordle problem require
+          11.2 bits of information, so this yields a pretty big jump in your knowledge of the puzzle! Since all other
+          methods will be computing the same result, I won't bother reporting that, but instead we'll just calculate how
+          long it takes them to do the same process.
+        </p>
+      </section>
       <section>
         <h2>A little less naive</h2>
         <p>
-          Were I writing standard application code, I think this would have been a reasonable place to stop. It requires
-          a few assumptions, but they are mostly reasonable, and the code is in my opinion quite readable.
+          The obvious next step is to see if we can avoid the allocations in our implementation of <code>grade</code>.
+          Actually, it's not too hard to do! We'll make a few key insights:
+        </p>
+        <ul>
+          <li>Every possible guess and solution has exactly 5 letters.</li>
+          <li>Every possible guess and solution is exclusively made from ASCII characters</li>
+        </ul>
+        <p>
+          Since words are only five letters, we can replace variable-length <code>str</code>s and <code>Vec</code>s with
+          simple fixed-size arrays, preventing some allocations. Additionally, since all letters are lowercase ASCII, we
+          can model each letter of each word as a number from 0 through 255 (inclusive), one for each ASCII codepoint.
         </p>
         <p>
-          <emph>Note:</emph> Were I wearing my software-engineer hat, I would be a lot more systematic about enforcing
-          invariants for all my types. However, this is only a blog post, and so I play fast and loose with my code
-          quality for sake of brevity.
+          Once our letters are restricted, we can squint a little at our yellow-bank map. The values no longer need to
+          be <code>usize</code>s, since the bank caps out at 5 letters saved per entry. Likewise, the keys are now just
+          numbers from 0 through 255, so instead of using an expensive hash-map, we can just use a 256-element array of
+          <code>u8</code> to store all our unmatched letters.
+        </p>
+        <p>
+          We can put these insights together to make a very performant and allocation-free implementation of our grade
+          function. I'll call this the "sensible" implementation.
+        </p>
+        <pre class="Rust"><code>type Word = [u8; 5];
+type Grade = [Color; 5];
+
+fn grade(w: Word, soln: Word) -> Grade {
+    let mut bank = [0u8; 256];
+    let mut grade = [Color::Black; 5];
+
+    for ((wc, sc), g) in w.into_iter().zip(soln).zip(&mut grade) {
+        if wc == sc {
+            *g = Color::Green;
+        } else {
+            bank[sc as usize] += 1;
+        }
+    }
+
+    for (wc, g) in w.into_iter().zip(&mut grade) {
+        if *g == Color::Black && bank[wc as usize] &gt; 0 {
+            bank[wc as usize] -= 1;
+            *g = Color::Yellow;
+        }
+    }
+
+    grade
+}</code></pre>
+        <p>This implementation gives us a respectable 5x improvement in speed.</p>
+        <table>
+          <tr>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Average grading time</th>
+            <th>Speedup</th>
+          </tr>
+          <tr>
+            <td>Naive</td>
+            <td>3.86s</td>
+            <td>129ns</td>
+            <td>1x</td>
+          </tr>
+          <tr>
+            <td>Sensible</td>
+            <td>733ms</td>
+            <td>24.5ns</td>
+            <td>5.27x 🏅</td>
+          </tr>
+        </table>
+        <p>
+          Were I writing standard application code, I think this would have been a good place to stop. It requires a few
+          assumptions, but they are mostly reasonable, and the code is in my opinion quite readable.
+        </p>
+        <p>
+          <strong>Note:</strong> Were I wearing my software-engineer hat, I would be a lot more systematic about
+          enforcing invariants for all my types. However, this is only a blog post, and so I play fast and loose with my
+          code quality for sake of brevity.
         </p>
       </section>
       <section>
@@ -64,8 +374,8 @@
         <p>
           Well, maybe. We'll have to start with another restrictive assumption. Previously, we allowed any letter in a
           word to be a byte, so all values of a <code>u8</code> were fair game. In our dataset, however, we find that
-          every word is a lowercase alphabetical string. This takes the number of possible characters from 255 to 26.
-          Doing a little bit of math, the minimum data needed to represent 5 26-letter words is
+          every word is a lowercase alphabetical string. This takes the number of possible characters from 256 to just
+          26. Doing a little bit of math, the minimum data needed to represent 5 26-letter words is
           <math
             ><mrow
               ><mn>5</mn
@@ -86,10 +396,147 @@
         <pre class="Rust"><code>type Word = u32;</code></pre>
         <p>
           This is a packed representation, so for a word <code>w</code>, to get the <code>i</code>-th letter of
-          <code>w</code>, we can unpack it with a bit-shift and mask: <code>w[i] = (w >> (5 * i)) & 0b11111</code>
+          <code>w</code>, we can unpack it with a bit-shift and mask - to extract out the letter, simply compute
+          <code>(w >> (5 * i)) & 0b11111</code>.
         </p>
+        <p>
+          Likewise, each <code>Color</code> is only one of three values, so we can pack <code>Color</code>s into two
+          bits. With five <code>Color</code>s per grade, then we can pack a <code>Grade</code> into a single
+          <code>u16</code>.
+        </p>
+        <pre clas="Rust"><code>type Grade = u16;</code></pre>
+        <p>
+          Finally, each entry in the yellow bank can have a maximum of 5 letters, so each entry needs only 3 bits.
+          Across all 26 letters, that means we can fit the entire yellow bank in 78 bits, so we can fit it in a single
+          <code>u128</code>. Putting this all together, we can take the previous sensible implementation and convert it
+          to use packed integers instead of arrays.
+        </p>
+        <pre class="Rust"><code>const GREEN: u16 = 0b10;
+const YELLOW: u16 = 0b01;
+const BLACK: u16 = 0b00;
+
+fn grade(guess: Word, soln: Word) -&gt; Grade {
+    let mut yellow_bank = 0u128;
+    let mut grade = 0u16;
+    let mut guess2 = guess;
+    let mut soln2 = soln;
+    for _ in 0..5 {
+        let matches_bottom_5 = (guess2 ^ soln2) & 0x1f == 0;
+
+        if matches_bottom_5 {
+            grade |= GREEN &lt;&lt; 10;
+        } else {
+            let sc = soln2 & 0x1f;
+            yellow_bank += 1 &lt;&lt; (3 * sc);
+        }
+        grade &gt;&gt;= 2;
+        guess2 &gt;&gt;= 5;
+        soln2 &gt;&gt;= 5;
+    }
+
+    for i in 0..5 {
+        let c = (guess &gt;&gt; (5 * i)) & 0x1f;
+        if grade & (0b11 &lt;&lt; (2 * i)) == BLACK {
+            let nyellow = (yellow_bank &gt;&gt; (3 * c)) & 0b111;
+            if nyellow &gt; 0 {
+                yellow_bank -= 1 &lt;&lt; (3 * c);
+                grade |= YELLOW &lt;&lt; (2 * i);
+            }
+        }
+    }
+
+    grade
+}</code></pre>
+        <p>
+          This code is of course far more convoluted than the previous implementation. However, it comes with a nice
+          bump to performance!
+        </p>
+        <table>
+          <tr>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Average grading time</th>
+            <th>Speedup</th>
+          </tr>
+          <tr>
+            <td>Naive</td>
+            <td>3.86s</td>
+            <td>129ns</td>
+            <td>1x</td>
+          </tr>
+          <tr>
+            <td>Sensible</td>
+            <td>733ms</td>
+            <td>24.5ns</td>
+            <td>5.27x</td>
+          </tr>
+          <tr>
+            <td>Packed</td>
+            <td>408ms</td>
+            <td>13.7ns</td>
+            <td>9.46x 🏅</td>
+          </tr>
+        </table>
       </section>
-      <section><h2>Multiple data, multiple problems</h2></section>
+      <section>
+        <h2>Multiple data, multiple problems</h2>
+        <table>
+          <tr>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Average grading time</th>
+            <th>Speedup</th>
+          </tr>
+          <tr>
+            <td>Naive</td>
+            <td>3.86s</td>
+            <td>129ns</td>
+            <td>1x</td>
+          </tr>
+          <tr>
+            <td>Sensible</td>
+            <td>733ms</td>
+            <td>24.5ns</td>
+            <td>5.27x</td>
+          </tr>
+          <tr>
+            <td>Packed</td>
+            <td>408ms</td>
+            <td>13.7ns</td>
+            <td>9.46x</td>
+          </tr>
+          <tr>
+            <td>SIMD (1 lane)</td>
+            <td>576ms</td>
+            <td>19.3ns</td>
+            <td>6.70x</td>
+          </tr>
+          <tr>
+            <td>SIMD (4 lanes)</td>
+            <td>217ms</td>
+            <td>7.26ns</td>
+            <td>17.8x</td>
+          </tr>
+          <tr>
+            <td>SIMD (8 lanes)</td>
+            <td>217ms</td>
+            <td>7.26ns</td>
+            <td>17.8x</td>
+          </tr>
+          <tr>
+            <td>SIMD (16 lanes)</td>
+            <td>206ms</td>
+            <td>6.89ns</td>
+            <td>18.7x</td>
+          </tr>
+          <tr>
+            <td>SIMD (32 lanes)</td>
+            <td>195ms</td>
+            <td>6.52ns</td>
+            <td>19.8x 🏅</td>
+          </tr>
+        </table>
+      </section>
       <section>
         <h2>Turbo-parallelism</h2>
       </section>
