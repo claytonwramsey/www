@@ -195,6 +195,7 @@
           <code>enum</code>, and then give grades as a <code>Vec&lt;Color&gt;</code>. To store the set of unmatched
           letters, the most general version would be a <code>HashMap&lt;char, usize&gt;</code>.
         </p>
+        <p>For the rest of this article, I'll call the data structure which stores the number of unmatched characters in the solution the <dfn>yellow bank</dfn>, or just <dfn>bank</dfn> for short.</p>
         <pre class="Rust"><code>use std::collections::HashMap;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -479,7 +480,82 @@ fn grade(guess: Word, soln: Word) -&gt; Grade {
         </table>
       </section>
       <section>
+        <h2>Going for a squeeze</h2>
+        <p>
+          We're now reaching the point where it's actually quite difficult to come up with any more optimizations.
+          However, there's one more place that I thought of to optimize, and it's going to require one last assumption.
+        </p>
+        <p>
+          If you scroll through the list of answers, you'll notice that they're all relatively normal English words.
+          Normal English words tend to have a nice mix of vowels and consonants, and the list contains no degenerate
+          onamotopoeia like <code>aaaaa</code>. The result:
+          <strong>every word on the answer list contains no more than 3 duplicate letters.</strong> (This is true for
+          the word list too, but it's not relevant to the optimization).
+        </p>
+        <p>
+          We can use that upper bound on duplicate letters to shrink our yellow-letters bank. We now only need 2 bits
+          per letter to represent every entry in the yellow bank, so we can fit the whole thing in a single
+          <code>u64</code>. Generally speaking, <code>u128</code> arithmetic is quite slow, so this is a big improvement
+          for our performance. I'll call this implementation <strong>squeeze</strong>, since we squeeze everything down
+          as tightly as it can go.
+        </p>
+        <p>Otherwise, the code is about the same, so I'm hiding the source behind the spoiler dropdown below.</p>        <details>
+          <summary>click me for code!</summary>
+          <pre class="rust"><code>fn grade(guess: Word, soln: Word) -&gt; Grade {
+    let mut yellow_bank = 0u64;
+    let mut grade = 0u16;
+    let mut guess2 = guess;
+    let mut soln2 = soln;
+    for _ in 0..5 {
+        let matches_bottom_5 = (guess2 ^ soln2) & 0x1f == 0;
+
+        if matches_bottom_5 {
+            grade |= GREEN &lt;&lt; 10;
+        } else {
+            let sc = soln2 & 0x1f;
+            yellow_bank += 1 &lt;&l; (2 * sc);
+        }
+        grade &gt;&gt;= 2;
+        guess2 &gt;&gt;= 5;
+        soln2 &gt;&gt;= 5;
+    }
+
+    for i in 0..5 {
+        let c = (guess &gt;&gt; (5 * i)) & 0x1f;
+        if grade & (0b11 &lt;&lt; (2 * i)) == BLACK {
+            let nyellow = (yellow_bank &gt;&gt; (2 * c)) & 0b11;
+            if nyellow &gt; 0 {
+                yellow_bank -= 1 &lt;&lt; (2 * c);
+                grade |= YELLOW &lt;&lt; (2 * i);
+            }
+        }
+    }
+
+    grade
+}</code></pre>
+        </details>
+      </section>
+      <section>
         <h2>Multiple data, multiple problems</h2>
+        <p>We've just about exhausted all of our sequential performance capacity. However, computers can do a lot more with a lot more than one operation at a time! If you've seen any of my <a href="/blog/captree">real work</a>, you might know that I'm a big fan of single-instruction, multiple-data (SIMD) parallelism.</p>
+        <p>
+            Using SIMD, we have access to special instructions on our CPU.
+            Ordinary instructions let us do fine-grained atomic operations, such as adding two numbers together. SIMD instructions take that one step further: we use one instruction to do many (typically 4 or 8) of the same operation on many values.
+            The chief difficulty of using SIMD is that <strong>every unit of parallelism must be doing the same thing</strong>. In other words, if our sequential code has an if-else-statement in it, the parallelized version must execute both branches of that statement.
+            Fortunately for us, though, our squeezed SIMD parallel algorithm has very few if-statements, and the bodies that they execute are quite cheap.
+        </p>
+        <p>
+            The next problem is (once again) the yellow bank.
+            If we are grading <code>L</code> guesses in parallel, then we could represent our guess and solution words as a vector of <code>L</code> <code>u32</code>s, but the yellow bank would have to be a vector of <code>L</code> <code>u64</code>s.
+            Converting between two different lane widths is very expensive in SIMD code, so we need to use the same integers for both the words and the yellow bank.
+            However, if we expand each lane to use a <code>u64</code> for each word, then we've wasted half our parallelism.
+        </p>
+        <p>
+            My solution: split the bank in half. We'll make two SIMD vectors to represent the yellow bank.
+            The first vector can hold the entries in the bank corresponding to the first 16 letters of the alphabet, while the second vector can hold the entries corresponding to the last 10.
+            The chief benefit is that we now only need to use <code>u32</code>s to represent our data, so we can dodge all the transfer costs for changing lane sizes.
+        </p>
+        <p>Of course, this complicates the process of actually fetching and storing numbers in the yellow bank.</p>
         <table>
           <tr>
             <th>Method</th>
