@@ -12,11 +12,6 @@ body {
 pre code {
     display: block;
     padding: 1em;
-}
-
-code {
-    background-color: #edf8fc;
-    border-radius: 3px;
     overflow-x: auto;
 }
 
@@ -42,10 +37,6 @@ a:hover {
 
     .night-invert {
         filter: invert(88%) hue-rotate(180deg);
-    }
-
-    code {
-        background-color: #1f2f35;
     }
 }
 
