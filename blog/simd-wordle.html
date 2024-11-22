@@ -15,7 +15,7 @@
     <meta name="keywords" content="rust, effects" />
     <link rel="canonical" href="https://claytonwramsey.com/blog/simd-wordle" />
 
-    <title>Solving 100,000,000 Wordle problems per second</title>
+    <title>Solving 20 billion Wordle problems per second</title>
 
     <link rel="stylesheet" type="text/css" href="/assets/main.css" />
     <link rel="stylesheet" type="text/css" href="/assets/hljs.css" />
@@ -35,7 +35,7 @@
         <a href="/blog">Blog</a>
         <a href="/recipes">Recipes</a>
       </nav>
-      <h1>Solving 100,000,000 Wordle problems per second</h1>
+      <h1>Solving 20 billion Wordle problems per second</h1>
       <div class="pubinfo">Clayton Ramsey - 2024-11-21</div>
     </header>
     <main>
@@ -276,23 +276,17 @@ fn grade(w: &Word, sol: &Word) -> Grade {
             <tr>
               <th>Method</th>
               <th>Runtime (best 1 word)</th>
+              <th>Average grading time</th>
               <th>Speedup</th>
             </tr>
-            <table>
-              <tr>
-                <th>Method</th>
-                <th>Runtime (best 1 word)</th>
-                <th>Average grading time</th>
-                <th>Speedup</th>
-              </tr>
-              <tr>
-                <td>Naive</td>
-                <td>3.86s</td>
-                <td>129ns</td>
-                <td>1x 🏅</td>
-              </tr>
-            </table>
+            <tr>
+              <td>Naive</td>
+              <td>3.84s</td>
+              <td>129ns</td>
+              <td>1x 🏅</td>
+            </tr>
           </table>
+          <p>We'll populate this table with further rows as we implement new methods to compare against.</p>
           <p>
             And, if you care, the best unconditional single-word opener is <code>soare</code>, with an expected
             remaining information of 5.29 bits in the puzzle. For reference, the 2309 possible solutions to a Wordle
@@ -361,15 +355,15 @@ fn grade(w: Word, soln: Word) -> Grade {
             </tr>
             <tr>
               <td>Naive</td>
-              <td>3.86s</td>
+              <td>3.84s</td>
               <td>129ns</td>
               <td>1x</td>
             </tr>
             <tr>
               <td>Sensible</td>
-              <td>733ms</td>
-              <td>24.5ns</td>
-              <td>5.27x 🏅</td>
+              <td>659ms</td>
+              <td>22.0ns</td>
+              <td>5.83x 🏅</td>
             </tr>
           </table>
           <p>
@@ -478,21 +472,21 @@ fn grade(guess: Word, soln: Word) -&gt; Grade {
             </tr>
             <tr>
               <td>Naive</td>
-              <td>3.86s</td>
+              <td>3.84s</td>
               <td>129ns</td>
               <td>1x</td>
             </tr>
             <tr>
               <td>Sensible</td>
-              <td>733ms</td>
-              <td>24.5ns</td>
-              <td>5.27x</td>
+              <td>659ms</td>
+              <td>22.0ns</td>
+              <td>5.83x</td>
             </tr>
             <tr>
               <td>Packed</td>
-              <td>408ms</td>
-              <td>13.7ns</td>
-              <td>9.46x 🏅</td>
+              <td>309ms</td>
+              <td>10.34ns</td>
+              <td>12.4x 🏅</td>
             </tr>
           </table>
         </section>
@@ -553,6 +547,38 @@ fn grade(guess: Word, soln: Word) -&gt; Grade {
     grade
 }</code></pre>
           </details>
+          <table>
+            <tr>
+              <th>Method</th>
+              <th>Runtime (best 1 word)</th>
+              <th>Average grading time</th>
+              <th>Speedup</th>
+            </tr>
+            <tr>
+              <td>Naive</td>
+              <td>3.84s</td>
+              <td>129ns</td>
+              <td>1x</td>
+            </tr>
+            <tr>
+              <td>Sensible</td>
+              <td>659ms</td>
+              <td>22.0ns</td>
+              <td>5.83x</td>
+            </tr>
+            <tr>
+              <td>Packed</td>
+              <td>309ms</td>
+              <td>10.34ns</td>
+              <td>12.4x</td>
+            </tr>
+            <tr>
+              <td>Squeeze</td>
+              <td>224ms</td>
+              <td>7.49ns</td>
+              <td>17.1x 🏅</td>
+            </tr>
+          </table>
         </section>
         <section>
           <h3>Multiple data, multiple problems</h3>
@@ -654,62 +680,6 @@ where
             benchmarks for each lane count to see which is fastest. My computer supports up to AVX2, so I expected the
             8-lane implementation to be the fastest.
           </p>
-          <table>
-            <tr>
-              <th>Method</th>
-              <th>Runtime (best 1 word)</th>
-              <th>Average grading time</th>
-              <th>Speedup</th>
-            </tr>
-            <tr>
-              <td>Naive</td>
-              <td>3.86s</td>
-              <td>129ns</td>
-              <td>1x</td>
-            </tr>
-            <tr>
-              <td>Sensible</td>
-              <td>733ms</td>
-              <td>24.5ns</td>
-              <td>5.27x</td>
-            </tr>
-            <tr>
-              <td>Packed</td>
-              <td>408ms</td>
-              <td>13.7ns</td>
-              <td>9.46x</td>
-            </tr>
-            <tr>
-              <td>SIMD (1 lane)</td>
-              <td>576ms</td>
-              <td>19.3ns</td>
-              <td>6.70x</td>
-            </tr>
-            <tr>
-              <td>SIMD (4 lanes)</td>
-              <td>217ms</td>
-              <td>7.26ns</td>
-              <td>17.8x</td>
-            </tr>
-            <tr>
-              <td>SIMD (8 lanes)</td>
-              <td>217ms</td>
-              <td>7.26ns</td>
-              <td>17.8x</td>
-            </tr>
-            <tr>
-              <td>SIMD (16 lanes)</td>
-              <td>206ms</td>
-              <td>6.89ns</td>
-              <td>18.7x</td>
-            </tr>
-            <tr>
-              <td>SIMD (32 lanes)</td>
-              <td>195ms</td>
-              <td>6.52ns</td>
-              <td>19.8x 🏅</td>
-            </tr>
-          </table>
         </section>
         <p>
           And we get great performance boosts! Our final performance for the SIMD approach runs fifty times faster than
@@ -717,21 +687,88 @@ where
           meaningful, since I calculated them by dividing the total grades required by the total time taken, so the
           average times are a representation of throughput, not latency.
         </p>
-        <section>
-          <h3>Turbo-parallelism</h3>
-          <p>
-            If going parallel in SIMD worked well for us, then going parallel with threads will probably work great too.
-            Luckily, selecting the best word is an embarrasingly parallel problem: at the end of the day, all we're
-            doing is calculating a minimum.
-          </p>
-          <p>
-            For our first-word benchmark, we'll divvy up the 12947 guess words into a chunk for every thread. For
-            instance, if we have 32 threads, each thread gets either 404 or 405 guess words in its chunk. Each thread
-            computes the best word in its apportioned chunk, then once all threads are done, we select the best word
-            from all the chunks.
-          </p>
-          <p>This code is really easy to implement with <code>std::thread::scope</code>.</p>
-          <pre class="rust"><code>let chunk_size = /* some number */;
+        <table>
+          <tr>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Average grading time</th>
+            <th>Speedup</th>
+          </tr>
+          <tr>
+            <td>Naive</td>
+            <td>3.84s</td>
+            <td>129ns</td>
+            <td>1x</td>
+          </tr>
+          <tr>
+            <td>Sensible</td>
+            <td>659ms</td>
+            <td>22.0ns</td>
+            <td>5.83x</td>
+          </tr>
+          <tr>
+            <td>Packed</td>
+            <td>309ms</td>
+            <td>10.34ns</td>
+            <td>12.4x</td>
+          </tr>
+          <tr>
+            <td>Squeeze</td>
+            <td>224ms</td>
+            <td>7.49ns</td>
+            <td>17.1x</td>
+          </tr>
+          <tr>
+            <td>SIMD (1 lane)</td>
+            <td>361ms</td>
+            <td>12.08ns</td>
+            <td>10.64x</td>
+          </tr>
+          <tr>
+            <td>SIMD (2 lanes)</td>
+            <td>370ms</td>
+            <td>12.38ns</td>
+            <td>10.38x</td>
+          </tr>
+          <tr>
+            <td>SIMD (4 lanes)</td>
+            <td>87.4ms</td>
+            <td>2.91ns</td>
+            <td>43.9x</td>
+          </tr>
+          <tr>
+            <td>SIMD (8 lanes)</td>
+            <td>49.8ms</td>
+            <td>1.67 ns</td>
+            <td>77.1x 🏅</td>
+          </tr>
+          <tr>
+            <td>SIMD (16 lanes)</td>
+            <td>55.5ms</td>
+            <td>1.86ns</td>
+            <td>69.2x</td>
+          </tr>
+          <tr>
+            <td>SIMD (32 lanes)</td>
+            <td>52.8ms</td>
+            <td>1.77ns</td>
+            <td>72.7x</td>
+          </tr>
+        </table>
+        <h3>Turbo-parallelism</h3>
+        <p>
+          If going parallel in SIMD worked well for us, then going parallel with threads will probably work great too.
+          Luckily, selecting the best word is an embarrasingly parallel problem: at the end of the day, all we're doing
+          is calculating a minimum.
+        </p>
+        <p>
+          For our first-word benchmark, we'll divvy up the 12947 guess words into a chunk for every thread. For
+          instance, if we have 32 threads, each thread gets either 404 or 405 guess words in its chunk. Each thread
+          computes the best word in its apportioned chunk, then once all threads are done, we select the best word from
+          all the chunks.
+        </p>
+        <p>This code is really easy to implement with <code>std::thread::scope</code>.</p>
+        <pre class="rust"><code>let chunk_size = /* some number */;
 let words = /* list of possible guesses */;
 let answers = /* list of possible answer words */;
 
@@ -770,49 +807,117 @@ scope(|s| {
 
     (best_ent, best_id)
 })</code></pre>
-          <p>
-            My one gripe about this code is I have to manually implement the minimization loop twice. Normally, I would
-            use <code>Iterator::min</code>, but since floating-point numbers lack total order, we have to roll our own
-            <code>min</code> implementation for floats.
-          </p>
-          <figure>
-            <img src="/assets/img/wordle/scaling.svg" />
-            <figcaption>
-              Parallel scaling of grading. Here, <code>L</code> refers to the number of lanes used by the SIMD-parallel
-              version.
-            </figcaption>
-          </figure>
-          <p>
-            When we run the benchmarks, we see pretty good per-thread scaling! The performance grows linearly with the
-            number of threads until we reach 16 threads. I think the reason for the sudden dropoff is a quirk of
-            processor architecture. On the 7950X, there are 32 threads on 16 cores, so the 17th thread has to share a
-            core with another thread. This causes contention and produces a performance drop. As the thread count
-            increases, the performance gains slow, and then start to drop at the very end.
-          </p>
-          <p>
-            If we want to eke out more performance, though, we'll need to give each thread a little more flexibility in
-            its schedule. There are currently two limitations to this method:
-          </p>
-          <ol>
-            <li>
-              We have to wait for the slowest thread. Even though each thread theoretically gets the same work,
-              sometimes one thread will take extra time. The remaining threads have to sit around waiting for the slow
-              thread to finish up instead of contributing meaningful work.
-            </li>
-            <li>
-              If we want to scale up to finding the best two-word opener, we'll have to spawn a bunch of threads
-              thousands of times. The overhead is pretty small compared to the grading time, but it adds up when we're
-              trying to solve a massive number of problems.
-            </li>
-          </ol>
-          <p>
-            I'll solve both of these issues later, but for now, just know that there's a better way to go about it - I
-            shall discuss it in detail shortly. For now, I'll leave you with the final first-round scaling table.
-          </p>
-        </section>
+        <p>
+          My one gripe about this code is I have to manually implement the minimization loop twice. Normally, I would
+          use <code>Iterator::min</code>, but since floating-point numbers lack total order, we have to roll our own
+          <code>min</code> implementation for floats.
+        </p>
+        <figure>
+          <img src="/assets/img/wordle/scaling.svg" />
+          <figcaption>
+            Parallel scaling of grading. Here, <code>L</code> refers to the number of lanes used by the SIMD-parallel
+            version.
+          </figcaption>
+        </figure>
+        <p>
+          When we run the benchmarks, we see pretty good per-thread scaling! The performance grows linearly with the
+          number of threads until we reach 16 threads. I think the reason for the sudden dropoff is a quirk of processor
+          architecture. On the 7950X, there are 32 threads on 16 cores, so the 17th thread has to share a core with
+          another thread. This causes contention and produces a performance drop. As the thread count increases, the
+          performance gains slow, and then start to drop at the very end.
+        </p>
+        <p>
+          If we want to eke out more performance, though, we'll need to give each thread a little more flexibility in
+          its schedule. There are currently two limitations to this method:
+        </p>
+        <ol>
+          <li>
+            We have to wait for the slowest thread. Even though each thread theoretically gets the same work, sometimes
+            one thread will take extra time. The remaining threads have to sit around waiting for the slow thread to
+            finish up instead of contributing meaningful work.
+          </li>
+          <li>
+            If we want to scale up to finding the best two-word opener, we'll have to spawn a bunch of threads thousands
+            of times. The overhead is pretty small compared to the grading time, but it adds up when we're trying to
+            solve a massive number of problems.
+          </li>
+        </ol>
+        <p>
+          I'll solve both of these issues later, but for now, just know that there's a better way to go about it - I
+          shall discuss it in detail shortly. For now, I'll leave you with the final first-round scaling table.
+        </p>
         <table>
           <tr>
-            <td>TODO</td>
+            <th>Method</th>
+            <th>Runtime (best 1 word)</th>
+            <th>Average grading time</th>
+            <th>Speedup</th>
+          </tr>
+          <tr>
+            <td>Naive</td>
+            <td>3.84s</td>
+            <td>129ns</td>
+            <td>1x</td>
+          </tr>
+          <tr>
+            <td>Sensible</td>
+            <td>659ms</td>
+            <td>22.0ns</td>
+            <td>5.83x</td>
+          </tr>
+          <tr>
+            <td>Packed</td>
+            <td>309ms</td>
+            <td>10.34ns</td>
+            <td>12.4x</td>
+          </tr>
+          <tr>
+            <td>Squeeze</td>
+            <td>224ms</td>
+            <td>7.49ns</td>
+            <td>17.1x</td>
+          </tr>
+          <tr>
+            <td>SIMD (1 lane)</td>
+            <td>361ms</td>
+            <td>12.08ns</td>
+            <td>10.64x</td>
+          </tr>
+          <tr>
+            <td>SIMD (2 lanes)</td>
+            <td>370ms</td>
+            <td>12.38ns</td>
+            <td>10.38x</td>
+          </tr>
+          <tr>
+            <td>SIMD (4 lanes)</td>
+            <td>87.4ms</td>
+            <td>2.91ns</td>
+            <td>43.9x</td>
+          </tr>
+          <tr>
+            <td>SIMD (8 lanes)</td>
+            <td>49.8ms</td>
+            <td>1.67 ns</td>
+            <td>77.1x</td>
+          </tr>
+          <tr>
+            <td>SIMD (16 lanes)</td>
+            <td>55.5ms</td>
+            <td>1.86ns</td>
+            <td>69.2x</td>
+          </tr>
+          <tr>
+            <td>SIMD (32 lanes)</td>
+            <td>52.8ms</td>
+            <td>1.77ns</td>
+            <td>72.7x</td>
+          </tr>
+          <tr>
+            <td>Parallel (32 threads, 8 lanes)</td>
+            <td>4.81ms</td>
+            <td>161ps</td>
+            <td>798x 🏅</td>
           </tr>
         </table>
       </section>
@@ -967,10 +1072,93 @@ scope(|s| {
         </section>
         <section>
           <h3>Parallelism, round 2</h3>
-          <p>Finally, we can circle back around to building a multithreaded solver. We'd like to build a method</p>
+          <p>
+            Finally, we can circle back around to building a multithreaded solver. We'd like to build a parallel system
+            which is sufficiently coarse-grained that each thread doesn't waste time coordinating, but also ensures that
+            each thread is always fed with work.
+          </p>
+          <p>
+            The easiest way to do this is with a task queue: at the start of the program, we spin out all the worker
+            threads. All the threads share a list of tasks that they need to work on; whenever a thread is done with its
+            current task, it grabs the next task from the list. In the general case, the main issue with task queues is
+            that if they are too fine-grained the contention over the next item in the task queue will cause slowdowns.
+          </p>
+          <p>
+            We have a very easy workaround, though. Let's imagine that our program has been given \(|W|\) valid guess
+            words. The number of words is known to us at the start of the program. We can then represent the next word
+            in the task queue as a single integer representing the index of the next word. Then each thread can acquire
+            a new task by incrementing a single number, with no other coordination required. Once a thread has acquired
+            a word \(w\), it can test every single pair of words \(w, w'\), which will take a decent chunk of time. The
+            whole queue is quite easy to implement, since we can just store our task queue state as a single
+            <code>AtomicUsize</code>.
+          </p>
+          <p>
+            The last problem sharing our minimum information so far. If we had atomic floats, we could use fetch-min
+            operations to update our lower bound on the expected remaining information. However, most CPU archtectures
+            do not support such operations. Instead, we can do a cheap trick: convert every float to a fixed-point
+            number. In my case, I just approximated the remaining entropy to the nearest one-millionth, then did all the
+            multithreaded operations with integers.
+          </p>
+          <p>The final result: we were able to get our unconditional openers in just 15 seconds.</p>
+          <pre class="txt"><code>~/p/wordle (master|✔) $ time ./target/release/wordle answers.txt words.txt
+n_threads = 32
+Top 10:
+clint, soare: 1.5440189
+cline, roast: 1.559105
+socle, riant: 1.5603062
+close, riant: 1.5661579
+crine, loast: 1.572707
+ceorl, saint: 1.5766429
+sonce, trail: 1.5812799
+roist, lance: 1.5888369
+salon, trice: 1.5888534
+clote, sarin: 1.5904317
+
+________________________________________________________
+Executed in   14.99 secs    fish           external
+    usr time  462.77 secs  402.00 micros  462.77 secs
+    sys time    0.34 secs  109.00 micros    0.34 secs</code></pre>
+          <p>
+            Our final answer: <code>soare, clint</code> is the best unconditional two-word opener for Wordle.
+            <code>salon, trice</code> also gets an honorable mention for being the best opener whose guesses are also
+            possible answers, so you have a chance at getting a perfect one-guess solution.
+          </p>
         </section>
       </section>
-      <section><h2>Closing time</h2></section>
+      <section>
+        <h2>Closing time</h2>
+        <p>
+          I had a lot of fun doing this project! I feel a little bad about taking so long to write it up - I started
+          working on it about a year ago, tabled the project, and only recently restarted about 2 months ago. It's nice
+          to be finally (sort of) finished!
+        </p>
+        <p>
+          I especially liked the process of building out faster and faster versions of the grader. The coolest part to
+          me was that there was a continous gradient between generality and performance: we can keep adding stronger and
+          stronger assumptions, getting a small performance bump every time.
+        </p>
+        <p>
+          I probably didn't save any time working on this: the naive implementation is only a few hundred times slower
+          than the final parallel version, so finding the best unconditional opener with the naive solution would have
+          only required about 3 hours of computation. I certainly wasted far more than 3 hours optimizing this
+          implementation.
+        </p>
+        <p>
+          I also have to apologize: the title is a bit of a stretch (sorry for clickbaiting you). I calculated it
+          approximately by dividing the total number of checks required by the number time taken. The reason it's not so
+          accurate is that the pruning process significantly reduces the number of checks required, so our real grading
+          throughput is more along the lines of just a few billion grades per second.
+        </p>
+        <p>
+          If I come back to this project, I want to aim my sights a little higher. I think it's reasonably possible to
+          calculate the true optimal policy for solving Wordle. All the solvers out there (including this one) use
+          entropy as a decent approximation of guess quality, but it doesn't actually provide any guarantee that we
+          minimize our average-case or worst-case number of guesses required. I want to see if it's possible to do so,
+          but my back-of-the-napkin math suggests that a brute force approach would take literally years on a dedicated
+          compute cluster to do it. I have a few ideas churning around, so if I get the chance, I might give it a shot,
+          but I make no guarantees.
+        </p>
+      </section>
     </main>
   </body>
 </html>
