@@ -39,6 +39,13 @@
       <div class="pubinfo">Clayton Ramsey - 2024-11-21</div>
     </header>
     <main>
+      <p>
+        Wordle is a mostly-solved problem, but we can mostly-solve it faster. Every so often, I get caught with the
+        puzzle automation mind virus, and feel a burning need to write an engine for solving a pointless little game or
+        puzzle. This time, I got caught by Wordle. To my knowledge, I think I've implemenented the fastest
+        implementation of a word grader out there. Of course, I'm nearly three years late to the party, but I had fun
+        writing all this, which is all that matters to me.
+      </p>
       <section>
         <h2>What even is Wordle?</h2>
         <p>
@@ -1119,9 +1126,9 @@ Executed in   14.99 secs    fish           external
     usr time  462.77 secs  402.00 micros  462.77 secs
     sys time    0.34 secs  109.00 micros    0.34 secs</code></pre>
           <p>
-            Our final answer: <code>soare, clint</code> is the best unconditional two-word opener for Wordle.
-            <code>salon, trice</code> also gets an honorable mention for being the best opener whose guesses are also
-            possible answers, so you have a chance at getting a perfect one-guess solution.
+            Our final answer: <code>soare</code>, <code>clint</code> is the best unconditional two-word opener for
+            Wordle. <code>salon</code>, <code>trice</code> also gets an honorable mention for being the best opener
+            whose guesses are also possible answers, so you have a chance at getting a perfect one-guess solution.
           </p>
         </section>
       </section>
@@ -1151,12 +1158,9 @@ Executed in   14.99 secs    fish           external
         </p>
         <p>
           If I come back to this project, I want to aim my sights a little higher. I think it's reasonably possible to
-          calculate the true optimal policy for solving Wordle. All the solvers out there (including this one) use
-          entropy as a decent approximation of guess quality, but it doesn't actually provide any guarantee that we
-          minimize our average-case or worst-case number of guesses required. I want to see if it's possible to do so,
-          but my back-of-the-napkin math suggests that a brute force approach would take literally years on a dedicated
-          compute cluster to do it. I have a few ideas churning around, so if I get the chance, I might give it a shot,
-          but I make no guarantees.
+          calculate a true optimal policy for solving Wordle in a decent amount of time. The optimal solutions are
+          known, but I think it would be fun to see if it's possible to bring it into the range of "check my email"
+          level speed.
         </p>
       </section>
     </main>
