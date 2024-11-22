@@ -1061,7 +1061,7 @@ scope(|s| {
                   ><mtext>min</mtext></msub
                 ></mrow
               ></math
-            >, then we know that guessing \(w_1, w_2\) will never yield a better result. That means we can skip the
+            >, then we know that guessing <math xmlns="" display="inline"><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>&#x0002C;</mo><msub><mi>w</mi><mn>2</mn></msub></mrow></math> will never yield a better result. That means we can skip the
             process of grading every possible solution, and simply throw away that guess.
           </p>
         </section>
@@ -1069,7 +1069,7 @@ scope(|s| {
           <h3>The new word order</h3>
           <p>
             Once we have this pruning technique, the next step is obvious: we want to get the best possible value of
-            \(\hat H_\text{start}\) to prune as many guesses as possible. We can't assume we've been given the truth,
+            <math xmlns="" display="inline"><mrow><msub><mover><mi>H</mi><mo stretchy="false">&#x0005E;</mo></mover><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">t</mi></mrow></msub></mrow></math> to prune as many guesses as possible. We can't assume we've been given the truth,
             since that would be cheating, but we do already have an excellent proxy for finding out which guesses might
             be good. We can just use the words which minimize the remaing entropy.
           </p>
@@ -1095,11 +1095,11 @@ scope(|s| {
             that if they are too fine-grained the contention over the next item in the task queue will cause slowdowns.
           </p>
           <p>
-            We have a very easy workaround, though. Let's imagine that our program has been given \(|W|\) valid guess
+            We have a very easy workaround, though. Let's imagine that our program has been given <math xmlns="" display="inline"><mrow><mo stretchy="false">&#x0007C;</mo><mi>W</mi><mo stretchy="false">&#x0007C;</mo></mrow></math> valid guess
             words. The number of words is known to us at the start of the program. We can then represent the next word
             in the task queue as a single integer representing the index of the next word. Then each thread can acquire
             a new task by incrementing a single number, with no other coordination required. Once a thread has acquired
-            a word \(w\), it can test every single pair of words \(w, w'\), which will take a decent chunk of time. The
+            a word <math xmlns="" display="inline"><mrow><mi>w</mi></mrow></math>, it can test every single pair of words <math xmlns="" display="inline"><mrow><mi>w</mi><mo>&#x0002C;</mo><msup><mi>w</mi><mi>&#x02032;</mi></msup></mrow></math>, which will take a decent chunk of time. The
             whole queue is quite easy to implement, since we can just store our task queue state as a single
             <code>AtomicUsize</code>.
           </p>
