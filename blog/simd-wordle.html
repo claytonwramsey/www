@@ -46,10 +46,10 @@
       <p>
         Wordle is a mostly-solved problem, but we can mostly-solve it faster. Every so often, I get caught with the
         puzzle automation mind virus, and feel a burning need to write an engine for solving a pointless little game or
-        puzzle. This time, I got caught by Wordle. To my knowledge, I think I've implemenented the fastest
-        implementation of a word grader out there. Of course, I'm nearly three years late to the party, but I had fun
-        writing all this, which is all that matters to me. If you don't care about the journey as much as me, you can
-        check out the source code <a href="https://github.com/claytonwramsey/wordle_simd">here</a>.
+        puzzle. This time, I got caught by Wordle. To my knowledge, I've implemenented the fastest implementation of a
+        word grader out there. Of course, I'm nearly three years late to the party, but I had fun writing all this,
+        which is all that matters to me. If you don't care about the journey as much as me, you can check out the source
+        code <a href="https://github.com/claytonwramsey/wordle_simd">here</a>.
       </p>
       <section>
         <h2>What even is Wordle?</h2>
@@ -149,16 +149,16 @@
         <p>
           Lots of people like to go with an unconditional first two guesses - for instance, no matter the puzzle, my
           brother always opens with <code>trace</code> and <code>lions</code>. A natural question: given knowledge of
-          the possible set of solutions <math><mi>S</mi></math> and the set of legal guesses
-          <math><mi>W</mi><mo>⊇</mo><mi>S</mi></math
+          the set of legal guesses <math><mi>W</mi></math> and the set of possible solutions
+          <math><mi>S</mi><mo>⊆</mo><mi>W</mi></math
           >, what is the best unconditional opener?
         </p>
         <p>
-          In practice, it is actually quite difficult to answer this, as doing so would require evaluating every
-          possible sequence of guesses, which would take enormous amounts of time. However, we can approximate the
-          quality of an opener using entropy: every time we play an opener, we're given a pair of grades. There are only
-          so many words which satisfy those grades. Given that we've received some grade <math><mi>g</mi></math> for our
-          word <math><mi>w</mi></math
+          In practice, this is actually quite difficult to answer, as doing so would require evaluating every possible
+          sequence of guesses, which would take enormous amounts of time. However, we can approximate the quality of an
+          opener using entropy: every time we play an opener, we're given a pair of grades. There are only so many words
+          which satisfy those grades. Given that we've received some grade <math><mi>g</mi></math> for our word
+          <math><mi>w</mi></math
           >, let
           <math
             ><mrow
@@ -182,7 +182,7 @@
         </p>
         <p>
           To keep things simple, I won't go into the gritty details of why this is so good. There are a billion other
-          articles on it, so go look up your favorite one if you'd like to learn more about the main. The rest of this
+          articles on it, so go look up your favorite one if you'd like to learn more about the math. The rest of this
           article will be focused on pure performance engineering. In order to calculate the expected remaining
           information for every possible opener, we'll have to construct a grade for every combination of an opener and
           the true word. Wordle canonically has 12947 words with 2309 possible solutions, so that means we'd have to
@@ -412,7 +412,7 @@ fn grade(w: Word, soln: Word) -> Grade {
           </p>
           <p>
             It's actually even better than that. We only need 5 bits to represent each letter, so a packed array of 5
-            words is only 25 bits. To get down to the theoretical minimum of 24 bits, we'd need to do
+            letters is only 25 bits. To get down to the theoretical minimum of 24 bits, we'd need to do
             multiplies-and-modulos to pack or extract each letter, but when representing each letter as its own
             independent bits, we can use (much faster) bitshift and masking operations.
           </p>
@@ -1133,7 +1133,7 @@ scope(|s| {
             store our task queue state as a single <code>AtomicUsize</code>.
           </p>
           <p>
-            The last problem sharing our minimum information so far. If we had atomic floats, we could use fetch-min
+            The last problem is sharing our minimum information. If we had atomic floats, we could use fetch-min
             operations to update our lower bound on the expected remaining information. However, most CPU archtectures
             do not support such operations. Instead, we can do a cheap trick: convert every float to a fixed-point
             number. In my case, I just approximated the remaining entropy to the nearest one-millionth, then did all the
