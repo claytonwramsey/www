@@ -12,7 +12,7 @@
     <meta charset="UTF-8" />
     <meta name="author" content="Clayton Ramsey" />
     <meta name="description" content="Wordle is a mostly-solved problem, but we can mostly-solve it faster." />
-    <meta name="keywords" content="rust, effects" />
+    <meta name="keywords" content="rust, simd, wordle" />
     <link rel="canonical" href="https://claytonwramsey.com/blog/simd-wordle" />
 
     <title>Solving 20 billion Wordle problems per second</title>
@@ -825,7 +825,7 @@ scope(|s| {
           <code>min</code> implementation for floats.
         </p>
         <figure>
-          <img src="/assets/img/wordle/scaling.svg" />
+          <img class="night-invert" src="/assets/img/wordle/scaling.svg" />
           <figcaption>
             Parallel scaling of grading. Here, <code>L</code> refers to the number of lanes used by the SIMD-parallel
             version.
