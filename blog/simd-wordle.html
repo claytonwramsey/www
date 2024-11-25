@@ -36,17 +36,13 @@
         <a href="/recipes">Recipes</a>
       </nav>
       <h1>Solving 20 billion Wordle problems per second</h1>
-      <div class="pubinfo">Clayton Ramsey - 2024-11-21</div>
-      <strong
-        >Note. This is a draft post and has not yet been published. There may be incorrect statements or missing
-        parts.</strong
-      >
+      <div class="pubinfo">Clayton Ramsey - 2024-11-25</div>
     </header>
     <main>
       <p>
         Wordle is a mostly-solved problem, but we can mostly-solve it faster. Every so often, I get caught with the
         puzzle automation mind virus, and feel a burning need to write an engine for solving a pointless little game or
-        puzzle. This time, I got caught by Wordle. To my knowledge, I've implemenented the fastest implementation of a
+        puzzle. This time, I got caught by Wordle. To my knowledge, I've implemented the fastest implementation of a
         word grader out there. Of course, I'm nearly three years late to the party, but I had fun writing all this,
         which is all that matters to me. If you don't care about the journey as much as me, you can check out the source
         code <a href="https://github.com/claytonwramsey/wordle_simd">here</a>.
@@ -315,7 +311,7 @@ fn grade(w: &Word, sol: &Word) -> Grade {
           </p>
           <ul>
             <li>Every possible guess and solution has exactly 5 letters.</li>
-            <li>Every possible guess and solution is exclusively made from ASCII characters</li>
+            <li>Every possible guess and solution is exclusively made from ASCII characters.</li>
           </ul>
           <p>
             Since words are only five letters, we can replace variable-length <code>str</code>s and <code>Vec</code>s
