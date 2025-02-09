@@ -1,324 +1,53 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="100mm"
-   height="100mm"
-   viewBox="0 0 100 100"
-   version="1.1"
-   id="svg5"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   sodipodi:docname="affordance_min.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview7"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="1.9981322"
-     inkscape:cx="101.09441"
-     inkscape:cy="202.43906"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer3" />
-  <defs
-     id="defs2">
-    <marker
-       style="overflow:visible"
-       id="marker9389"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="TriangleStart"
-       markerWidth="3"
-       markerHeight="3.46820804"
-       viewBox="0 0 5.3244081 6.1553851"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path9387" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleStart"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="TriangleStart"
-       markerWidth="3"
-       markerHeight="3.46820804"
-       viewBox="0 0 5.3244081 6.1553851"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135" />
-    </marker>
-    <rect
-       x="754.78302"
-       y="81.095268"
-       width="38.340492"
-       height="45.749756"
-       id="rect2992" />
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8830">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8832"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8834">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8836"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8838">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8840"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8842">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8844"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8846">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8848"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-  </defs>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Borders">
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420"
-       width="133.86345"
-       height="1"
-       x="187.27087"
-       y="-33.853451"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8846)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420-6"
-       width="133.86345"
-       height="1"
-       x="126.98409"
-       y="-1.5735483"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8842)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420-8"
-       width="1"
-       height="50"
-       x="246.72377"
-       y="-83.422356"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8838)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.19991;stroke-linejoin:round;stroke-dasharray:0.59973, 0.19991"
-       id="rect3420-8-2"
-       width="1"
-       height="31.971085"
-       x="231.8781"
-       y="-33.409336"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8834)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.292165;stroke-linejoin:round;stroke-dasharray:0.876495, 0.292165"
-       id="rect3420-8-7"
-       width="1"
-       height="68.288185"
-       x="259.93826"
-       y="-33.932034"
-       transform="matrix(1,0,0,0.99786812,-197.47601,70.078327)"
-       clip-path="url(#clipPath8830)" />
-  </g>
-  <g
-     inkscape:label="Points"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3"
-       cx="27.039103"
-       cy="24.854847"
-       r="1" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3-7"
-       cx="75.511101"
-       cy="12.590254"
-       r="1" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3-6"
-       cx="22.696201"
-       cy="49.228077"
-       r="1" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3-1"
-       cx="50.310993"
-       cy="53.036987"
-       r="1" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3-2"
-       cx="78.77504"
-       cy="64.506149"
-       r="1" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="path234-3-5"
-       cx="14.302981"
-       cy="93.499817"
-       r="1" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer3"
-     inkscape:label="Top"
-     style="display:inline">
-    <rect
-       style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1.04387;stroke-linejoin:round;stroke-dasharray:3.13161, 1.04387;stroke-dashoffset:0.104387;stroke-opacity:0.980599"
-       id="rect3810"
-       width="70.831284"
-       height="73.042381"
-       x="14.290304"
-       y="16.431162"
-       rx="22.978874" />
-    <path
-       style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:0.855715;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.1;stroke-opacity:0.980599;marker-start:url(#TriangleStart);marker-end:url(#marker9389)"
-       d="M 64.441782,34.907999 74.005168,23.205777"
-       id="path9168" />
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="71.616516"
-       y="31.491055"
-       id="text9712"><tspan
-         sodipodi:role="line"
-         id="tspan9710"
-         style="stroke-width:1"
-         x="71.616516"
-         y="31.491055">r</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="28.320347"
-       y="25.697178"
-       id="text9712-9"><tspan
-         sodipodi:role="line"
-         id="tspan9710-3"
-         style="stroke-width:1"
-         x="28.320347"
-         y="25.697178">a</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="77.570061"
-       y="13.928248"
-       id="text9712-7"><tspan
-         sodipodi:role="line"
-         id="tspan9710-4"
-         style="stroke-width:1"
-         x="77.570061"
-         y="13.928248">b</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="23.959951"
-       y="50.349186"
-       id="text9712-5"><tspan
-         sodipodi:role="line"
-         id="tspan9710-2"
-         style="stroke-width:1"
-         x="23.959951"
-         y="50.349186">c</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="51.749069"
-       y="54.34906"
-       id="text9712-54"><tspan
-         sodipodi:role="line"
-         id="tspan9710-7"
-         style="stroke-width:1"
-         x="51.749069"
-         y="54.34906">d</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="74.24984"
-       y="65.482292"
-       id="text9712-4"><tspan
-         sodipodi:role="line"
-         id="tspan9710-43"
-         style="stroke-width:1"
-         x="74.24984"
-         y="65.482292">e</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-weight:500;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';display:inline;fill:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:4, 1;stroke-opacity:0.980599"
-       x="16.672453"
-       y="95.168159"
-       id="text9712-0"><tspan
-         sodipodi:role="line"
-         id="tspan9710-78"
-         style="stroke-width:1"
-         x="16.672453"
-         y="95.168159">f</tspan></text>
-  </g>
+<svg id="svg5" width="100mm" height="100mm" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ <defs id="defs2">
+  <marker id="marker9389" overflow="visible" markerHeight="3.46820804" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" viewBox="0 0 5.3244081 6.1553851">
+   <path id="path9387" transform="scale(.5)" d="m5.77 0-8.65 5v-10z" fill="context-stroke" fill-rule="evenodd" stroke="context-stroke" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleStart" overflow="visible" markerHeight="3.46820804" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" viewBox="0 0 5.3244081 6.1553851">
+   <path id="path135" transform="scale(.5)" d="m5.77 0-8.65 5v-10z" fill="context-stroke" fill-rule="evenodd" stroke="context-stroke" stroke-width="1pt"/>
+  </marker>
+  <clipPath id="clipPath8830">
+   <rect id="rect8832" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8834">
+   <rect id="rect8836" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8838">
+   <rect id="rect8840" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8842">
+   <rect id="rect8844" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8846">
+   <rect id="rect8848" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+ </defs>
+ <g id="layer2" fill="#cacaca" stroke-linejoin="round">
+  <rect id="rect3420" transform="translate(-197.48 70.014)" x="187.27" y="-33.853" width="133.86" height="1" clip-path="url(#clipPath8846)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-6" transform="translate(-197.48 70.014)" x="126.98" y="-1.5735" width="133.86" height="1" clip-path="url(#clipPath8842)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-8" transform="translate(-197.48 70.014)" x="246.72" y="-83.422" width="1" height="50" clip-path="url(#clipPath8838)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-8-2" transform="translate(-197.48 70.014)" x="231.88" y="-33.409" width="1" height="31.971" clip-path="url(#clipPath8834)" stroke-dasharray="0.59973, 0.19991" stroke-width=".19991"/>
+  <rect id="rect3420-8-7" transform="matrix(1 0 0 .99787 -197.48 70.078)" x="259.94" y="-33.932" width="1" height="68.288" clip-path="url(#clipPath8830)" stroke-dasharray="0.876495, 0.292165" stroke-width=".29216"/>
+ </g>
+ <g id="layer1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25">
+  <circle id="path234-3" cx="27.039" cy="24.855" r="1"/>
+  <circle id="path234-3-7" cx="75.511" cy="12.59" r="1"/>
+  <circle id="path234-3-6" cx="22.696" cy="49.228" r="1"/>
+  <circle id="path234-3-1" cx="50.311" cy="53.037" r="1"/>
+  <circle id="path234-3-2" cx="78.775" cy="64.506" r="1"/>
+  <circle id="path234-3-5" cx="14.303" cy="93.5" r="1"/>
+ </g>
+ <g id="layer3" stroke-linejoin="round" stroke-opacity=".9806">
+  <rect id="rect3810" x="14.29" y="16.431" width="70.831" height="73.042" rx="22.979" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3.13161, 1.04387" stroke-dashoffset=".10439" stroke-width="1.0439"/>
+  <path id="path9168" d="m64.442 34.908 9.5634-11.702" fill="#cacaca" fill-opacity=".049514" marker-end="url(#marker9389)" marker-start="url(#TriangleStart)" stroke="#3c3c3c" stroke-dashoffset=".1" stroke-width=".85572"/>
+  <text id="text9712" x="71.616516" y="31.491055" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710" x="71.616516" y="31.491055">r</tspan></text>
+  <text id="text9712-9" x="28.320347" y="25.697178" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-3" x="28.320347" y="25.697178">a</tspan></text>
+  <text id="text9712-7" x="77.570061" y="13.928248" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-4" x="77.570061" y="13.928248">b</tspan></text>
+  <text id="text9712-5" x="23.959951" y="50.349186" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-2" x="23.959951" y="50.349186">c</tspan></text>
+  <text id="text9712-54" x="51.749069" y="54.34906" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-7" x="51.749069" y="54.34906">d</tspan></text>
+  <text id="text9712-4" x="74.24984" y="65.482292" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-43" x="74.24984" y="65.482292">e</tspan></text>
+  <text id="text9712-0" x="16.672453" y="95.168159" fill="#000000" font-family="'CMU Serif'" font-size="5.6444px" font-style="italic" font-weight="500" stroke-dasharray="4, 1" xml:space="preserve"><tspan id="tspan9710-78" x="16.672453" y="95.168159">f</tspan></text>
+ </g>
 </svg>

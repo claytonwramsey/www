@@ -1,285 +1,59 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="100mm"
-   height="100mm"
-   viewBox="0 0 100 100"
-   version="1.1"
-   id="svg5"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   sodipodi:docname="rmin.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview7"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="2.2145625"
-     inkscape:cx="188.7506"
-     inkscape:cy="188.97638"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer3" />
-  <defs
-     id="defs2">
-    <marker
-       style="overflow:visible"
-       id="marker8672"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="TriangleStart"
-       markerWidth="5.3244081"
-       markerHeight="6.155385"
-       viewBox="0 0 5.3244081 6.1553851"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path8670" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleStart"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="TriangleStart"
-       markerWidth="5.3244081"
-       markerHeight="6.155385"
-       viewBox="0 0 5.3244081 6.1553851"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135" />
-    </marker>
-    <rect
-       x="754.78302"
-       y="81.095268"
-       width="38.340492"
-       height="45.749756"
-       id="rect2992" />
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8830">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8832"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8834">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8836"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8838">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8840"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8842">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8844"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath8846">
-      <rect
-         style="fill:#cacaca;fill-opacity:0.049514;stroke:#3c3c3c;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3, 1;stroke-dashoffset:0.1;stroke-opacity:0.980599"
-         id="rect8848"
-         width="100.10547"
-         height="100.11996"
-         x="197.43153"
-         y="-70.102264" />
-    </clipPath>
-  </defs>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Borders">
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420"
-       width="133.86345"
-       height="1"
-       x="187.27087"
-       y="-33.853451"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8846)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420-6"
-       width="133.86345"
-       height="1"
-       x="126.98409"
-       y="-1.5735483"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8842)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-       id="rect3420-8"
-       width="1"
-       height="50"
-       x="246.72377"
-       y="-83.422356"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8838)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.19991;stroke-linejoin:round;stroke-dasharray:0.59973, 0.19991"
-       id="rect3420-8-2"
-       width="1"
-       height="31.971085"
-       x="231.8781"
-       y="-33.409336"
-       transform="translate(-197.47601,70.014333)"
-       clip-path="url(#clipPath8834)" />
-    <rect
-       style="fill:#cacaca;fill-opacity:1;stroke-width:0.292165;stroke-linejoin:round;stroke-dasharray:0.876495, 0.292165"
-       id="rect3420-8-7"
-       width="1"
-       height="68.288185"
-       x="259.93826"
-       y="-33.932034"
-       transform="matrix(1,0,0,0.99786812,-197.47601,70.078327)"
-       clip-path="url(#clipPath8830)" />
+<svg id="svg5" width="100mm" height="100mm" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ <defs id="defs2">
+  <marker id="marker8672" overflow="visible" markerHeight="6.155385" markerWidth="5.3244081" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" viewBox="0 0 5.3244081 6.1553851">
+   <path id="path8670" transform="scale(.5)" d="m5.77 0-8.65 5v-10z" fill="context-stroke" fill-rule="evenodd" stroke="context-stroke" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleStart" overflow="visible" markerHeight="6.155385" markerWidth="5.3244081" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" viewBox="0 0 5.3244081 6.1553851">
+   <path id="path135" transform="scale(.5)" d="m5.77 0-8.65 5v-10z" fill="context-stroke" fill-rule="evenodd" stroke="context-stroke" stroke-width="1pt"/>
+  </marker>
+  <clipPath id="clipPath8830">
+   <rect id="rect8832" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8834">
+   <rect id="rect8836" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8838">
+   <rect id="rect8840" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8842">
+   <rect id="rect8844" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+  <clipPath id="clipPath8846">
+   <rect id="rect8848" x="197.43" y="-70.102" width="100.11" height="100.12" fill="#cacaca" fill-opacity=".049514" stroke="#3c3c3c" stroke-dasharray="3, 1" stroke-dashoffset=".1" stroke-linejoin="round" stroke-opacity=".9806"/>
+  </clipPath>
+ </defs>
+ <g id="layer2" fill="#cacaca" stroke-linejoin="round">
+  <rect id="rect3420" transform="translate(-197.48 70.014)" x="187.27" y="-33.853" width="133.86" height="1" clip-path="url(#clipPath8846)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-6" transform="translate(-197.48 70.014)" x="126.98" y="-1.5735" width="133.86" height="1" clip-path="url(#clipPath8842)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-8" transform="translate(-197.48 70.014)" x="246.72" y="-83.422" width="1" height="50" clip-path="url(#clipPath8838)" stroke-dasharray="0.750001, 0.25" stroke-width=".25"/>
+  <rect id="rect3420-8-2" transform="translate(-197.48 70.014)" x="231.88" y="-33.409" width="1" height="31.971" clip-path="url(#clipPath8834)" stroke-dasharray="0.59973, 0.19991" stroke-width=".19991"/>
+  <rect id="rect3420-8-7" transform="matrix(1 0 0 .99787 -197.48 70.078)" x="259.94" y="-33.932" width="1" height="68.288" clip-path="url(#clipPath8830)" stroke-dasharray="0.876495, 0.292165" stroke-width=".29216"/>
+ </g>
+ <g id="layer1">
+  <g id="g3273" transform="translate(-184.74 1.3694)">
+   <circle id="path234-3" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
   </g>
-  <g
-     inkscape:label="Points"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <g
-       id="g3273"
-       transform="translate(-184.73989,1.3693648)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
-    <g
-       id="g3273-2"
-       transform="translate(-136.26789,-10.895227)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3-7"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
-    <g
-       id="g3273-3"
-       transform="translate(-189.08279,25.742595)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3-6"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
-    <g
-       id="g3273-6"
-       transform="translate(-161.468,29.551507)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3-1"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
-    <g
-       id="g3273-9"
-       transform="translate(-133.00395,41.020668)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3-2"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
-    <g
-       id="g3273-7"
-       transform="translate(-197.47601,70.014334)">
-      <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:0.25;stroke-linejoin:round;stroke-dasharray:0.750001, 0.25"
-         id="path234-3-5"
-         cx="211.77899"
-         cy="23.485481"
-         r="1" />
-    </g>
+  <g id="g3273-2" transform="translate(-136.27 -10.895)">
+   <circle id="path234-3-7" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer3"
-     inkscape:label="Top"
-     style="display:inline">
-    <ellipse
-       style="fill:#90ccff;fill-opacity:0.527731;stroke:#008ce0;stroke-width:1;stroke-linejoin:round;stroke-dasharray:3.99998882,1;stroke-dashoffset:0;stroke-opacity:0.980599"
-       id="path1049"
-       cx="50.745155"
-       cy="53.281532"
-       rx="25.827202"
-       ry="25.574463" />
-    <path
-       style="fill:#90ccff;fill-opacity:0.527731;stroke:#000000;stroke-width:0.456863;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.980599;marker-start:url(#TriangleStart);marker-end:url(#marker8672)"
-       d="M 52.505109,51.245096 67.26509,36.402848"
-       id="path6246" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;font-family:'CMU Classical Serif';-inkscape-font-specification:'CMU Classical Serif, Normal';fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.499999;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.980599"
-       x="59.15379"
-       y="48.303093"
-       id="text8794"><tspan
-         sodipodi:role="line"
-         id="tspan8792"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5"
-         x="59.15379"
-         y="48.303093"><tspan
-           style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:5.64444px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Medium Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-           id="tspan9036">r</tspan><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.66889px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub;fill:#000000;fill-opacity:1;stroke:none"
-           id="tspan8796">min</tspan></tspan></text>
+  <g id="g3273-3" transform="translate(-189.08 25.743)">
+   <circle id="path234-3-6" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
   </g>
+  <g id="g3273-6" transform="translate(-161.47 29.552)">
+   <circle id="path234-3-1" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
+  </g>
+  <g id="g3273-9" transform="translate(-133 41.021)">
+   <circle id="path234-3-2" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
+  </g>
+  <g id="g3273-7" transform="translate(-197.48 70.014)">
+   <circle id="path234-3-5" cx="211.78" cy="23.485" r="1" stroke-dasharray="0.750001, 0.25" stroke-linejoin="round" stroke-width=".25"/>
+  </g>
+ </g>
+ <g id="layer3" stroke-linejoin="round" stroke-opacity=".9806">
+  <ellipse id="path1049" cx="50.745" cy="53.282" rx="25.827" ry="25.574" fill="#90ccff" fill-opacity=".52773" stroke="#008ce0" stroke-dasharray="3.99998882,1"/>
+  <path id="path6246" d="m52.505 51.245 14.76-14.842" fill="#90ccff" fill-opacity=".52773" marker-end="url(#marker8672)" marker-start="url(#TriangleStart)" stroke="#000" stroke-width=".45686"/>
+  <text id="text8794" x="59.15379" y="48.303093" fill="#000000" font-family="'CMU Classical Serif'" font-size="5.6444px" stroke="#000000" stroke-width=".5" xml:space="preserve"><tspan id="tspan8792" x="59.15379" y="48.303093" fill="#000000" font-family="'CMU Serif'" stroke="none" stroke-width=".5"><tspan id="tspan9036" font-size="5.6444px" font-style="italic" font-weight="500" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">r</tspan><tspan id="tspan8796" baseline-shift="sub" fill="#000000" font-size="3.6689px" stroke="none" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">min</tspan></tspan></text>
+ </g>
 </svg>
