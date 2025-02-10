@@ -39,4 +39,3 @@ make.
 
 - Use whatever vegetables you like in this recipe. I don\'t like black
   olives, but you can definitely add them if you like them.
-  :::

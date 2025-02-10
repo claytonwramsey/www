@@ -15,6 +15,7 @@
     <title>{{ config.title }}</title>
     <link rel="canonical" href="{{ current_url | safe }}" />
     <link rel="stylesheet" type="text/css" href="/main.css" />
+    {% block headers %} {% endblock %}
     <link rel="icon" href="/favicon.ico" />
   </head>
   <body>

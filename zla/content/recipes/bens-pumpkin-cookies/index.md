@@ -17,7 +17,7 @@ modifications.
 
 > those clayton cookies hit so hard 😭 i need them again frfr
 >
-> One of my friends after trying them
+> <footer>One of my friends after trying them</footer>
 
 This recipe is scaled to make around 50 cookies and takes about 1 hour.
 

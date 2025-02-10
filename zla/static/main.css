@@ -9,6 +9,10 @@ body {
   color: #222;
 }
 
+pre {
+  border-radius: 20px;
+}
+
 pre code {
   display: block;
   padding: 1em;
@@ -71,6 +75,7 @@ h3 {
 img {
   width: 100%;
   align-self: center;
+  border-radius: 10px;
 }
 
 footer {
