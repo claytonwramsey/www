@@ -1,0 +1,33 @@
+<!doctype html>
+
+<!--
+  Hi! Thanks for checking out this website.
+  I made it myself!
+  This website was made by hand.
+  I intentionally haven't minified anything so you can see how it all fits together.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="{% block description %} {% endblock %}" />
+    <title>{{ config.title }}</title>
+    <link rel="canonical" href="{{ current_url | safe }}" />
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+    <link rel="icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/cv">CV</a>
+        <a href="/blog">Blog</a>
+        <a href="/recipes">Recipes</a>
+      </nav>
+      <h1>{% block title %} {% endblock %}</h1>
+    </header>
+    <main>{% block content %} {% endblock %}</main>
+  </body>
+</html>

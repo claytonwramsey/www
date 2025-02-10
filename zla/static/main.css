@@ -1,0 +1,126 @@
+body {
+  margin: 15px auto;
+  max-width: 800px;
+  line-height: 1.6;
+  font-size: 15px;
+  padding: 0 10px;
+  /* Use system fonts */
+  font-family: system-ui, sans-serif;
+  color: #222;
+}
+
+pre code {
+  display: block;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+a:hover {
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: 2px;
+}
+
+/* Change color in night mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #eee;
+    background-color: #222;
+  }
+
+  a:link {
+    color: lightskyblue;
+  }
+
+  a:visited {
+    color: violet;
+  }
+
+  .night-invert {
+    filter: invert(88%) hue-rotate(180deg);
+  }
+}
+
+img {
+  fill: currentColor !important;
+}
+
+nav {
+  font-size: 25px;
+  a {
+    margin-right: 15px;
+  }
+}
+
+table {
+  text-align: center;
+  border-spacing: 15px 5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+
+img {
+  width: 100%;
+  align-self: center;
+}
+
+footer {
+  text-align: center;
+  font-size: 12px;
+}
+
+blockquote {
+  margin-left: 5px;
+  padding-left: 10px;
+  border-left: 2px solid;
+  footer {
+    text-align: left;
+    margin-left: 20px;
+    font-size: 12px;
+  }
+}
+
+figure {
+  text-align: center;
+}
+
+figcaption {
+  text-align: center;
+}
+
+.pubinfo {
+  font-style: italic;
+  text-align: center;
+}
+
+/* Raise text size on small screens */
+@media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
+  body {
+    font-size: 30px;
+  }
+
+  nav {
+    font-size: 45px;
+  }
+
+  pre {
+    font-size: 25px;
+  }
+
+  footer {
+    font-size: 20px;
+  }
+
+  blockquote {
+    font-size: 30px;
+  }
+}
