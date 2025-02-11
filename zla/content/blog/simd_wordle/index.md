@@ -95,8 +95,8 @@ color as one member of an `enum`, and then give grades as a
 version would be a `HashMap<char, usize>`.
 
 For the rest of this article, I'll call the data structure which stores
-the number of unmatched characters in the solution the [yellow
-bank]{.dfn}, or just [bank]{.dfn} for short.
+the number of unmatched characters in the solution the <dfn>yellow bank</dfn>,
+or just <dfn>bank</dfn> for short.
 
 ```Rust
 use std::collections::HashMap;
@@ -148,7 +148,7 @@ speed on a slightly smaller task: calculating the best single-word
 opener.
 
 To do this calculation, we'll need to compute the entropy after each
-possible opening guess, meaning we'll need to grade ${2309*}12947$
+possible opening guess, meaning we'll need to grade $2309 * 12947$
 words, or about 29 million.
 
 Without further ado, here are my results:
@@ -594,9 +594,13 @@ minimization loop twice. Normally, I would use `Iterator::min`, but
 since floating-point numbers lack total order, we have to roll our own
 `min` implementation for floats.
 
+<div class="night-invert">
+
 ![Parallel scaling of grading. Here, `L` refers to the number of lanes
 used by the SIMD-parallel
-version.](/assets/img/wordle/scaling.svg){.night-invert}
+version.](scaling.svg)
+
+</div>
 
 When we run the benchmarks, we see pretty good per-thread scaling! The
 performance grows linearly with the number of threads until we reach 16
