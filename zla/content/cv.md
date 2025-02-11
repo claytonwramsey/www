@@ -38,17 +38,17 @@ description = "Clayton Ramsey's curriculum vitae"
 ### Peer-Reviewed Conference Papers
 
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
-  Lydia E. Kavraki. \"[Collision-Affording Point Trees: SIMD-Amenable
+  Lydia E. Kavraki. "[Collision-Affording Point Trees: SIMD-Amenable
   Nearest Neighbors for Fast Collision
-  Checking.](https://arxiv.org/abs/2406.02807)\" In Robotics: Science
-  and Systems, 2024. To Appear. \*Equal Contribution.
+  Checking.](https://arxiv.org/abs/2406.02807)" In <cite>Robotics: Science
+  and Systems</cite>, 2024. To Appear. \*Equal Contribution.
 
 ### Workshop Papers
 
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
-  Lydia E. Kavraki. \"Dynamic Motion Planning from Perception via
-  Accelerated Point Cloud Collision Checking.\" In IEEE ICRA 2024
-  Workshop - Agile Robotics: From Perception to Dynamic Action, 2024.
+  Lydia E. Kavraki. "Dynamic Motion Planning from Perception via
+  Accelerated Point Cloud Collision Checking." In <cite>IEEE ICRA 2024
+  Workshop - Agile Robotics: From Perception to Dynamic Action</cite>, 2024.
   \*Equal Contribution.
 
 ## Awards and Honors
@@ -64,7 +64,7 @@ description = "Clayton Ramsey's curriculum vitae"
   United States Figure Skating, February 2018 and November 2022 and
   February 2024
 - [Eta Kappa Nu Member](https://hkn.ieee.org/), IEEE, 2023
-- [President\'s Honor
+- [Presidents Honor
   Roll](https://registrar.rice.edu/students/academic-honors#PHR), Rice
   University, Fall 2022 and Spring 2023
 

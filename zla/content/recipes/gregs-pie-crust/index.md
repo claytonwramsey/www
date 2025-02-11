@@ -32,7 +32,7 @@ make.
 1.  Mix flour, salt, sugar, and butter until mixture resembles coarse
     meal.
 2.  Mix in 0.5 cups buttermilk.
-3.  Flatten into two disks, each roughly 1/4\" thick. Store in
+3.  Flatten into two disks, each roughly 1/4" thick. Store in
     refrigerator at least 1 hour; preferably overnight.
 4.  Preheat oven to 425° F.
 5.  Prepare your preferred filling. Roll out the dough into a flat sheet
@@ -45,7 +45,7 @@ make.
 
 ## Notes
 
-- If you place the pie higher in the oven, it\'ll get a crispier top
+- If you place the pie higher in the oven, itll get a crispier top
   crust, which I prefer.
 - The filling for a pie is much less a science than an art. I
   recommend getting roughly 3-5 pounds of fruit, cutting it into thin

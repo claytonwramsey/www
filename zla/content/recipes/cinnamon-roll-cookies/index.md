@@ -10,7 +10,7 @@ description = "These aren't really cinnamon rolls, but they aren't really cookie
 
 </figure>
 
-These aren\'t really cinnamon rolls, but they aren\'t really cookies
+These arent really cinnamon rolls, but they arent really cookies
 either. This recipe is scaled to make around 36 cookies and takes about
 2 hours.
 

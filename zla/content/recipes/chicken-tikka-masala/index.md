@@ -30,7 +30,7 @@ minutes.
 - 1 tsp black pepper
 - 1 tsp cayenne pepper
 - 0.25 tsp cinnamon
-- 3 chicken breasts (2-3lb total), cut into 0.75\" cubes
+- 3 chicken breasts (2-3lb total), cut into 0.75" cubes
 - 2 serrano peppers, diced
 - 15 oz canned tomato sauce
 - 1/3 cup water

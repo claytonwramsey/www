@@ -18,7 +18,7 @@ Check out the links up at the top if you'd like to explore.
   SIMD-Amenable Nearest Neighbors for Fast Collision Checking" was
   accepted at [Robotics: Science and
   Systems](https://roboticsconference.org) in Delft in the
-  Netherlands. I\'ll be presenting it on July 16! For more details,
+  Netherlands. Ill be presenting it on July 16! For more details,
   check out my [blog post](/blog/captree) or the
   [arXiv](https://arxiv.org/abs/2406.02807).
 - **2024-04-24**: I'll be presenting a poster on my recent work in
@@ -43,9 +43,9 @@ Check out the links up at the top if you'd like to explore.
 
 This website is pretty simple.
 It's currently generated via [Zola](https://www.getzola.org/) with a custom lightweight theme.
-I\'m a big fan of
+Im a big fan of
 [various](http://motherfuckingwebsite.com)
-[efforts](http://bettermotherfuckingwebsite.com) to use HTML\'s existing
+[efforts](http://bettermotherfuckingwebsite.com) to use HTMLs existing
 qualities for accessibility and design. I think that the web should be
 designed around simple, handmade things and believe that I can be a part
 of that.
