@@ -594,13 +594,13 @@ minimization loop twice. Normally, I would use `Iterator::min`, but
 since floating-point numbers lack total order, we have to roll our own
 `min` implementation for floats.
 
-<div class="night-invert">
+<figure class="night-invert">
 
 ![Parallel scaling of grading. Here, `L` refers to the number of lanes
 used by the SIMD-parallel
 version.](scaling.svg)
 
-</div>
+</figure>
 
 When we run the benchmarks, we see pretty good per-thread scaling! The
 performance grows linearly with the number of threads until we reach 16

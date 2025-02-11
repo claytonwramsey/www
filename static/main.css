@@ -21,6 +21,10 @@ body {
   border-radius: 0px;
 }
 
+iframe {
+  border-radius: 15px;
+}
+
 pre {
   border-radius: 20px;
   background-color: #fafafa;

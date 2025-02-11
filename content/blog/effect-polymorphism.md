@@ -10,37 +10,37 @@ TL;DR: Local programmer is inconvenienced by error-handling boilerplate,
 writes uninformed article about experimental programming language
 features. More at 11.
 
-I\'ve encountered lots of pain points when dependency-inverting things,
-especially when working with combinators. Most recently, I\'ve been
+I've encountered lots of pain points when dependency-inverting things,
+especially when working with combinators. Most recently, I've been
 thinking about how I might expose Python bindings for a [half-baked
-motion planning library](https://github.com/claytonwramsey/rumple) I\'m
+motion planning library](https://github.com/claytonwramsey/rumple) I'm
 building. The chief problem is that I want users to provide their own
 configuration spaces, samplers, robots, and collision checkers. If those
 are implemented in Python, they can throw an exception at any time,
 yielding an error in the corresponding PyO3 API. The problem is that all
-of my functions which might call into that behavior don\'t return an
+of my functions which might call into that behavior don't return an
 error - what am I to do?
 
-I\'m not the only one with this sort of problem!
+I'm not the only one with this sort of problem!
 [boats](https://without.boats/blog/the-problem-of-effects/) has been
 writing about this for nearly five years, and [handling iterators of
 results is still a pain](https://stackoverflow.com/questions/63798662).
-As the `async` story for Rust has improved, we\'ve seen similar results
+As the `async` story for Rust has improved, we've seen similar results
 on the pain (or lack thereof) of [function coloring in
 Rust](https://morestina.net/blog/1686/rust-async-is-colored). In short,
 crossing control-flow boundaries in statically typed languages is
 painful and difficult.
 
 First off, a disclaimer: I am more interested in programming language
-theory than the average joe, but I\'m still not an expert. I\'ve only
+theory than the average joe, but I'm still not an expert. I've only
 read a little bit on the topic of algebraic effects, so I may get some
-things wrong - I\'m a roboticist, not a category theorist. The purpose
+things wrong - I'm a roboticist, not a category theorist. The purpose
 of this article is not so much to propose a novel contribution as to
 draw attention to a common problem and an elegant solution.
 
 ## Dependency inversion
 
-For the sake of this post, I\'ll refer to <dfn>dependency inversion</dfn>
+For the sake of this post, I'll refer to <dfn>dependency inversion</dfn>
 as the practice of taking a subroutine in a procedure and taking it out
 as an argument. For example, consider the following Rust code:
 
@@ -121,10 +121,10 @@ trait TryMagicNumber {
 }
 ```
 
-So, with a little bit of brute force, we\'ve come up with an API that
-can handle fallibility. It\'s annoying to maintain, sure, but at least
-we\'ve achieved maximum flexibility. But wait! What if we want to make
-an implementation of `magic_number` using an unsafe function! Then we\'d
+So, with a little bit of brute force, we've come up with an API that
+can handle fallibility. It's annoying to maintain, sure, but at least
+we've achieved maximum flexibility. But wait! What if we want to make
+an implementation of `magic_number` using an unsafe function! Then we'd
 have to make a new trait!
 
 ```rust
@@ -145,8 +145,8 @@ trait TryUnsafeMagicNumber {
 ```
 
 Now imagine if we wanted to make a version of `magic_number` that worked
-via dynamic-dispatch. To do so, we\'d have to make a new trait
-`ObjectMagicNumber`, since `MagicNumber` is not object-safe. Then we\'d
+via dynamic-dispatch. To do so, we'd have to make a new trait
+`ObjectMagicNumber`, since `MagicNumber` is not object-safe. Then we'd
 need to make even more traits for every version of it!
 
 ```rust
@@ -161,9 +161,9 @@ trait TryUnsafeObjectMagicNumber { /* ... */ }
 
 Then we have to consider all the many other variations on this
 once-simple API: mutability, allocations, I/O, blocking, `const`,
-`async`. The list goes on. If we had $n$ such properties, we\'d need to
+`async`. The list goes on. If we had $n$ such properties, we'd need to
 create $2^n$ traits and $2^n$ functions to handle them all. Each one
-of these variations is reasonable, but we know that since we can\'t
+of these variations is reasonable, but we know that since we can't
 accept all of them, we must accept none of them.
 
 ## What are effects, anyway?
@@ -173,8 +173,8 @@ possible variations on a function in a clean and generic way. Every
 function has some set of effects, and effects are inherited: if $f$ has
 effect $E$, and $g$ calls $f$, then $g$ also has effect $E$.
 
-To build some examples, let\'s make a new fake programming language
-called RustE (Rust, with Effects). We\'ll make only a few syntactic
+To build some examples, let's make a new fake programming language
+called RustE (Rust, with Effects). We'll make only a few syntactic
 changes, allowing the creation of effects and for effects to be
 annotated with a `can` clause describing their effects.
 
@@ -202,7 +202,7 @@ fn qux() can Bar {
 
 To avoid the [function
 coloring](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function)
-problem, we\'ll also allow for `handle` clauses, which allow a function
+problem, we'll also allow for `handle` clauses, which allow a function
 _without_ an effect to call a function _with_ an effect.
 
 ```{clas="rust"}
@@ -296,13 +296,13 @@ the language.
 
 The same applies for `async`, I/O, and allocations. If you squint hard
 enough, you might be able to imagine a case where interior mutability is
-a sort of effect handler too. Surprisingly enough, `const` isn\'t really
+a sort of effect handler too. Surprisingly enough, `const` isn't really
 an effect, but non-`const` code is! Non-`const` code can call `const`
 functions, but not the other way around, so running at runtime is the
 effect. I suppose you could alternately come up with \"contravariant\"
 effects, by which any function with contravariant effect $E'$
 may only call functions which also have the effect $E'$. Then
-`const` would be one such contravariant effect, but, honestly, it\'s not
+`const` would be one such contravariant effect, but, honestly, it's not
 worth the hassle.
 
 ## Effect polymorphism comes in
@@ -327,7 +327,7 @@ fn my_sum<N: MagicNumber>() -> u32 can N::Effect {
 }
 ```
 
-I\'m pretty happy with this! There\'s very little ceremony involved, and
+I'm pretty happy with this! There's very little ceremony involved, and
 we get to express vastly more things than we could before!
 
 Of course, once we have something like this system, there are a lot of
@@ -344,22 +344,22 @@ obvious questions:
 For now, though, it would be really nice to just write code which is
 polymorphic over its effects.
 
-## I\'m no closer to fixing my Python issues
+## I'm no closer to fixing my Python issues
 
-It\'s one thing to muse about a solution to my problem and another thing
+It's one thing to muse about a solution to my problem and another thing
 entirely to actually solve it. As much as I would like to go completely
 down the rabbit hole and implement a dream language with algebraic
 effects, linear types, trait-based polymorphism, and zero-cost
 abstraction, I also have to get my projects done some time this century.
 
-There\'s been a lot of ink spilled about efficiently compiling algebraic
-effects, but at the time of writing there\'s no mainstream programming
+There's been a lot of ink spilled about efficiently compiling algebraic
+effects, but at the time of writing there's no mainstream programming
 language that does so. [Koka](https://github.com/koka-lang/koka) is
-probably the closest thing that we have to such a language, but it\'s
+probably the closest thing that we have to such a language, but it's
 admittedly not production-ready.
 
 For now, I will probably end up just making code that has weird effects
-panic. It\'s not the best choice, but it\'s good enough for now.
+panic. It's not the best choice, but it's good enough for now.
 
 Thanks to [Aedan](https://aedancullen.com/),
 [Shreyas](https://shreyasminocha.me/), and [Wisha](https://wisha.page/)
