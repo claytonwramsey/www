@@ -54,7 +54,7 @@ collection.
 Rust's standard library offers two simple reference-counted garbage
 collectors: the single-threaded
 [`Rc`](https://doc.rust-lang.org/std/rc/) and its atomically-indexed
-counterpart [`Arc`](https://doc.rust-lang.org/std/sync/struct.Arc). They
+counterpart [`Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html). They
 operate by maintaining a reference count in each heap allocation. Under
 most circumstances, these work great, but they can't handle cyclic
 references. Combined with interior mutability, it's trivial to refute
@@ -875,14 +875,14 @@ actually worked.
 | :------------------------------------------------------------ | ----------------------------- | ---------------- |
 | `dumpster` (unsync)                                           | ❌                            | ✅               |
 | `dumpster` (sync)                                             | ✅                            | ✅               |
-| [`Rc`](https://doc.rust-lang.org/std/rc/struct.Rc)            | ❌                            | ✅               |
-| [`Arc`](https://doc.rust-lang.org/std/sync/struct.Arc)        | ✅                            | ✅               |
+| [`Rc`](https://doc.rust-lang.org/std/rc/struct.Rc.html)       | ❌                            | ✅               |
+| [`Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html)   | ✅                            | ✅               |
 | [`bacon-rajan-cc`](https://github.com/fitzgen/bacon-rajan-cc) | ❌                            | ✅               |
 | [`cactusref`](https://github.com/artichoke/cactusref)         | ❌                            | ❌               |
 | [`elise`](https://github.com/wusyong/elise)                   | ✅                            | ❌               |
 | [`gc`](https://github.com/Manishearth/rust-gc)                | ❌                            | ✅               |
 | [`gcmodule`](https://github.com/quark-zju/gcmodule)           | yes, but with a different API | ✅               |
-| [`rcgc`](https://github.com/jonas-schievink/rcgc)             | ❌                            | ❌               |
+| [`rcgc`](https://crates.io/crates/rcgc)                       | ❌                            | ❌               |
 | [`shredder`](https://github.com/Others/shredder)              | ✅                            | ✅               |
 
 I excluded the ones that didn't have a `dumpster`-like API because it
@@ -1014,7 +1014,7 @@ crates.io](https://crates.io/crates/dumpster) and available for anyone
 to download. It's licensed under the GNU GPLv3.
 
 Special thanks to [Wisha](https://wisha.page/),
-[Charlie](https://seniormars.github.io/), and
+[Charlie](https://seniormars.com/), and
 [Shreyas](https://shreyasminocha.me/) for reviewing this post, fielding
 my bad questions, and putting up with me rambling about this for nearly
 two months straight.

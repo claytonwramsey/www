@@ -65,7 +65,7 @@ description = "Clayton Ramsey's curriculum vitae"
   February 2024
 - [Eta Kappa Nu Member](https://hkn.ieee.org/), IEEE, 2023
 - [Presidents Honor
-  Roll](https://registrar.rice.edu/students/academic-honors#PHR), Rice
+  Roll](https://registrar.rice.edu/students/academic-honors), Rice
   University, Fall 2022 and Spring 2023
 
 ## Service
