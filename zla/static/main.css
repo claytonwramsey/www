@@ -9,6 +9,10 @@ body {
   color: #222;
 }
 
+.typst-display {
+  border-radius: 0px;
+}
+
 pre {
   border-radius: 20px;
 }
@@ -29,6 +33,10 @@ a:hover {
   body {
     color: #eee;
     background-color: #222;
+  }
+
+  .typst-doc {
+    filter: invert(100%) hue-rotate(180deg);
   }
 
   a:link {
