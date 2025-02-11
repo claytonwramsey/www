@@ -205,7 +205,7 @@ coloring](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-funct
 problem, we'll also allow for `handle` clauses, which allow a function
 _without_ an effect to call a function _with_ an effect.
 
-```{clas="rust"}
+```rust
 fn baz2() {
     handle Bar {} {
         // Bar was handled, so no compile error
