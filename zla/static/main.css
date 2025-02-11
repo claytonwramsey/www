@@ -48,6 +48,10 @@ table {
   border-radius: 15px;
 }
 
+th {
+  text-align: center !important;
+}
+
 h1 {
   text-align: center;
 }

@@ -153,9 +153,9 @@ words, or about 29 million.
 
 Without further ado, here are my results:
 
-| Method | Runtime (best 1 word) | Average grading time | Speedup |
-| ------ | --------------------- | -------------------- | ------- |
-| Naive  | 3.84s                 | 129ns                | 1x      |
+| Method | Runtime (ms) | Mean grading time (ns) | Speedup |
+| :----- | -----------: | ---------------------: | ------: |
+| Naive  |       3840.0 |                 129.00 |     1.0 |
 
 We'll populate this table with further rows as we implement new methods
 to compare against.
@@ -224,10 +224,10 @@ fn grade(w: Word, soln: Word) -> Grade {
 
 This implementation gives us a respectable 5x improvement in speed.
 
-| Method   | Runtime (best 1 word) | Average grading time | Speedup |
-| -------- | --------------------- | -------------------- | ------- |
-| Naive    | 3.84s                 | 129ns                | 1x      |
-| Sensible | 659ms                 | 22.0ns               | 5.83x   |
+| Method   | Runtime (ms) | Mean grading time (ns) | Speedup |
+| :------- | -----------: | ---------------------: | ------: |
+| Naive    |       3840.0 |                 129.00 |     1.0 |
+| Sensible |        659.0 |                  22.00 |     5.8 |
 
 Were I writing standard application code, I think this would have been a
 good place to stop. It requires a few assumptions, but they are mostly
@@ -328,11 +328,11 @@ fn grade(guess: Word, soln: Word) -> Grade {
 This code is of course far more convoluted than the previous
 implementation. However, it comes with a nice bump to performance!
 
-| Method   | Runtime (best 1 word) | Average grading time | Speedup |
-| -------- | --------------------- | -------------------- | ------- |
-| Naive    | 3.84s                 | 129ns                | 1x      |
-| Sensible | 659ms                 | 22.0ns               | 5.83x   |
-| Packed   | 309ms                 | 10.34ns              | 12.4x   |
+| Method   | Runtime (ms) | Mean grading time (ns) | Speedup |
+| :------- | -----------: | ---------------------: | ------: |
+| Naive    |       3840.0 |                 129.00 |     1.0 |
+| Sensible |        659.0 |                  22.00 |     5.8 |
+| Packed   |        309.0 |                  10.34 |    12.4 |
 
 ### Going for a squeeze
 
@@ -400,12 +400,12 @@ fn grade(guess: Word, soln: Word) -> Grade {
 
 </details>
 
-| Method   | Runtime (best 1 word) | Average grading time | Speedup |
-| -------- | --------------------- | -------------------- | ------- |
-| Naive    | 3.84s                 | 129ns                | 1x      |
-| Sensible | 659ms                 | 22.0ns               | 5.83x   |
-| Packed   | 309ms                 | 10.34ns              | 12.4x   |
-| Squeeze  | 224ms                 | 7.49ns               | 17.1x   |
+| Method   | Runtime (ms) | Mean grading time (ns) | Speedup |
+| :------- | -----------: | ---------------------: | ------: |
+| Naive    |       3840.0 |                 129.00 |     1.0 |
+| Sensible |        659.0 |                  22.00 |     5.8 |
+| Packed   |        309.0 |                  10.34 |    12.4 |
+| Squeeze  |        224.0 |                   7.49 |    17.1 |
 
 ### Multiple data, multiple problems
 
@@ -519,18 +519,18 @@ meaningful, since I calculated them by dividing the total grades
 required by the total time taken, so the average times are a
 representation of throughput, not latency.
 
-| Method          | Runtime (best 1 word) | Average grading time | Speedup |
-| --------------- | --------------------- | -------------------- | ------- |
-| Naive           | 3.84s                 | 129ns                | 1x      |
-| Sensible        | 659ms                 | 22.0ns               | 5.83x   |
-| Packed          | 309ms                 | 10.34ns              | 12.4x   |
-| Squeeze         | 224ms                 | 7.49ns               | 17.1x   |
-| SIMD (1 lane)   | 361ms                 | 12.08ns              | 10.64x  |
-| SIMD (2 lanes)  | 370ms                 | 12.38ns              | 10.38x  |
-| SIMD (4 lanes)  | 87.4ms                | 2.91ns               | 43.9x   |
-| SIMD (8 lanes)  | 49.8ms                | 1.67 ns              | 77.1x   |
-| SIMD (16 lanes) | 55.5ms                | 1.86ns               | 69.2x   |
-| SIMD (32 lanes) | 52.8ms                | 1.77ns               | 72.7x   |
+| Method          | Runtime (ms) | Mean grading time (ns) | Speedup |
+| :-------------- | -----------: | ---------------------: | ------: |
+| Naive           |       3840.0 |                 129.00 |     1.0 |
+| Sensible        |        659.0 |                  22.00 |     5.8 |
+| Packed          |        309.0 |                  10.34 |    12.4 |
+| Squeeze         |        224.0 |                   7.49 |    17.1 |
+| SIMD (1 lane)   |        361.0 |                  12.08 |    10.6 |
+| SIMD (2 lanes)  |        370.0 |                  12.38 |    10.4 |
+| SIMD (4 lanes)  |         87.4 |                   2.91 |    43.9 |
+| SIMD (8 lanes)  |         49.8 |                   1.67 |    77.1 |
+| SIMD (16 lanes) |         55.5 |                   1.86 |    69.2 |
+| SIMD (32 lanes) |         52.8 |                   1.77 |    72.7 |
 
 ### Turbo-parallelism
 
@@ -625,19 +625,19 @@ there's a better way to go about it - I shall discuss it in detail
 shortly. For now, I'll leave you with the final first-round scaling
 table.
 
-| Method                         | Runtime (best 1 word) | Average grading time | Speedup |
-| ------------------------------ | --------------------- | -------------------- | ------- |
-| Naive                          | 3.84s                 | 129ns                | 1x      |
-| Sensible                       | 659ms                 | 22.0ns               | 5.83x   |
-| Packed                         | 309ms                 | 10.34ns              | 12.4x   |
-| Squeeze                        | 224ms                 | 7.49ns               | 17.1x   |
-| SIMD (1 lane)                  | 361ms                 | 12.08ns              | 10.64x  |
-| SIMD (2 lanes)                 | 370ms                 | 12.38ns              | 10.38x  |
-| SIMD (4 lanes)                 | 87.4ms                | 2.91ns               | 43.9x   |
-| SIMD (8 lanes)                 | 49.8ms                | 1.67 ns              | 77.1x   |
-| SIMD (16 lanes)                | 55.5ms                | 1.86ns               | 69.2x   |
-| SIMD (32 lanes)                | 52.8ms                | 1.77ns               | 72.7x   |
-| Parallel (32 threads, 8 lanes) | 4.81ms                | 161ps                | 798x 🏅 |
+| Method                         | Runtime (ms) | Mean grading time (ns) |  Speedup |
+| :----------------------------- | -----------: | ---------------------: | -------: |
+| Naive                          |       3840.0 |                 129.00 |      1.0 |
+| Sensible                       |        659.0 |                  22.00 |      5.8 |
+| Packed                         |        309.0 |                  10.34 |     12.4 |
+| Squeeze                        |        224.0 |                   7.49 |     17.1 |
+| SIMD (1 lane)                  |        361.0 |                  12.08 |     10.6 |
+| SIMD (2 lanes)                 |        370.0 |                  12.38 |     10.4 |
+| SIMD (4 lanes)                 |         87.4 |                   2.91 |     43.9 |
+| SIMD (8 lanes)                 |         49.8 |                   1.67 |     77.1 |
+| SIMD (16 lanes)                |         55.5 |                   1.86 |     69.2 |
+| SIMD (32 lanes)                |         52.8 |                   1.77 |     72.7 |
+| Parallel (32 threads, 8 lanes) |          4.8 |                   0.16 | 🏅 798.0 |
 
 ## The super-solver
 
