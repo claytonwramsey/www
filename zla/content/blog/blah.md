@@ -12,6 +12,8 @@ authors = "Clayton Ramsey"
 Here's some code (it's `code`):
 
 ```rust
+println!("blah!!!");
+
 let chunk_size = /* some number */;
 let words = /* list of possible guesses */;
 let answers = /* list of possible answer words */;

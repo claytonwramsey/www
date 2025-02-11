@@ -4,12 +4,11 @@
 
 .z-code {
   color: #61676c;
-  background-color: #fafafa;
 }
 
 .z-comment,
 .z-punctuation.z-definition.z-comment {
-  color: #abb0b6;
+  color: #6f7780;
   /* font-style: italic; */
 }
 .z-variable {
@@ -17,31 +16,31 @@
 }
 .z-string,
 .z-constant.z-other.z-symbol {
-  color: #769b06;
+  color: #607f06;
 }
 .z-constant.z-numeric {
-  color: #ff8f40;
+  color: #c75300;
 }
 .z-string.z-regexp,
 .z-constant.z-character.z-escape {
   color: #4cbf99;
 }
 .z-constant.z-language {
-  color: #ff8f40;
+  color: #c75300;
 }
 .z-constant.z-character,
 .z-constant.z-other {
-  color: #ff8f40;
+  color: #c75300;
 }
 .z-variable.z-member {
   color: #ec5f67;
 }
 .z-keyword,
 .z-keyword.z-operator.z-word {
-  color: #ea5f23;
+  color: #cd4b13;
 }
 .z-keyword.z-operator {
-  color: #ed9366;
+  color: #c45117;
 }
 .z-punctuation.z-separator,
 .z-punctuation.z-terminator {
@@ -51,7 +50,7 @@
   color: #61676c;
 }
 .z-punctuation.z-accessor {
-  color: #ed9366;
+  color: #c45117;
 }
 .z-punctuation.z-definition.z-annotation {
   color: #61676c;
@@ -63,10 +62,10 @@
   color: #e6b673;
 }
 .z-storage {
-  color: #ea5f23;
+  color: #cd4b13;
 }
 .z-storage.z-type {
-  color: #ea5f23;
+  color: #cd4b13;
 }
 .z-entity.z-name.z-function {
   color: #db8002;
@@ -79,20 +78,20 @@
   font-style: underline;
 }
 .z-variable.z-parameter {
-  color: #ff8f40;
+  color: #c75300;
 }
 .z-variable.z-language {
-  color: #41a1c1;
+  color: #317d96;
   /* font-style: italic; */
 }
 .z-entity.z-name.z-tag,
 .z-meta.z-tag.z-sgml {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-punctuation.z-definition.z-tag.z-end,
 .z-punctuation.z-definition.z-tag.z-begin,
 .z-punctuation.z-definition.z-tag {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-entity.z-other.z-attribute-name {
   color: #db8002;
@@ -103,15 +102,15 @@
 }
 .z-support.z-function,
 .z-support.z-macro {
-  color: #e25353;
+  color: #dd3636;
 }
 .z-support.z-constant {
-  color: #ed9366;
+  color: #c45117;
   /* font-style: italic; */
 }
 .z-support.z-type,
 .z-support.z-class {
-  color: #41a1c1;
+  color: #317d96;
   /* font-style: italic; */
 }
 .z-invalid {
@@ -119,7 +118,7 @@
 }
 .z-invalid.z-deprecated {
   color: #ffffff;
-  background-color: #ea5f23;
+  background-color: #cd4b13;
 }
 .z-meta.z-diff,
 .z-meta.z-diff.z-header {
@@ -140,19 +139,19 @@
 .z-source.z-scss .z-support.z-type,
 .z-source.z-less .z-support.z-type,
 .z-source.z-stylus .z-support.z-type {
-  color: #abb0b6;
+  color: #6f7780;
 }
 .z-support.z-type.z-property-name {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-constant.z-numeric.z-line-number.z-find-in-files {
-  color: #abb0b6;
+  color: #6f7780;
 }
 .z-constant.z-numeric.z-line-number.z-match {
-  color: #ea5f23;
+  color: #cd4b13;
 }
 .z-entity.z-name.z-filename.z-find-in-files {
-  color: #769b06;
+  color: #607f06;
 }
 .z-message.z-error {
   color: #f51818;
@@ -193,7 +192,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -227,7 +226,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -257,7 +256,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -283,7 +282,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -305,7 +304,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -323,7 +322,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -337,7 +336,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta
@@ -347,7 +346,7 @@
   .z-meta
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-source.z-json
   .z-meta.z-structure.z-dictionary.z-json
@@ -355,10 +354,10 @@
 .z-source.z-json
   .z-meta.z-structure.z-dictionary.z-json
   .z-punctuation.z-definition.z-string {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-markup.z-heading {
-  color: #ea5f23;
+  color: #cd4b13;
   font-weight: bold;
 }
 .z-string.z-other.z-link,
@@ -371,11 +370,11 @@
   color: #db8002;
 }
 .z-markup.z-italic {
-  color: #e25353;
+  color: #dd3636;
   /* font-style: italic; */
 }
 .z-markup.z-bold {
-  color: #e25353;
+  color: #dd3636;
   font-weight: bold;
 }
 .z-markup.z-italic .z-markup.z-bold,
@@ -390,12 +389,12 @@
   background-color: #61676c;
 }
 .z-meta.z-separator {
-  color: #abb0b6;
+  color: #6f7780;
   background-color: #61676c;
   font-weight: bold;
 }
 .z-markup.z-quote {
-  color: #ff8f40;
+  color: #c75300;
   /* font-style: italic; */
 }
 .z-markup.z-list.z-numbered.z-bullet,
@@ -403,26 +402,26 @@
   color: #4cbf99;
 }
 .z-markup.z-inserted {
-  color: #769b06;
+  color: #607f06;
 }
 .z-markup.z-changed {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-markup.z-deleted {
-  color: #e25353;
+  color: #dd3636;
 }
 .z-markup.z-strike {
   color: #e6b673;
 }
 .z-markup.z-table {
-  color: #41a1c1;
+  color: #317d96;
   background-color: #61676c;
 }
 .z-text.z-html.z-markdown .z-markup.z-raw.z-inline {
-  color: #ed9366;
+  color: #c45117;
 }
 .z-text.z-html.z-markdown .z-meta.z-dummy.z-line-break {
-  color: #abb0b6;
+  color: #6f7780;
 }
 .z-markup.z-raw.z-block.z-fenced.z-markdown {
   color: #61676c;
@@ -430,17 +429,17 @@
 }
 .z-punctuation.z-definition.z-fenced.z-markdown,
 .z-variable.z-language.z-fenced.z-markdown {
-  color: #abb0b6;
+  color: #6f7780;
   background-color: #61676c;
 }
 .z-variable.z-language.z-fenced.z-markdown {
-  color: #abb0b6;
+  color: #6f7780;
 }
 .z-markup.z-inserted.z-git_gutter {
-  color: #769b06;
+  color: #607f06;
 }
 .z-markup.z-changed.z-git_gutter {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-markup.z-deleted.z-git_gutter {
   color: #f51818;
@@ -456,22 +455,22 @@
 }
 .z-acejump.z-label.z-blue {
   color: #ffffff;
-  background-color: #41a1c1;
+  background-color: #317d96;
 }
 .z-acejump.z-label.z-green {
   color: #ffffff;
-  background-color: #769b06;
+  background-color: #607f06;
 }
 .z-acejump.z-label.z-orange {
   color: #ffffff;
-  background-color: #ea5f23;
+  background-color: #cd4b13;
 }
 .z-acejump.z-label.z-purple {
   color: #ffffff;
-  background-color: #e25353;
+  background-color: #dd3636;
 }
 .z-sublimelinter.z-mark.z-warning {
-  color: #41a1c1;
+  color: #317d96;
 }
 .z-sublimelinter.z-gutter-mark {
   color: #ffffff;
