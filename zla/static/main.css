@@ -28,30 +28,6 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-/* Change color in night mode */
-@media (prefers-color-scheme: dark) {
-  body {
-    color: #eee;
-    background-color: #222;
-  }
-
-  .typst-doc {
-    filter: invert(100%) hue-rotate(180deg);
-  }
-
-  a:link {
-    color: lightskyblue;
-  }
-
-  a:visited {
-    color: violet;
-  }
-
-  .night-invert {
-    filter: invert(88%) hue-rotate(180deg);
-  }
-}
-
 img {
   fill: currentColor !important;
 }
@@ -68,6 +44,8 @@ table {
   border-spacing: 15px 5px;
   margin-left: auto;
   margin-right: auto;
+  background-color: #fafafa;
+  border-radius: 15px;
 }
 
 h1 {
@@ -135,5 +113,33 @@ figcaption {
 
   blockquote {
     font-size: 30px;
+  }
+}
+
+/* Change color in night mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #eee;
+    background-color: #222;
+  }
+
+  .typst-doc {
+    filter: invert(100%) hue-rotate(180deg);
+  }
+
+  a:link {
+    color: lightskyblue;
+  }
+
+  a:visited {
+    color: violet;
+  }
+
+  .night-invert {
+    filter: invert(88%) hue-rotate(180deg);
+  }
+
+  table {
+    background-color: #0f1419;
   }
 }
