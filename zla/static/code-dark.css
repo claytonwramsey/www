@@ -13,7 +13,7 @@
 
   .z-comment,
   .z-punctuation.z-definition.z-comment {
-    color: #5c6773;
+    color: #717f8e;
     /* font-style: italic; */
   }
   .z-variable {
@@ -144,13 +144,13 @@
   .z-source.z-scss .z-support.z-type,
   .z-source.z-less .z-support.z-type,
   .z-source.z-stylus .z-support.z-type {
-    color: #5c6773;
+    color: #717f8e;
   }
   .z-support.z-type.z-property-name {
     color: #39bae6;
   }
   .z-constant.z-numeric.z-line-number.z-find-in-files {
-    color: #5c6773;
+    color: #717f8e;
   }
   .z-constant.z-numeric.z-line-number.z-match {
     color: #ff7733;
@@ -394,7 +394,7 @@
     background-color: #bfbab0;
   }
   .z-meta.z-separator {
-    color: #5c6773;
+    color: #717f8e;
     background-color: #bfbab0;
     font-weight: bold;
   }
@@ -426,7 +426,7 @@
     color: #f29668;
   }
   .z-text.z-html.z-markdown .z-meta.z-dummy.z-line-break {
-    color: #5c6773;
+    color: #717f8e;
   }
   .z-markup.z-raw.z-block.z-fenced.z-markdown {
     color: #bfbab0;
@@ -434,11 +434,11 @@
   }
   .z-punctuation.z-definition.z-fenced.z-markdown,
   .z-variable.z-language.z-fenced.z-markdown {
-    color: #5c6773;
+    color: #717f8e;
     background-color: #bfbab0;
   }
   .z-variable.z-language.z-fenced.z-markdown {
-    color: #5c6773;
+    color: #717f8e;
   }
   .z-markup.z-inserted.z-git_gutter {
     color: #c2d94c;
