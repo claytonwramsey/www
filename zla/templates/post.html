@@ -4,3 +4,10 @@
   <link rel="stylesheet" type="text/css" href="/code-light.css" />
   <link rel="stylesheet" type="text/css" href="/code-dark.css" />
 {% endblock %}
+
+{% block content %}
+<div class="pubinfo">
+  {{ page.authors[0] }} - {{ page.date | date(format="%Y-%m-%d") }}
+</div>
+{{ page.content | safe }}
+{% endblock %}

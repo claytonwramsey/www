@@ -4,6 +4,9 @@ template = "post.html"
 date = 2024-10-01
 authors = ["Clayton Ramsey"]
 description = "So what?"
+
+[extra]
+authors = "Clayton Ramsey"
 +++
 
 Here's some code (it's `code`):
