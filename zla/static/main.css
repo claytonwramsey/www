@@ -11,10 +11,19 @@ body {
 
 .typst-display {
   border-radius: 0px;
+  overflow-x: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.typst-doc {
+  border-radius: 0px;
 }
 
 pre {
   border-radius: 20px;
+  background-color: #fafafa;
 }
 
 pre code {
@@ -64,7 +73,6 @@ h3 {
 
 img {
   width: 100%;
-  align-self: center;
   border-radius: 10px;
 }
 
