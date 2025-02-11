@@ -45,7 +45,7 @@ This website is pretty simple.
 It's currently generated via [Zola](https://www.getzola.org/) with a custom lightweight theme.
 Im a big fan of
 [various](http://motherfuckingwebsite.com)
-[efforts](http://bettermotherfuckingwebsite.com) to use HTMLs existing
+[efforts](http://bettermotherfuckingwebsite.com) to use HTML's existing
 qualities for accessibility and design. I think that the web should be
 designed around simple, handmade things and believe that I can be a part
 of that.
