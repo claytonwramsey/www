@@ -4,14 +4,14 @@ authors = ["Clayton Ramsey"]
 description = "Like snickerdoodles for peanut butter eaters."
 +++
 
-Like snickerdoodles for peanut butter eaters.
-Yields 60 cookies.
-
 <figure>
 
 ![Peanut butter cookies in a bowl](peanut-butter-cookies.jpg)
 
 </figure>
+
+Like snickerdoodles for peanut butter eaters.
+Yields 60 cookies.
 
 ## Ingredients
 
