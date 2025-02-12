@@ -11,7 +11,7 @@ description = "Like snickerdoodles for peanut butter eaters."
 </figure>
 
 Like snickerdoodles for peanut butter eaters.
-Yields 60 cookies.
+Yields 60 cookies, 2-3 hours.
 
 ## Ingredients
 
