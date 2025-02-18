@@ -29,7 +29,7 @@ Given some guess $w$ and solution word $s$, the grade $g$ for letter $i$
 of a guess is defined as follows:
 
 - If $w_i = s_i$, $g_i$ is green.
-- If $w_i \neq s_i$ and there is another letter $s_j = w_i$,
+- If $w_i != s_i$ and there is another letter $s_j = w_i$,
   _and_ $s_j$ has not matched with an earlier letter $w_(< i)$, then
   $g_i$ is yellow.
 - Otherwise, $g_i$ is black.
