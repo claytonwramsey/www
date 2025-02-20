@@ -16,18 +16,24 @@ description = "Clayton Ramsey's curriculum vitae"
 
 - **Ph.D., Computer Science (in progress)**, Rice University, Houston,
   TX. Aug 2023 - Present
+  <br>
   Advised by Dr. Lydia E. Kavraki
+
 - **B.A., Computer Science; B.S., Electrical Engineering**, Rice
-  University, Houston, TX. Aug 2019 - May 2023\
+  University, Houston, TX. Aug 2019 - May 2023
 
 ## Professional Experience
 
 - **Doctoral Student**, Rice University, Houston, TX. Aug 2023 -
-  Present\
+  Present
+  <br>
   Advised by Dr. Lydia E. Kavraki
+
 - **Undergraduate Researcher**, Rice University, Houston, TX. May
-  2021 - Aug 2022\
+  2021 - Aug 2022
+  <br>
   Advised by Dr. Lydia E. Kavraki
+
 - **Embedded Systems Intern**, Stellar Solutions, Palo Alto, CA. May
   2020 - Aug 2020
 - **Mechanical Design Intern**, Stellar Solutions, Palo Alto, CA. Jun
@@ -91,9 +97,11 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Invited Talks
 
-- **Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors
-  for Fast Collision Checking**, University of Houston Downtown,
-  November 2024
+**Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking**
+
+- NASA Johnson Space Center, December 2024
+- University of Houston Downtown, November 2024
+- Rice University, October 2024
 
 ## Open Source Software
 
@@ -108,6 +116,6 @@ description = "Clayton Ramsey's curriculum vitae"
 
 <footer>
 
-Last updated January 2025.
+Last updated February 2025.
 
 </footer>
