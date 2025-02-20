@@ -108,9 +108,6 @@ description = "Clayton Ramsey's curriculum vitae"
 ### Maintainer
 
 - [dumpster](https://github.com/claytonwramsey/dumpster)
-
-### Contributor
-
 - [Vector-Accelerated Motion Planner
   (VAMP)](https://github.com/KavrakiLab/vamp)
 
