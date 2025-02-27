@@ -61,6 +61,10 @@ table {
   border-radius: 15px;
 }
 
+figure {
+  overflow-x: auto;
+}
+
 th {
   text-align: center !important;
 }
@@ -112,23 +116,23 @@ figcaption {
 /* Raise text size on small screens */
 @media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
   body {
-    font-size: 30px;
+    /* font-size: 30px; */
   }
 
   nav {
-    font-size: 45px;
+    font-size: 22px;
   }
 
   pre {
-    font-size: 25px;
+    font-size: 14px;
   }
 
   footer {
-    font-size: 20px;
+    /* font-size: 20px; */
   }
 
   blockquote {
-    font-size: 30px;
+    /* font-size: 30px; */
   }
 }
 
