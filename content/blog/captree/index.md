@@ -685,9 +685,11 @@ class="night-invert" />
 <img src="construct_right.svg"
 class="night-invert" />
 </div>
+
 <figcaption>This produces two new cells, each with half as many points.
 The affordance set is filtered down and then expanded to include points
 from the opposite side of the partition.</figcaption>
+
 </figure>
 
 After all this, I still haven't explained how these trees are
@@ -951,6 +953,9 @@ each other when sorted.
 ![Points on a 2D plane, colored by their position along a Morton
 curve.](morton.svg)
 
+<figcaption>Points on a 2D plane, colored by their position along a Morton
+curve.</figcaption>
+
 </figure>
 
 The best-known space-filling curve is the [Hilbert
@@ -1048,6 +1053,9 @@ machine.
 
 ![Collision-checking throughput performance in the C++
 implementation.](throughput_fig.png)
+
+<figcaption>Collision-checking throughput performance in the C++
+implementation.</figcaption>
 
 </figure>
 
@@ -1148,10 +1156,11 @@ had to reinstall the OS from scratch. In the end, we just gave up.
 <figure>
 <img src="realsense_filtered_pc.png"
 class="night-invert" />
-<figure>
+
+<figcaption>
 A point cloud of a table in our lab. It took painfully long to get this
 image and one paragraph in our paper.
-</figure>
+</figcaption>
 </figure>
 
 We also tried to get the planning system running on a real robot. The
@@ -1237,6 +1246,8 @@ directed that way: preparing materials and advertising my work.
 <figure>
 
 ![Me, presenting my poster at TEROS.](teros.png)
+
+<figcaption>Me, presenting my poster at TEROS.</figcaption>
 
 </figure>
 
