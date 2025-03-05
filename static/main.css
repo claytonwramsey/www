@@ -30,6 +30,10 @@ pre {
   background-color: #fafafa;
 }
 
+li p {
+  margin: 0;
+}
+
 pre code {
   display: block;
   padding: 1em;
