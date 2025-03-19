@@ -11,7 +11,7 @@ description = "A spicy jambalaya recipe."
 </figure>
 
 A spicy jambalaya recipe. I got the base for this recipe from Matt and
-Bobby, who were RAs for my dorm in undergrad, but Ive made my own
+Bobby, who were RAs for my dorm in undergrad, but I've made my own
 modifications.
 
 This recipe makes about 8 to 10 servings. It takes roughly 2 hours to

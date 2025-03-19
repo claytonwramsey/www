@@ -45,7 +45,7 @@ make.
 
 ## Notes
 
-- If you place the pie higher in the oven, itll get a crispier top
+- If you place the pie higher in the oven, it'll get a crispier top
   crust, which I prefer.
 - The filling for a pie is much less a science than an art. I
   recommend getting roughly 3-5 pounds of fruit, cutting it into thin

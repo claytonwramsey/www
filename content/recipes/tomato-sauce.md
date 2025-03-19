@@ -4,7 +4,7 @@ authors = ["Clayton Ramsey"]
 description = "My mother's recipe for tomato sauce."
 +++
 
-My mothers recipe for tomato sauce. Its quite hearty, and, more
+My mothers recipe for tomato sauce. It's quite hearty, and, more
 importantly, quite cheap.
 
 This recipe makes about 8 to 10 servings. It takes roughly 1 hour to
@@ -27,7 +27,7 @@ make.
 
 ## Directions
 
-1.  Heat a large pot on the stove. Sauté onion, sticks, celery, bell
+1.  Heat a large pot on the stove. Sauté onion, celery, bell
     peppers, and garlic in oil until clear.
 2.  Add sausage, slicing with a spatula until mixed and mostly cooked,
     approx. 5 min.
@@ -37,5 +37,5 @@ make.
 
 ## Notes
 
-- Use whatever vegetables you like in this recipe. I dont like black
+- Use whatever vegetables you like in this recipe. I don't like black
   olives, but you can definitely add them if you like them.
