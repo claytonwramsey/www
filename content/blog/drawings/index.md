@@ -4,6 +4,7 @@ date = 2025-04-10
 description = ""
 template = "post.html"
 authors = ["Clayton Ramsey"]
+draft = true
 +++
 
 As a grad student, I have to give a lot of presentations, and all those presentations have to look good.
