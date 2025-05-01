@@ -30,6 +30,28 @@ pre {
   background-color: #fafafa;
 }
 
+p {
+  margin: 0px;
+}
+
+.pubinfo {
+  margin: 0.7em;
+}
+
+p + p {
+  text-indent: 1.5em;
+}
+
+.typst-inline {
+  margin-top: -10px;
+}
+
+ul,
+ol {
+  margin: 0.7em;
+  padding-left: 1.5em;
+}
+
 li p {
   margin: 0;
 }
@@ -81,6 +103,12 @@ h1,
 h2,
 h3 {
   line-height: 1.2;
+  margin-bottom: 0.6em;
+}
+
+h2,
+h3 {
+  margin-top: 1.3em;
 }
 
 img {
