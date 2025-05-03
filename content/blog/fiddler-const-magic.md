@@ -73,14 +73,12 @@ to 1125899911036930.
 We can use our bitboards to compute setwise operations in $O(1)$ time.
 Here's a short (but not exhaustive) list of operations we can do:
 
-Mathematical representation Bitboard operation
-
----
-
-$A union B$ `a | b`
-$A union B$ `a & b`
-$A Delta B$ `a ^ b`
-$overline(A)$ `!a`
+| Mathematical representation | Bitboard operation |
+| --------------------------- | ------------------ |
+| $A union B$                 | `a \| b`           |
+| $A union B$                 | `a & b`            |
+| $A Delta B$                 | `a ^ b`            |
+| $overline(A)$               | `!a`               |
 
 **Update 2023-06-22:** I use Rust's notation for `!a`. In C and C++, one
 would use `~a` for the bitwise not operation.
