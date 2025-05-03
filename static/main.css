@@ -155,6 +155,14 @@ figcaption {
   text-align: center;
 }
 
+main > p:last-child:after {
+  content: " \2766";
+  display: inline;
+  text-align: right;
+  font-size: 1.5em;
+  line-height: 0.5;
+}
+
 /* Raise text size on small screens */
 @media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
   body {
@@ -212,6 +220,7 @@ figcaption {
   }
   main {
     column-count: 2;
+    text-align: justify;
   }
   pre code {
     text-overflow: wrap;
@@ -221,7 +230,15 @@ figcaption {
     -webkit-column-count: 2;
     -moz-column-count: 2;
     font-size: 10pt;
+    line-height: 1.3;
     margin: auto;
+    text-wrap: pretty;
+    word-break: normal;
+    text-justify: auto;
+  }
+  ul,
+  ol {
+    padding-left: 0.2em;
   }
   nav {
     visibility: hidden;
