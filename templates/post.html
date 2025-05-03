@@ -5,9 +5,12 @@
   <link rel="stylesheet" type="text/css" href="/code-dark.css" />
 {% endblock %}
 
-{% block content %}
-<div class="pubinfo">
+{% block posttitle %}
+<div class="pubinfo" >
   {{ page.authors[0] }} - {{ page.date | date(format="%Y-%m-%d") }}
 </div>
+{% endblock %}
+
+{% block content %}
 {{ page.content | safe }}
 {% endblock %}

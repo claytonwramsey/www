@@ -20,7 +20,6 @@
     <link rel="icon" href="/favicon.ico" />
   </head>
   <body>
-    <header>
       <nav>
         <a href="/">Home</a>
         <a href="/about">About</a>
@@ -29,6 +28,7 @@
         <a href="/recipes">Recipes</a>
       </nav>
       <h1>{% block title %} {% endblock %}</h1>
+      {% block posttitle %} {% endblock %}
     </header>
     <main>{% block content %} {% endblock %}</main>
   </body>

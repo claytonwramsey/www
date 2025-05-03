@@ -205,3 +205,26 @@ figcaption {
     background-color: #0f1419;
   }
 }
+
+@media print {
+  header {
+    column-count: 1;
+  }
+  main {
+    column-count: 2;
+  }
+  pre code {
+    text-overflow: wrap;
+    white-space: pre-wrap;
+  }
+  body {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    font-size: 10pt;
+    margin: auto;
+  }
+  nav {
+    visibility: hidden;
+    height: 0px;
+  }
+}
