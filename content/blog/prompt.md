@@ -76,7 +76,7 @@ Returning to our reasons for using a language model, we can now examine them onc
 The model output in the doesn't-matter category falls under two classes to me: the stuff that actually doesn't matter and the stuff that actually does matter.
 I'll start with the things that don't matter.
 When someone comments under a Reddit post with a computer-generated summary of the original text, I honestly believe that everyone in the world would be better off had they not done so.
-Either the article is so vapid that a summary provides all of its value (in which case, it does not merit the engagement of a comment) or it demands a real reading by a real human for comprehension, in which case the summary is pointless.
+Either the article is so vapid that a summary provides all of its value, in which case, it does not merit the engagement of a comment, or it demands a real reading by a real human for comprehension, in which case the summary is pointless.
 In essence, writing such a comment wastes everyone's time.
 This is the case for all of the disposable uses of a model.
 
@@ -87,9 +87,8 @@ For paper reviewers, it's worse: a half-assed review will produce little more th
 ### If it's worth doing, it's worth doing badly
 
 I'll now cover the opposite case: my peers who see generative models as superior to their own output.
-I believe nothing could be further from the truth.
-I see people using large language models most often in professional communication, typically to produce fluff or fix the tone of their original prompts.
-Every single time, the model obscures the original meaning and adds layer upon layer of superfluous nonsense to even the simplest of ideas.
+I see this most often in professional communication, typically to produce fluff or fix the tone of their original prompts.
+Every single time, the model obscures the original meaning and adds layers of superfluous nonsense to even the simplest of ideas.
 If you're lucky, it at least won't be wrong, but most often the model will completely fabricate critical details of the original writing and produce something completely incomprehensible.
 No matter how bad any original human's writing is, I can (hopefully?) trust that they have some kind of internal understanding to share; with a language model, there is no such luck.
 
