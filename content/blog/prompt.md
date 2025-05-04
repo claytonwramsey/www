@@ -1,7 +1,7 @@
 +++
 title = "I'd rather read the prompt"
 date = 2025-05-03
-description = ""
+description = "I have literally never seen LLM writing that actually improved my life."
 template = "post.html"
 authors = ["Clayton Ramsey"]
 +++
