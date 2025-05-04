@@ -4,7 +4,6 @@ date = 2025-05-03
 description = ""
 template = "post.html"
 authors = ["Clayton Ramsey"]
-draft = true
 +++
 
 When I grade students' assignments, I sometimes see answers like this:
