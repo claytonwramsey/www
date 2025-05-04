@@ -34,7 +34,7 @@ I then take a picture of the sketch with my phone, and fiddle with my phone's bu
 Sometimes this is the end state of my figure, since I often don't need perfectly gorgeous slides, and I quite like the scrappy look of the doodles.
 
 <figure>
-  <img src="traced.svg" alt="Traced diagram" type="text/svg" />
+  <img src="traced.svg" alt="Traced diagram" type="text/svg" class="night-invert" />
   <figcaption>The diagram after tracing.</figcaption>
 </figure>
 
@@ -86,7 +86,7 @@ This gives cleaner lines and yields scalable figures, but sometimes it smudges t
 <div style="width: 10%"></div>
 <div style="width: 45%">
 
-<img src="inkscape.svg" />
+<img src="inkscape.svg" class="night-invert" />
 
 </div>
 </div>
