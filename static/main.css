@@ -162,8 +162,7 @@ figcaption {
 main > p:last-child:after {
   content: " \2766";
   display: inline;
-  text-align: right;
-  font-size: 1.5em;
+  font-size: 1.4em;
   line-height: 0.5;
 }
 
@@ -228,6 +227,11 @@ main > p:last-child:after {
     height: 100%;
     column-fill: auto;
   }
+  body {
+    font-family:
+      Superclarendon, "Bookman Old Style", "URW Bookman", "URW Bookman L",
+      "Georgia Pro", Georgia, serif;
+  }
   pre code {
     text-overflow: wrap;
     white-space: pre-wrap;
@@ -253,6 +257,14 @@ main > p:last-child:after {
   }
   a:after {
     content: " [" attr(href) "]";
+  }
+  main > p:first-child::first-letter {
+    float: left;
+    font-size: 280%;
+    /* font-weight: bold; */
+    text-transform: capitalize;
+    padding-right: 0.1ex;
+    padding-top: 0.25ex;
   }
 
   /* workaround for break-after: avoid not supported */
