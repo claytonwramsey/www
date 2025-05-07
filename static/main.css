@@ -82,8 +82,13 @@ img {
 
 nav {
   font-size: 25px;
+  text-align: center;
+  line-height: 1.2;
   a {
+    display: inline-block;
     margin-right: 15px;
+    margin-left: 15px;
+    text-decoration: none;
   }
 }
 
@@ -168,24 +173,12 @@ main > p:last-child:after {
 
 /* Raise text size on small screens */
 @media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
-  body {
-    /* font-size: 30px; */
-  }
-
   nav {
     font-size: 22px;
   }
 
   pre {
     font-size: 14px;
-  }
-
-  footer {
-    /* font-size: 20px; */
-  }
-
-  blockquote {
-    /* font-size: 30px; */
   }
 }
 
