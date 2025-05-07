@@ -90,10 +90,9 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Teaching Assistant
 
-- **Algorithmic Robotics**, Rice University, Fall 2023
+- **Algorithmic Robotics**, Rice University, Fall 2023 and Fall 2024
 - **Functional Programming**, Rice University, Fall 2022
-- **Fundamentals of Computer Engineering**, Rice University, Fall
-  2020 - Spring 2021
+- **Fundamentals of Computer Engineering**, Rice University, Fall 2020 - Spring 2021
 
 ## Invited Talks
 
@@ -108,11 +107,10 @@ description = "Clayton Ramsey's curriculum vitae"
 ### Maintainer
 
 - [dumpster](https://github.com/claytonwramsey/dumpster)
-- [Vector-Accelerated Motion Planner
-  (VAMP)](https://github.com/KavrakiLab/vamp)
+- [Vector-Accelerated Motion Planner (VAMP)](https://github.com/KavrakiLab/vamp)
 
 <footer>
 
-Last updated February 2025.
+Last updated May 2025.
 
 </footer>
