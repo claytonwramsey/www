@@ -176,8 +176,8 @@ main > p:last-child:after {
   nav {
     font-size: 22px;
     a {
-      margin-left: 10px;
-      margin-right: 10px;
+      margin-left: 5px;
+      margin-right: 5px;
     }
   }
 
