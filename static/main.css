@@ -175,6 +175,10 @@ main > p:last-child:after {
 @media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
   nav {
     font-size: 22px;
+    a {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
   }
 
   pre {
