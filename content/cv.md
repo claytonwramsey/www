@@ -96,6 +96,10 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Invited Talks
 
+**Fast, flexible robot planning in Rust**
+
+- [Rust for Robotics Workshop](https://sites.google.com/view/r4rworkshop), IEEE International Conference on Robotics and Automation, May 2025
+
 **Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking**
 
 - NASA Johnson Space Center, December 2024
