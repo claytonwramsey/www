@@ -70,8 +70,7 @@ description = "Clayton Ramsey's curriculum vitae"
   United States Figure Skating, February 2018 and November 2022 and
   February 2024
 - [Eta Kappa Nu Member](https://hkn.ieee.org/), IEEE, 2023
-- [Presidents Honor
-  Roll](https://registrar.rice.edu/students/academic-honors), Rice
+- [President's Honor Roll](https://registrar.rice.edu/students/academic-honors), Rice
   University, Fall 2022 and Spring 2023
 
 ## Service
@@ -96,11 +95,15 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Invited Talks
 
-**Fast, flexible robot planning in Rust**
+### SIMD-Accelerated Sampling-Based Motion Planning
+
+- [RoboARCH Workshop](https://sites.google.com/view/roboarch-icra25/schedule?authuser=0), IEEE International Conference on Robotics and Automation, May 2025
+
+### Fast, flexible robot planning in Rust
 
 - [Rust for Robotics Workshop](https://sites.google.com/view/r4rworkshop), IEEE International Conference on Robotics and Automation, May 2025
 
-**Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking**
+### Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking
 
 - NASA Johnson Space Center, December 2024
 - University of Houston Downtown, November 2024
