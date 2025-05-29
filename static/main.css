@@ -34,7 +34,8 @@ iframe {
   border-radius: 15px;
 }
 
-pre {
+pre,
+blockquote {
   border-radius: 20px;
   background-color: #fafafa;
 }
@@ -140,10 +141,11 @@ footer {
 }
 
 blockquote {
-  margin: 0.5em;
-  margin-left: 5px;
-  padding-left: 10px;
-  border-left: 2px solid;
+  padding: 0.7em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: 0;
+  margin-right: 0;
   footer {
     text-align: left;
     margin-left: 20px;
