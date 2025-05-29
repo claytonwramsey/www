@@ -211,7 +211,8 @@ main > p:last-child:after {
     filter: invert(88%) hue-rotate(180deg);
   }
 
-  table {
+  table,
+  blockquote {
     background-color: #0f1419;
   }
 }
