@@ -253,9 +253,6 @@ main > p:last-child:after {
     visibility: hidden;
     height: 0px;
   }
-  a:after {
-    content: " [" attr(href) "]";
-  }
   main > p:first-child::first-letter {
     float: left;
     font-size: 280%;
