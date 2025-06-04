@@ -235,6 +235,7 @@ main > p:last-child:after {
   pre code {
     text-overflow: wrap;
     white-space: pre-wrap;
+    font-size: 8pt;
   }
   body {
     font-size: 10pt;
