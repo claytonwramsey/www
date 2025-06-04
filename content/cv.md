@@ -41,8 +41,8 @@ description = "Clayton Ramsey's curriculum vitae"
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
   Lydia E. Kavraki. "[Collision-Affording Point Trees: SIMD-Amenable
   Nearest Neighbors for Fast Collision
-  Checking.](https://arxiv.org/abs/2406.02807)" In <cite>Robotics: Science
-  and Systems</cite>, 2024. To Appear. \*Equal Contribution.
+  Checking.](https://www.roboticsproceedings.org/rss20/p038.html)" In <cite>Robotics: Science
+  and Systems</cite>, 2024. \*Equal Contribution.
 
 ### Workshop Papers
 
