@@ -44,7 +44,7 @@ minutes.
 2.  To a large pan, add oil and saute onions, ginger, garlic, and
     peppers until onions are clear.
 3.  Add the spices and mix thoroughly, roughly 30 seconds.
-4.  Add chicken, stirring regularly, until surface of chick is seared
+4.  Add chicken, stirring regularly, until surface of chicken is seared
     slightly.
 5.  Add tomato sauce, water, cornstarch, and heavy cream, then bring to
     a simmer. Simmer until rice is done, the longer the better.

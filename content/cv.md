@@ -19,25 +19,20 @@ description = "Clayton Ramsey's curriculum vitae"
   <br>
   Advised by Dr. Lydia E. Kavraki
 
-- **B.A., Computer Science; B.S., Electrical Engineering**, Rice
-  University, Houston, TX. Aug 2019 - May 2023
+- **B.A., Computer Science; B.S., Electrical Engineering**, Rice University, Houston, TX.
+  Aug 2019 - May 2023
 
 ## Professional Experience
 
-- **Doctoral Student**, Rice University, Houston, TX. Aug 2023 -
-  Present
+- **Visiting Technologist**, NASA Johnson Space Center, Houston, TX. May 2025 - Present
+- **Doctoral Student**, Rice University, Houston, TX. Aug 2023 - Present
   <br>
   Advised by Dr. Lydia E. Kavraki
-
-- **Undergraduate Researcher**, Rice University, Houston, TX. May
-  2021 - Aug 2022
+- **Undergraduate Researcher**, Rice University, Houston, TX. May 2021 - Aug 2022
   <br>
   Advised by Dr. Lydia E. Kavraki
-
-- **Embedded Systems Intern**, Stellar Solutions, Palo Alto, CA. May
-  2020 - Aug 2020
-- **Mechanical Design Intern**, Stellar Solutions, Palo Alto, CA. Jun
-  2019 - Aug 2019
+- **Embedded Systems Intern**, Stellar Solutions, Palo Alto, CA. May 2020 - Aug 2020
+- **Mechanical Design Intern**, Stellar Solutions, Palo Alto, CA. Jun 2019 - Aug 2019
 
 ## Publications
 
@@ -59,14 +54,11 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Awards and Honors
 
-- [NASA Space Technology Graduate Research Opportunities
-  Fellowship](https://www.nasa.gov/directorates/stmd/space-tech-research-grants/nstgro/),
+- [NASA Space Technology Graduate Research Opportunities Fellowship](https://www.nasa.gov/directorates/stmd/space-tech-research-grants/nstgro/),
   National Aeronautics and Space Administration, 2024
-- [DoD National Defense Science and Engineering Graduate
-  Fellowship](https://ndseg.sysplus.com/NDSEG/about), Department of
+- [DoD National Defense Science and Engineering Graduate Fellowship](https://ndseg.sysplus.com/NDSEG/about), Department of
   Defense, 2024
-- [Gold
-  Medalist](https://www.usfigureskating.org/skate/test-structure),
+- [Gold Medalist](https://www.usfigureskating.org/skate/test-structure),
   United States Figure Skating, February 2018 and November 2022 and
   February 2024
 - [Eta Kappa Nu Member](https://hkn.ieee.org/), IEEE, 2023
@@ -77,9 +69,10 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Referree
 
-- International Journal of Robotics Research (IJRR); 2024
 - IEEE Robotics and Automation Letters (RA-L); 2024, 2025
-- IEEE Conference on Robotics and Automation (ICRA); 2024, 2025
+- IEEE International Conference on Robotics and Automation (ICRA); 2024, 2025
+- Rust for Robotics Workshop, IEEE International Conference on Robotics and Automation, 2025
+- International Journal of Robotics Research (IJRR); 2024
 
 ## Teaching
 

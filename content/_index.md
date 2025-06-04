@@ -12,6 +12,7 @@ Check out the links up at the top if you'd like to explore.
 
 ## News
 
+- **2025-05-27**: I started as a Visiting Technologist at NASA Johnson Space Center, collaborating with the Dexterous Robotics group!
 - **2025-02-05**: I've been invited to give a talk at the [Rust for Robotics Workshop](https://sites.google.com/view/r4rworkshop) at [ICRA 2025](https://2025.ieee-icra.org/) in Atlanta this May!
   I'll be talking about my recent and upcoming work on efficient motion planning as well as task and motion planning.
 - **2024-06-08**: My paper "Collision-Affording Point Trees:
