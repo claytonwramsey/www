@@ -727,7 +727,8 @@ required to construct the tree is quite verbose. I've made a
 stripped-down version in the spoiler block below for completeness,
 though.
 
-\*deep breath\*
+<details>
+<summary>*deep breath*</summary>
 
 First, a helper function for determining whether a sphere contains all
 of a cell:
@@ -889,6 +890,8 @@ fn capt_new_help(
     );
 }
 ```
+
+</details>
 
 <figure class="night-invert">
 

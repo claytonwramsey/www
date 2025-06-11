@@ -530,6 +530,9 @@ the bishop moves-lookup table. In all, it's about 300 lines of code.
 It's now time to compile our code. Running `cargo build`, we get to wait
 about 30 seconds until we encounter this beauty of an output:
 
+<details>
+<summary>one billion lines of compiler output</summary>
+
 ```text
 ~/C/fiddler (static_magic|✚2) $ cargo build
    Compiling fiddler v0.1.0 (/home/clayton/Chess/fiddler)
@@ -639,6 +642,8 @@ query stack during panic:
 end of query stack
 error: could not compile `fiddler` (lib)
 ```
+
+</details>
 
 I accidentally found a compiler bug! I opened the issue for it
 [here](https://github.com/rust-lang/rust/issues/112748). I don't know
