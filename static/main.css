@@ -101,8 +101,8 @@ nav {
 
 .site-title {
   display: inline-block;
-  margin-right: margin-right: 40px;
-  font-weight: 500;
+  margin-right: 40px;
+  font-weight: bold;
 }
 
 .nav-block {
@@ -110,9 +110,12 @@ nav {
   display: inline-block;
   a {
     display: inline-block;
-    margin-right: 12px;
-    margin-left: 12px;
+    margin-right: 10px;
+    margin-left: 10px;
     text-decoration: none;
+  }
+  a:visited {
+    color: blue;
   }
   font-weight: 400;
 }
@@ -232,8 +235,12 @@ main > p:last-child:after {
     color: lightskyblue;
   }
 
+  .nav-block a:visited {
+    color: lightskyblue;
+  }
+
   a:visited {
-    color: violet;
+    color: skyblue;
   }
 
   .night-invert {
@@ -258,8 +265,7 @@ main > p:last-child:after {
   }
   body {
     font-family:
-      Superclarendon, "Bookman Old Style", "URW Bookman", "URW Bookman L",
-      "Georgia Pro", Georgia, serif;
+      "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
   }
   pre code {
     text-overflow: wrap;
@@ -290,7 +296,7 @@ main > p:last-child:after {
     /* font-weight: bold; */
     text-transform: capitalize;
     padding-right: 0.1ex;
-    padding-top: 0.25ex;
+    padding-top: 0.03lh;
   }
 
   /* workaround for break-after: avoid not supported */
