@@ -22,7 +22,7 @@ In case you lived under a rock around 3 years ago, Wordle is a little
 word-guessing game developed by [Josh
 Wardle](https://www.powerlanguage.co.uk/). The goal is to guess a
 five-letter English word by sampling different words. Every time you
-give a guess, you receive a [grade]{.dfn}, which is an assignment of
+give a guess, you receive a <dfn>grade</dfn>, which is an assignment of
 five colors to the letters in your guess.
 
 Given some guess $w$ and solution word $s$, the grade $g$ for letter $i$

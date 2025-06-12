@@ -1,6 +1,6 @@
 +++
 template = "index.html"
-title = "Clayton's Website"
+title = ""
 description = "Clayton Ramsey's personal website"
 +++
 

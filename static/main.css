@@ -5,7 +5,9 @@ body {
   font-size: 15px;
   padding: 0 10px;
   /* Use system fonts */
-  font-family: system-ui, sans-serif;
+  font-family:
+    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Helvetica,
+    Arial, sans-serif;
   color: #222;
   padding-bottom: 500px;
 }
@@ -42,6 +44,7 @@ blockquote {
 
 p {
   margin: 0px;
+  overflow-inline: clip;
 }
 
 .pubinfo {
@@ -54,6 +57,7 @@ p + p {
 
 .typst-inline {
   margin-top: -10px;
+  line-height: 1px;
 }
 
 ul,
@@ -64,6 +68,12 @@ ol {
 
 li p {
   margin: 0;
+}
+
+code {
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
 }
 
 pre code {
@@ -83,14 +93,28 @@ img {
 
 nav {
   font-size: 25px;
-  text-align: center;
   line-height: 1.2;
+  font-family:
+    Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
+  text-align: center;
+}
+
+.site-title {
+  display: inline-block;
+  margin-right: margin-right: 40px;
+  font-weight: 500;
+}
+
+.nav-block {
+  margin-left: auto;
+  display: inline-block;
   a {
     display: inline-block;
     margin-right: 15px;
     margin-left: 15px;
     text-decoration: none;
   }
+  font-weight: 400;
 }
 
 table {
@@ -118,10 +142,15 @@ h1 {
 
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5,
+h6 {
   line-height: 1.2;
   margin-bottom: 0.6em;
   break-after: avoid;
+  font-family:
+    Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
 }
 
 h2,
@@ -235,6 +264,7 @@ main > p:last-child:after {
   pre code {
     text-overflow: wrap;
     white-space: pre-wrap;
+    text-align: left;
     font-size: 8pt;
   }
   body {
