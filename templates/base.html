@@ -8,25 +8,28 @@
 -->
 
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="author" content="Clayton Ramsey" />
-    <meta name="description" content="{% block description %} {% endblock %}" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{% block title2 %} {% endblock %}</title>
-    <link rel="canonical" href="{{ current_url | safe }}" />
-    <link rel="stylesheet" type="text/css" href="/main.css" />
-    {% block headers %} {% endblock %}
-    <link rel="icon" href="/favicon.ico" />
-  </head>
-  <body>
-      <nav>
-        <div class="site-title">clayton's website</div>
-        <div class="nav-block"><a href="/">home</a><a href="/about">about</a><a href="/cv">cv</a><a href="/blog">blog</a><a href="/recipes">recipes</a></div>
-      </nav>
-      <h1>{% block title %} {% endblock %}</h1>
-      {% block posttitle %} {% endblock %}
-    </header>
-    <main>{% block content %} {% endblock %}</main>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="author" content="Clayton Ramsey" />
+  <meta name="description" content="{% block description %} {% endblock %}" />
+  <meta name="viewport" content="width=device-width" />
+  <title>{% block title2 %} {% endblock %}</title>
+  <link rel="canonical" href="{{ current_url | safe }}" />
+  <link rel="stylesheet" type="text/css" href="/main.css" />
+  {% block headers %} {% endblock %}
+  <link rel="icon" href="/favicon.ico" />
+</head>
+
+<body>
+  <nav>
+    <span class="site-title">clayton's website</span><span class="nav-block"><a href="/">home</a><a
+        href="/about">about</a><a href="/cv">cv</a><a href="/blog">blog</a><a href="/recipes">recipes</a></span>
+  </nav>
+  <h1>{% block title %} {% endblock %}</h1>
+  {% block posttitle %} {% endblock %}
+  </header>
+  <main>{% block content %} {% endblock %}</main>
+</body>
+
 </html>
