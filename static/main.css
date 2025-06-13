@@ -82,7 +82,13 @@ pre code {
   overflow-x: auto;
 }
 
+a {
+  text-decoration: none;
+  color: #3f51b5;
+}
+
 a:hover {
+  text-decoration: underline;
   text-decoration-skip-ink: none;
   text-decoration-thickness: 2px;
 }
@@ -114,9 +120,29 @@ nav {
     margin-right: 10px;
     margin-left: 10px;
     text-decoration: none;
+    color: inherit;
   }
   a:visited {
-    color: blue;
+    color: inherit;
+  }
+  a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 5px;
+  }
+  :nth-child(1):hover {
+    text-decoration-color: #e03c31;
+  }
+  :nth-child(2):hover {
+    text-decoration-color: #fbbe00;
+  }
+  :nth-child(3):hover {
+    text-decoration-color: #3f51b5;
+  }
+  :nth-child(4):hover {
+    text-decoration-color: #4caf50;
+  }
+  :nth-child(5):hover {
+    text-decoration-color: #ff5722;
   }
   font-weight: 400;
 }
@@ -232,15 +258,11 @@ main > p:last-child:after {
     filter: invert(100%) hue-rotate(180deg);
   }
 
-  a:link {
+  main a:link {
     color: lightskyblue;
   }
 
-  .nav-block a:visited {
-    color: lightskyblue;
-  }
-
-  a:visited {
+  main a:visited {
     color: skyblue;
   }
 
