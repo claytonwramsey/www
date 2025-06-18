@@ -77,12 +77,26 @@ nav {
   margin: 0.7em;
 }
 
+figure .typst-display {
+  margin-left: 0px;
+  margin-right: 0px;
+  width: 100% !important;
+}
+
+.typst-doc {
+  border-radius: 0px;
+}
+
+iframe {
+  border-radius: 15px;
+}
+
 p {
   margin: 0px;
   overflow-inline: clip;
 }
 
-p+p {
+p + p {
   text-indent: 1.5em;
 }
 
@@ -104,12 +118,6 @@ code {
 
 iframe {
   border-radius: 15px;
-}
-
-pre,
-blockquote {
-  border-radius: 20px;
-  background-color: #fafafa;
 }
 
 pre code {
@@ -142,7 +150,6 @@ table {
   margin-right: auto;
   margin-top: 0.7em;
   margin-bottom: 0.7em;
-  background-color: #fafafa;
   border-radius: 15px;
 }
 
@@ -226,8 +233,7 @@ blockquote {
   }
 }
 
-
-main>p:last-child:after {
+main > p:last-child:after {
   content: " \2766";
   display: inline;
   font-size: 1.4em;
@@ -271,11 +277,6 @@ main>p:last-child:after {
 
   .night-invert {
     filter: invert(88%) hue-rotate(180deg);
-  }
-
-  table,
-  blockquote {
-    background-color: #0f1419;
   }
 }
 
@@ -323,7 +324,7 @@ main>p:last-child:after {
     height: 0px;
   }
 
-  main>p:first-child::first-letter {
+  main > p:first-child::first-letter {
     float: left;
     font-size: 280%;
     /* font-weight: bold; */
