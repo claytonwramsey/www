@@ -112,6 +112,11 @@ description = "Clayton Ramsey's curriculum vitae"
 
 - [dumpster](https://github.com/claytonwramsey/dumpster)
 - [Vector-Accelerated Motion Planner (VAMP)](https://github.com/KavrakiLab/vamp)
+- [captree-rs](https://github.com/KavrakiLab/captree-rs)
+
+### Contributor
+
+- [kiddo](https://github.com/sdd/kiddo)
 
 <footer>
 
