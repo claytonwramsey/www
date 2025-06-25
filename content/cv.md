@@ -74,6 +74,10 @@ description = "Clayton Ramsey's curriculum vitae"
 - Rust for Robotics Workshop, IEEE International Conference on Robotics and Automation, 2025
 - International Journal of Robotics Research (IJRR); 2024
 
+### Volunteer
+
+- [Workshop on Language and Semantics of Task and Motion Planning](https://dyalab.mines.edu/2025/icra-workshop/), IEEE International Conference on Robotics and Automation (ICRA), 2025
+
 ## Teaching
 
 ### Instructor
