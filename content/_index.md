@@ -20,7 +20,7 @@ Check out the links up at the top if you'd like to explore.
   SIMD-Amenable Nearest Neighbors for Fast Collision Checking" was
   accepted at [Robotics: Science and
   Systems](https://roboticsconference.org) in Delft in the
-  Netherlands. Ill be presenting it on July 16! For more details,
+  Netherlands. I'll be presenting it on July 16! For more details,
   check out my [blog post](/blog/captree) or the
   [arXiv](https://arxiv.org/abs/2406.02807).
 - **2024-04-24**: I'll be presenting a poster on my recent work in
