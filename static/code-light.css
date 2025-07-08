@@ -33,7 +33,7 @@
   color: #c75300;
 }
 .z-variable.z-member {
-  color: #ec5f67;
+  color: #E51F29;
 }
 .z-keyword,
 .z-keyword.z-operator.z-word {
@@ -68,13 +68,13 @@
   color: #cd4b13;
 }
 .z-entity.z-name.z-function {
-  color: #db8002;
+  color: #A35F00;
 }
-.z-entity.z-name, .z-entity.z-name.z-tag, .z-entity.z-name.z-label) {
-  color: #399ee6;
+.z-entity.z-name, .z-entity.z-name.z-tag, .z-entity.z-name.z-label {
+  color: #1776BA;
 }
 .z-entity.z-other.z-inherited-class {
-  color: #399ee6;
+  color: #1776BA;
   font-style: underline;
 }
 .z-variable.z-parameter {
@@ -94,11 +94,11 @@
   color: #317d96;
 }
 .z-entity.z-other.z-attribute-name {
-  color: #db8002;
+  color: #A35F00;
 }
 .z-variable.z-function,
 .z-variable.z-annotation {
-  color: #db8002;
+  color: #A35F00;
 }
 .z-support.z-function,
 .z-support.z-macro {
@@ -125,14 +125,14 @@
   color: #c594c5;
 }
 .z-source.z-ruby .z-variable.z-other.z-readwrite {
-  color: #db8002;
+  color: #A35F00;
 }
 .z-source.z-css .z-entity.z-name.z-tag,
 .z-source.z-sass .z-entity.z-name.z-tag,
 .z-source.z-scss .z-entity.z-name.z-tag,
 .z-source.z-less .z-entity.z-name.z-tag,
 .z-source.z-stylus .z-entity.z-name.z-tag {
-  color: #399ee6;
+  color: #1776BA;
 }
 .z-source.z-css .z-support.z-type,
 .z-source.z-sass .z-support.z-type,
@@ -367,7 +367,7 @@
   /* font-style: italic; */
 }
 .z-punctuation.z-definition.z-image {
-  color: #db8002;
+  color: #A35F00;
 }
 .z-markup.z-italic {
   color: #dd3636;

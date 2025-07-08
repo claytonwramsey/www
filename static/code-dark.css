@@ -75,7 +75,7 @@
   .z-entity.z-name.z-function {
     color: #ffb454;
   }
-  .z-entity.z-name, .z-entity.z-name.z-tag, .z-entity.z-name.z-label) {
+  .z-entity.z-name, .z-entity.z-name.z-tag, .z-entity.z-name.z-label {
     color: #59c2ff;
   }
   .z-entity.z-other.z-inherited-class {
