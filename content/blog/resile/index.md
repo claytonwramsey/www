@@ -44,7 +44,7 @@ draft = true
 
 
 	edge("-|>"),
-	blob((x, 2), [from scratch], tint: blue, shape: house),
+	blob((x, 2), [Replan], tint: yellow, shape: house),
 	edge("-|>"),
 	blob((x, 4), $pi_0$, tint: blue),
 	e((x, 2), (x + 0.5, 4)),
@@ -55,7 +55,7 @@ draft = true
 	blob((x, 4), $pi_2$, tint: orange),
 
 	let x = x + 1,
-	blob((x, 2), [to state 0], tint: blue, shape: house),
+	blob((x, 2), [Repair 1], tint: yellow, shape: house),
 	e(root, (x, 2)),
 
 	edge("-|>"),
@@ -69,11 +69,11 @@ draft = true
 	
 
 	let x = x + 1,
-	blob((x, 2), [to state 2], tint: blue, shape: house),
+	blob((x, 2), [Repair 2], tint: yellow, shape: house),
 	e(root, (x, 2)),
 
 	let x = x + 1,
-	blob((x,2), [to state 3], tint: blue, shape: house),
+	blob((x,2), [Repair 3], tint: yellow, shape: house),
 	e(root, (x, 2)),
 )
 ```
@@ -83,6 +83,7 @@ draft = true
 #import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
 #import fletcher.shapes: house, hexagon
 #set text(font: "New Computer Modern")
+#set page(margin: 1pt)
 
 #let blob(pos, label, tint: white, ..args) = node(
 	pos, align(center, label),
