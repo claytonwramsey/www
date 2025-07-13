@@ -77,12 +77,6 @@ nav {
   margin: 0.7em;
 }
 
-figure .typst-display {
-  margin-left: 0px;
-  margin-right: 0px;
-  width: 100% !important;
-}
-
 .typst-doc {
   border-radius: 0px;
 }
@@ -158,14 +152,8 @@ th {
 }
 
 figure {
-  overflow-x: auto;
   text-align: center;
-
-  .typst-display {
-    margin-left: 0px;
-    margin-right: 0px;
-    width: 100% !important;
-  }
+  max-width: 100% !important;
 }
 
 figcaption {
@@ -174,12 +162,12 @@ figcaption {
 
 .typst-display {
   border-radius: 0px;
-  overflow-x: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-top: 1em;
   margin-bottom: 1em;
+  max-width: 100%;
 }
 
 .typst-doc {
@@ -253,6 +241,15 @@ main > p:last-child:after {
 
   pre {
     font-size: 14px;
+  }
+
+  figure {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  figure {
+    overflow-x: scroll;
   }
 }
 
