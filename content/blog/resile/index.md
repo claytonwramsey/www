@@ -7,44 +7,30 @@ authors = ["Clayton Ramsey"]
 draft = true
 +++
 
+<figure>
+
 ```typ,include=els_tree.typ
 
 ```
+
+</figure>
+
+<figure>
 
 ```typ,include=meta_tree.typ
 
 ```
 
-```typ
-#import "@preview/lovelace:0.3.0": *
+</figure>
 
-#set page(width: 20cm)
+<figure>
 
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
+```typ,include=meta_compute.typ
 
-  pseudocode-list(booktabs: true, numbered-title: [MetaCompute])[
-
-    - *Input*: wrapped subproblem $p$, existing solution $S$,  old vocabulary $V$, new vocabulary $V'$, solution index $i$, world state $w$,
-    - *Output*: solution, incomplete subproblem, or child and sibling problems
-    + *if* $p$ is a fictitious node *then*
-      + *if* $i = "len"(S)$ *then*
-        + *return* DeadEnd;
-      + $w_"goal" <-$ world state after executing $S_{..i}$;
-      + $i <- i + 1$;
-      + $g <- "TryTranslate"(w_"goal", V, V')$;
-      + *if* $g = "Failure"$ *then*
-        + *return* Incomplete;
-      + *return* child subproblem $"MakeSubproblem"(w, g)$ and sibling subproblem $p$;
-    + *else*
-      + $r <- "Compute"(p)$;
-      + *if* $r$ is solution $S^"new"$ *then*
-        + $S^"new" <- "TryStitch"(S^"new", S_{i..})$;
-        + *if* $S^"new" = "Failure"$ *then*
-          + *return* DeadEnd;
-        + *return* solution $S^"new"$;
-      + *return* $r$;
-  ]
-) <cool>
 ```
+
+<figcaption>this is a caption</figcation>
+
+</figure>
+
+blah blah blee b lah1
