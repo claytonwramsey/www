@@ -47,6 +47,12 @@ This gives cleaner lines and yields scalable figures, but sometimes it smudges t
 
 <div style="display: flex">
 <div style="width: 45%">
+<!-- make width 100% for this figure -->
+<style>
+.typst-display {
+  width: 100% !important;
+}
+</style>
 
 ```typ
 #import "@preview/fletcher:0.5.2" as fletcher: *
