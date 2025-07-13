@@ -14,7 +14,9 @@ feed_filenames = ["rss.xml", "atom.xml"]
 highlight_code = true
 highlight_theme = "css"
 smart_punctuation = true
-math = "typst"
+
+[markdown.math]
+engine = "typst"
 
 [extra]
 # Put all your custom variables here

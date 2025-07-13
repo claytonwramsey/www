@@ -17,7 +17,7 @@ jobs:
         with:
           crate: zola
           git: https://github.com/cestef/zola.git
-          commit: d41fffc
+          commit: c09afde
 
       - name: Build website
         run: zola build
