@@ -345,4 +345,10 @@ main > p:last-child:after {
     height: 50px;
     margin-bottom: -50px;
   }
+
+  figure {
+    margin-left: 5px;
+    margin-right: 5px;
+    page-break-inside: avoid;
+  }
 }
