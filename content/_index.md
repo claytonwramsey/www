@@ -51,5 +51,14 @@ qualities for accessibility and design. I think that the web should be
 designed around simple, handmade things and believe that I can be a part
 of that.
 
+Everything on this website, unless otherwise specified, is written by hand by me.
+I don't use generative models for any of the text or images found on this website; for a reasoning, check my article on [why I'd rather read the prompt](/blog/prompt).
+
 The source code for this website can be found
 [here](https://github.com/claytonwramsey/www).
+
+## License and copyright
+
+The materials found on this website are licensed to you under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 international license](https://creativecommons.org/licenses/by-nc-sa/4.0/) (CC BY-NC-SA).
+In short, this means that you can share and adapt my writings, so long as your copy is appropriately credited to me, not used for commercial purposes, and distributed under the same license.
+For more details, refer to the linked text of the license.
