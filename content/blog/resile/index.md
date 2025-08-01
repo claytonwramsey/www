@@ -34,3 +34,23 @@ draft = true
 </figure>
 
 blah blah blee b lah1
+
+<figure>
+
+```typ,include=roll_forward.typ
+
+```
+
+<figcaption>Generating new start states by forward-rolling an old plan</figcaption>
+
+</figure>
+
+<figure>
+
+```typ,include=roll_backward.typ
+
+```
+
+<figcaption>Generating new goal constraints attempting translation</figcaption>
+
+</figure>
