@@ -93,5 +93,6 @@
 		corner-radius: 5pt,
 		inset: 8pt,
 		label: align(bottom)[Solution],
+		snap: false,
 	),
 )
