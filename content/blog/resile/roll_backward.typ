@@ -73,8 +73,7 @@
 	blob(g3, $g_3$, tint: yellow),
 
 	let failed = (
-	  (inherit: "|"),
-	  (inherit: "X", scale: 200%, stroke: red + 2pt),
+	  (inherit: "X", scale: 200%, stroke: red + 2pt, pos: 0.5),
 		"|>",
 	),
 	edge(w0, g0, marks: failed, bend: +30deg, stroke: (dash: "dashed")),

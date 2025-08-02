@@ -69,8 +69,7 @@
 
 	edge(w0p, w1p, "-|>", label: $a'_0$, label-side: right),
 	edge(w1p, w2p, label: $a'_1$, marks: (
-	  "|",
-	  (inherit: "X", scale: 200%, stroke: red + 2pt),
+	  (inherit: "X", scale: 200%, stroke: red + 2pt, pos: 0.5),
 		"|>",
 	), stroke: (dash: "dashed"), label-side: right),
 	// e(w2p, w3p, $a_2'$),
