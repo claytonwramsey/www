@@ -7,6 +7,16 @@ authors = ["Clayton Ramsey"]
 draft = true
 +++
 
+Introduction to my project!!!
+
+## The soul of a new project
+
+- CAPT work is done, motion planning is free!
+- Maybe we can take TAMP into the online domain
+- I spend a lot of time preparing presentations, browsing lobste.rs
+
+## Juggling priorities
+
 <figure>
 
 ```typ,include=els_tree.typ
@@ -14,6 +24,35 @@ draft = true
 ```
 
 </figure>
+
+- Explain how ELS works
+- also, classes and grading require my time and soul
+
+## Another day, another CMake error
+
+- Serious work on project begins in the fall
+- Assembling dependencies:
+  - VAMP
+  - SymK
+  - IKFast
+  - probably some others?
+- Every dependency takes loads of time and soul
+
+## A skunk's work
+
+- Rust side project rewriting the motion planner in Rust
+- Started in the fall, but earnest development over winter break
+- Finally achieve good perf numbers at start of spring semester
+- Maybe a rewrite is possible?
+- Screw it, I'll rewrite it myself
+
+## Harder, better, faster, stronger
+
+- Spend a lot of time optimizing the new conventional TAMP solver
+- Cut out SymK as a dependency
+- Trying to become a more independent worker
+
+## Running it back
 
 <figure>
 
@@ -23,17 +62,25 @@ draft = true
 
 </figure>
 
+- Original idea for a meta-ELS
+
+## Getting relaxed
+
 <figure>
 
-```typ,include=meta_compute.typ
+```typ,include=roll_backward.typ
 
 ```
 
-<figcaption>this is a caption</figcation>
+<figcaption>Generating new goal constraints attempting translation</figcaption>
 
 </figure>
 
+- First meta-ELS idea fails; relaxing the problem to produce solvable goal constraints
+
 blah blah blee b lah1
+
+## Running it forward
 
 <figure>
 
@@ -45,12 +92,8 @@ blah blah blee b lah1
 
 </figure>
 
-<figure>
+## Benching and marking
 
-```typ,include=roll_backward.typ
+## Publiculating
 
-```
-
-<figcaption>Generating new goal constraints attempting translation</figcaption>
-
-</figure>
+## Auslaut
