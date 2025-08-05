@@ -7,9 +7,9 @@ description = "It's really just sponge cake, but the spiral shape makes it seem 
 It's really just sponge cake, but the spiral shape makes it seem more refined.
 10 servings, roughly 2-3 hours (mostly downtime).
 
-# Ingredients
+## Ingredients
 
-## Cake
+### Cake
 
 - 1 cup flour
 - 0.25 tsp salt
@@ -22,13 +22,13 @@ It's really just sponge cake, but the spiral shape makes it seem more refined.
 - Juice of 1/2 lemon
 - Powdered sugar for decoration
 
-## Filling
+### Filling
 
 - 1.5 cup heavy whipping cream
 - 0.5 cups powdered sugar
 - 1 tsp vanilla extract
 
-# Directions
+## Directions
 
 1. Preheat oven to 350 F.
 1. In one bowl, combine flour, salt, baking powder, and lemon zest.
@@ -52,7 +52,7 @@ It's really just sponge cake, but the spiral shape makes it seem more refined.
    Trim off the uneven ends of the cake to produce a neat cylindrical shape.
    Cut slices with a very sharp knife to preserve the roll's distinctive shape.
 
-# Notes
+## Notes
 
 - I always eyeball the quantities for whipped cream and never bother with measuring it.
   You can change the filling recipes to taste.
