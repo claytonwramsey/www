@@ -41,7 +41,7 @@ It's really just sponge cake, but the spiral shape makes it seem more refined.
 1. Transfer the cake to a clean sheet of parchment paper.
    Working quickly, tightly roll the cake up with the parchment paper so that its short axis is now the long side of the roll. 
    The parchment paper layers should separate the windings of the cake.
-   Tie off the ends of the pachment and place seam-down on a flat surface in a refrigerator; let cool for 1 hour.
+   Tie off the ends of the parchment and place seam-down on a flat surface in a refrigerator; let cool for 1 hour.
 1. Shortly before retrieving the cake, prepare the filling.
    Whip cream, powdered sugar, and vanilla extract until the cream has been beaten to stiff peaks.
 1. Remove cake from the refrigerator and unroll on a flat surface.
