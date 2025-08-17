@@ -4,32 +4,84 @@ template = "post.html"
 date = 2025-08-15
 authors = ["Clayton Ramsey"]
 description = ""
+draft = true
 +++
+
+- Invited to speak at a workshop
+- (Nearly) finished first independent project
+- Still growing on my own
 
 ## Establishing my own direction
 
-- Big theme of this year is being an independent researcher, picking topics that I want to work on
-- This also involved spending a lot of time spinning my wheels with no clue of what to do
-- But I feel like I've grown a lot!
-- My current strategy for finding good research projects is to just do stuff that would be fun to implement.
-  Unknown if this will work out in the long run but it is very good for my morale.
+This year, my own personal theme has been establishing independence.
+In the fall, I checked in regularly with my mentors-_cum_-collaborators [Wil](https://wbthomason.com/) and [Zak](https://zkingston.com/), as well as with my doctoral advisor, Lydia, for tactical direction; now, I pick out my own directions and fire off progress updates for vibe-checks.
+To toot my own horn: I think this was a big success!
+[Last year](/blog/first-year), I feared I wasn't cut out for it; I am quite proud of my growth here.
+
+Admittedly, my research strategies are pretty weird: I've no tolerance eating frogs, so I establish direction via, essentially, play.
+I pick my tools, problems, and approaches mostly based my personal excitement; the net result is that I optimize myself into a niche of things that I like.
+Day-to-day, this means I get to spend a lot of time thinking about data structures and hardware acceleration; there is a tiny monkey in my brain who only is happy when he sees the millisecond counts in my benchmarks go down.
+I do not know how long this approach will last or how far it will take me, but for now it is excellent for my morale.
 
 ## Getting blocked
 
-- I struggle a lot with focusing
-- Getting blocked on a task makes this even harder
-- I also am not very good at asking for help and involving others in my work
-- the evil loop: fall behind, feel bad, stop interacting with the project because it makes me feel bad
-- Exacerbated by many family health issues; it felt like I struggled to muster time and focus even more than usual this year or so
+I struggle to maintain focus focus, even on things I like working on.
+It's worst when I'm blocked: I encounter a problem that I don't fully understand, requiring at the a context-switch into some other documentation or a coworker's help.
+Each blockage is an off-ramp to go do something else; I'd suddenly find myself checking my email, bothering an intern, or just playing with an easier project.
+Likewise, I'm introverted and dislike asking others for help, so I wait far too long to actually ask for advice when I get stuck -- if I do at all.
+The net result is that blocked projects stay blocked until I work up the willpower to work on them again.
+
+The longer a project spends in a blocked state, the worse it gets, since making progress now requires facing my own non-progress.
+Like any properly maladjusted grad student, I stake my happiness on my work progress, so a project that moves slowly is also a project that makes me feel bad.
+Continuing from a blocked state then requires not only the standard willpower for working on something hard or socially stressful but also the emotional wherewithal to engage with a project that I already feel bad about.
+The net result is a vicious cycle: I fall behind, feel bad about it, don't continue, and fall further behind.
+
+Under normal conditions I can manage this cycle well enough, but this year has been harder for me.
+My research work is much more independent now, so I find I have less immediate feedback; if I want tactical advice, I usually have to ask for it.
+More personally, my mother's third and likely final cancer diagnosis has demanded that I spend much of my free time with her, about a three hour drive away from home.
+Sometimes I feel that I spend my weeks carting between sleep and work and mom in a dreamlike fug.
+Going to work, staying focused, and even doing things I normally find fun are all just a little harder now; the net result is that my own productivity is far more variable than it used to be.
+
+My internship at JSC during the summer was probably the worst case of non-progress that I've had since, frankly, middle school.
+My mom's health issues were reaching a head, and I burned an hour commuting each way to the outskirts of Houston to spend all day in a windowless concrete box; such conditions are not conducive to clarity of focus or concentration of will.
+By the end, I felt I had next to nothing to show for the summer's work, especially compared to my peers.
+
+Were I older and wiser, perhaps I could conclude with a motivating tale of my resourcefulness and growth; however the astute reader will note the publication date.
+I'm writing just after the summer has ended, so I'm fresh off of that experience.
+I have some cause for hope though; during the school year, my commute becomes a ten-minute bike ride to a office with a window.
+If my surroundings can tank my productivity, then maybe my surroundings can also revive them.
 
 ## Having fun with my tools
 
-- Rewriting my entire stack in Rust was actually a great decision.
-- Massive disrespect to the people who say you shouldn't do a rewrite lol
+On to more exciting topics!
+
+The last time I wrote a reflection, I talked about the standard C++ toolkit.
+My current work is in task and motion planning; the details are irrelevant to this post, but in short, implementing a solver for these planning problems requires a writer to glue a plethora of enormous software dependencies together.
+All of these pieces are special in their own way, making dependency management an exercise in organized chaos.
+The worst offender was task planning: my task planner was a Python script that takes in file-paths with problem definitions, then sets off a chain of dominoes converting the problem into an intermediate representation (another file), and finally firing off a separate search binary compiled from C++ to generate an infinite stream of solutions.
+Naturally, there is no way to inspect the process, nor to programmatically request just one solution in a stream, so I wrote a hacky wrapper using `inotify` to inspect the planner's output in `/tmp` and send IPC signals to stop and start the planner process group whenever I needed another task plan.
+
+After a few months mired in build scripts and template errors, I just gave up.
+I rewrote the entire motion planning framework in Rust, and eventually rewrote my task planners too, then forked my simulation tools to make compile times faster.
+On the whole, the rewrites of all my dependencies spanned maybe ten thousand lines of code, and took me a month or two of cumulative effort spread across the fall semester (and my winter break).
+
+Conventional wisdom dictates that one should never do a total rewrite of their software, but in my case, it was a great choice!
+Rewriting the motion planner gave me finer control over the planner (good for building on top of it), while rewriting the task planner yielded an order-of-magnitude speedup.
+The difference is stark: I spent much of the fall of this year spinning my wheels, with very little clue of what to do and how to do it.
+Once I started rewriting my entire project in Rust, I had a second wind: working on the project was way more fun, so I was able to move much more quickly.
+
+I've come to think of my own research as a sort of play: the more fun I'm having, the more progress I make, and the more progress I make, the more fun I'm having.
 
 ## A spot of hope?
 
-- I finally have a project that's approaching the finish line
-- I feel like I now can set my own research directions, _but_
-- I still struggle with time management, staying focused, and motivation
-- getting better (ish?) at it though
+After over a year of work, I finally have a research project chugging along (mostly) smoothly.
+I'm targeting a publication deadline in mid-September, so I have a lot of writing to do, but I am confident that I can make it.
+Look out for a blog post when the project is (eventually) done!!
+
+Personally, I feel that this has shown a lot of growth for me.
+I can now set my own research directions, but I still struggle with motivation and time management.
+In all, though, I'm looking forward to new projects building off my current work, and also maybe to getting sidetracked and building some weird tools.
+
+So far, my research journey is like stumbling through a forest at night: getting tripped up, sometimes circling backward, but eventually getting just a little further.
+For a while I thought I was getting nowhere, but now the gaps between the trees grow wider and the roots catch me less often; I walk further, faster, more confidently.
+[TODO a nice closing sentence?]
