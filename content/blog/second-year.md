@@ -1,39 +1,43 @@
 +++
-title = "Another year of grad school: reflections"
+title = "My second year of grad school: reflections"
 template = "post.html"
-date = 2025-08-15
+date = 2025-08-17
 authors = ["Clayton Ramsey"]
-description = ""
-draft = true
+description = "Two years of Ph.D. study have made me twice as smart as before!"
 +++
 
-- Invited to speak at a workshop
-- (Nearly) finished first independent project
-- Still growing on my own
+Two years of Ph.D. study have made me twice as smart as before!
+
+Well, not really.
+But I've still grown a lot, and I've added up a lot of achievements.
+Admittedly, there hasn't been much outward change, since I've no more publications than last year, but I think I'm in a far better shape than the [last time](/blog/first-year) I wrote a reflection.
+I've pushed my prior work in front of loads of eyeballs, especially since I presented it at a number of places, from on campus at Rice to two different workshops at ICRA.
+Meanwhile, my long-running ongoing project in task in motion planning is finally wrapping up, so I am now getting ready to publish a paper requiring many-times more work than my first project.
+More importantly, though, I think I've grown and developed as a researcher and a programmer.
 
 ## Establishing my own direction
 
-This year, my own personal theme has been establishing independence.
+This year, my personal theme has been establishing independence.
 In the fall, I checked in regularly with my mentors-_cum_-collaborators [Wil](https://wbthomason.com/) and [Zak](https://zkingston.com/), as well as with my doctoral advisor, Lydia, for tactical direction; now, I pick out my own directions and fire off progress updates for vibe-checks.
 To toot my own horn: I think this was a big success!
-[Last year](/blog/first-year), I feared I wasn't cut out for it; I am quite proud of my growth here.
+Last year, I feared I wasn't cut out for it; I am quite proud of my growth here.
 
 Admittedly, my research strategies are pretty weird: I've no tolerance eating frogs, so I establish direction via, essentially, play.
-I pick my tools, problems, and approaches mostly based my personal excitement; the net result is that I optimize myself into a niche of things that I like.
-Day-to-day, this means I get to spend a lot of time thinking about data structures and hardware acceleration; there is a tiny monkey in my brain who only is happy when he sees the millisecond counts in my benchmarks go down.
+I pick my tools, problems, and approaches mostly based on personal excitement; the net result is that I optimize myself into a niche of things that I like.
+Day-to-day, this means I spend my time thinking about data structures and hardware acceleration; there is a tiny monkey in my brain pleased only when millisecond counts in my benchmarks go down.
 I do not know how long this approach will last or how far it will take me, but for now it is excellent for my morale.
 
 ## Getting blocked
 
-I struggle to maintain focus focus, even on things I like working on.
+I struggle to maintain focus, even on things I like working on.
 It's worst when I'm blocked: I encounter a problem that I don't fully understand, requiring at the a context-switch into some other documentation or a coworker's help.
 Each blockage is an off-ramp to go do something else; I'd suddenly find myself checking my email, bothering an intern, or just playing with an easier project.
-Likewise, I'm introverted and dislike asking others for help, so I wait far too long to actually ask for advice when I get stuck -- if I do at all.
-The net result is that blocked projects stay blocked until I work up the willpower to work on them again.
+Likewise, I'm introverted and dislike asking others for help, so I wait far too long to seek help when I get stuck --- if I do at all.
+The net result is blocked projects stay blocked until I work up the willpower to work on them again.
 
 The longer a project spends in a blocked state, the worse it gets, since making progress now requires facing my own non-progress.
-Like any properly maladjusted grad student, I stake my happiness on my work progress, so a project that moves slowly is also a project that makes me feel bad.
-Continuing from a blocked state then requires not only the standard willpower for working on something hard or socially stressful but also the emotional wherewithal to engage with a project that I already feel bad about.
+Like any properly maladjusted grad student, I stake my happiness on my work progress, so a slow-moving is also a depressing project.
+Continuing from a blocked state then requires not only the standard willpower for working on something hard or socially stressful but also the emotional wherewithal to engage with a project that already makes me feel bad.
 The net result is a vicious cycle: I fall behind, feel bad about it, don't continue, and fall further behind.
 
 Under normal conditions I can manage this cycle well enough, but this year has been harder for me.
@@ -55,11 +59,13 @@ If my surroundings can tank my productivity, then maybe my surroundings can also
 
 On to more exciting topics!
 
-The last time I wrote a reflection, I talked about the standard C++ toolkit.
-My current work is in task and motion planning; the details are irrelevant to this post, but in short, implementing a solver for these planning problems requires a writer to glue a plethora of enormous software dependencies together.
+My current work is in task and motion planning; the details are irrelevant to this post, but in short, implementing a solver for these planning problems requires gluing a plethora of dependencies together.
 All of these pieces are special in their own way, making dependency management an exercise in organized chaos.
 The worst offender was task planning: my task planner was a Python script that takes in file-paths with problem definitions, then sets off a chain of dominoes converting the problem into an intermediate representation (another file), and finally firing off a separate search binary compiled from C++ to generate an infinite stream of solutions.
 Naturally, there is no way to inspect the process, nor to programmatically request just one solution in a stream, so I wrote a hacky wrapper using `inotify` to inspect the planner's output in `/tmp` and send IPC signals to stop and start the planner process group whenever I needed another task plan.
+Of course, any mistake in this management would fill my hard drive with nine hundred gigabytes of task plans.
+If I don't catch it, no problem!
+My desktop environment will notify me by crashing on out-of-storage errors.
 
 After a few months mired in build scripts and template errors, I just gave up.
 I rewrote the entire motion planning framework in Rust, and eventually rewrote my task planners too, then forked my simulation tools to make compile times faster.
