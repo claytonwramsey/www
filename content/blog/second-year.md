@@ -36,7 +36,7 @@ Likewise, I'm introverted and dislike asking others for help, so I wait far too 
 The net result is blocked projects stay blocked until I work up the willpower to work on them again.
 
 The longer a project spends in a blocked state, the worse it gets, since making progress now requires facing my own non-progress.
-Like any properly maladjusted grad student, I stake my happiness on my work progress, so a slow-moving is also a depressing project.
+Like any properly maladjusted grad student, I stake my happiness on my work progress, so a slow-moving project is also a depressing project.
 Continuing from a blocked state then requires not only the standard willpower for working on something hard or socially stressful but also the emotional wherewithal to engage with a project that already makes me feel bad.
 The net result is a vicious cycle: I fall behind, feel bad about it, don't continue, and fall further behind.
 
@@ -50,7 +50,7 @@ My internship at JSC during the summer was probably the worst case of non-progre
 My mom's health issues were reaching a head, and I burned an hour commuting each way to the outskirts of Houston to spend all day in a windowless concrete box; such conditions are not conducive to clarity of focus or concentration of will.
 By the end, I felt I had next to nothing to show for the summer's work, especially compared to my peers.
 
-Were I older and wiser, perhaps I could conclude with a motivating tale of my resourcefulness and growth; however the astute reader will note the publication date.
+Were I older and wiser, perhaps I could conclude with a motivating tale of my resourcefulness and growth; however, the astute reader will note the publication date.
 I'm writing just after the summer has ended, so I'm fresh off of that experience.
 I have some cause for hope though; during the school year, my commute becomes a ten-minute bike ride to a office with a window.
 If my surroundings can tank my productivity, then maybe my surroundings can also revive them.
@@ -59,8 +59,9 @@ If my surroundings can tank my productivity, then maybe my surroundings can also
 
 On to more exciting topics!
 
-My current work is in task and motion planning; the details are irrelevant to this post, but in short, implementing a solver for these planning problems requires gluing a plethora of dependencies together.
-All of these pieces are special in their own way, making dependency management an exercise in organized chaos.
+My current work is in task and motion planning; the details are irrelevant to this post, but in short, solving such planning problems requires gluing a plethora of dependencies together.
+Each dependency special in its own way, making dependency management an exercise in organized chaos.
+
 The worst offender was task planning: my task planner was a Python script that takes in file-paths with problem definitions, then sets off a chain of dominoes converting the problem into an intermediate representation (another file), and finally firing off a separate search binary compiled from C++ to generate an infinite stream of solutions.
 Naturally, there is no way to inspect the process, nor to programmatically request just one solution in a stream, so I wrote a hacky wrapper using `inotify` to inspect the planner's output in `/tmp` and send IPC signals to stop and start the planner process group whenever I needed another task plan.
 Of course, any mistake in this management would fill my hard drive with nine hundred gigabytes of task plans.
@@ -87,7 +88,3 @@ Look out for a blog post when the project is (eventually) done!!
 Personally, I feel that this has shown a lot of growth for me.
 I can now set my own research directions, but I still struggle with motivation and time management.
 In all, though, I'm looking forward to new projects building off my current work, and also maybe to getting sidetracked and building some weird tools.
-
-So far, my research journey is like stumbling through a forest at night: getting tripped up, sometimes circling backward, but eventually getting just a little further.
-For a while I thought I was getting nowhere, but now the gaps between the trees grow wider and the roots catch me less often; I walk further, faster, more confidently.
-[TODO a nice closing sentence?]
