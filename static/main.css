@@ -292,6 +292,7 @@ main > p:last-child:after {
   body {
     font-family:
       "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
+    color: #000;
   }
 
   pre code {
