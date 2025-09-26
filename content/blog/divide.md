@@ -3,6 +3,7 @@ title = "The ways that divide us"
 draft = true
 date = 2025-09-26
 authors = ["Clayton Ramsey"]
+template = "post.html"
 +++
 
 Friday, five P.M., or perhaps six.
