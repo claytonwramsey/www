@@ -1,0 +1,14 @@
+@media print {
+  main {
+    column-count: 1;
+    text-align: justify;
+    height: 100%;
+    column-fill: auto;
+  }
+
+  footer {
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

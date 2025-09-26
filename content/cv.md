@@ -1,5 +1,5 @@
 +++
-template = "page.html"
+template = "cv.html"
 title = "Clayton W. Ramsey"
 description = "Clayton Ramsey's curriculum vitae"
 +++

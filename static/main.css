@@ -5,9 +5,7 @@ body {
   font-size: 15px;
   padding: 0 10px;
   /* Use system fonts */
-  font-family:
-    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Helvetica,
-    Arial, sans-serif;
+  font-family: Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Helvetica, Arial, sans-serif;
   color: #222;
   padding-bottom: 500px;
 }
@@ -22,8 +20,7 @@ body {
 nav {
   font-size: 25px;
   line-height: 1.2;
-  font-family:
-    Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
+  font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
   text-align: center;
 }
 
@@ -105,9 +102,7 @@ li p {
 }
 
 code {
-  font-family:
-    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
-    "DejaVu Sans Mono", monospace;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 }
 
 iframe {
@@ -192,8 +187,7 @@ h6 {
   line-height: 1.2;
   margin-bottom: 0.6em;
   break-after: avoid;
-  font-family:
-    Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
+  font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
 }
 
 h2,
@@ -290,8 +284,7 @@ main > p:last-child:after {
   }
 
   body {
-    font-family:
-      "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
+    font-family: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
     color: #000;
   }
 
