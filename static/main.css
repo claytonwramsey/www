@@ -1,8 +1,8 @@
 body {
   margin: 15px auto;
   max-width: 720px;
-  line-height: 1.6;
-  font-size: 15px;
+  line-height: 1.7rem;
+  font-size: 16px;
   padding: 0 10px;
   /* Use system fonts */
   font-family: Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Helvetica, Arial, sans-serif;
