@@ -35,4 +35,4 @@ This recipe is scaled to make around 40 cookies and takes about 1 hour.
 
 - If you add a little extra salt, the cookies will taste interesting.
   Not good or bad per se, but interesting.
-- Add \~0.5 cup cocoa powder to make double-chocolate cookies.
+- To make double-chocolate cookies, substitute 1 cup of cocoa powder for 1 cup of flour, then add flour until the dough is the desired consistency.
