@@ -21,7 +21,7 @@ make.
 
 - 2 tbsp bacon fat
 - 1.5 lb chicken, cubed
-- 1.5 lb pork but, cubed
+- 1.5 lb pork butt, cubed
 - 1 lb andouille sausage, sliced
 - 8 tbsp ground paprika
 - 6 tbsp ground cayenne pepper
@@ -54,3 +54,8 @@ make.
 6.  Add green onions, parsley, and rice; stir thoroughly.
 7.  Cover and let steam until rice is cooked, approx 30 min., stirring
     once at 15 min.
+
+## Notes
+
+- I do not bother measuring out any quantities for this recipe.
+  It is sufficient to eyeball everything.

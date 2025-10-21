@@ -53,3 +53,5 @@ minutes.
 ## Notes
 
 - Substitute yogurt for heavy cream for a more acidic flavor.
+- I do not bother measuring out any quantities for this recipe.
+  It is sufficient to eyeball everything.
