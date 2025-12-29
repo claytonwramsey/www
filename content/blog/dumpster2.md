@@ -94,15 +94,18 @@ pub trait TraceWith<V> {
 
 mod secret {
     // can update this list of requirements to add more visitors
-    pub trait TraceWithV: TraceWith<MyVisitor> {}
+    pub trait TraceWithV: TraceWith<Visitor1> + TraceWith<Visitor2> {}
     impl<T> TraceWithV for T
     where
-      T: ?Sized + TraceWith<MyVisitor>
+      T: TraceWith<Visitor1> + TraceWith<Visitor2>
     {}
 }
 
-struct MyVisitor;
-impl Visitor for MyVisitor1 { /* ... */ }
+struct Visitor1;
+impl Visitor for Visitor1 { /* ... */ }
+
+struct Visitor2;
+impl Visitor for Visitor2 { /* ... */ }
 ```
 
 Since `TraceWithV` and `Trace` have no generics in any of their types or methods, `Trace` is dyn-compatible, so it's finally possible to write (admittedly clunky) dynamic-dispatched code.
