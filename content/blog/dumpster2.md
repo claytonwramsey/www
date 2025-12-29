@@ -4,7 +4,6 @@ date = 2025-12-28
 description = "Every language attempts to expand until it can be Java."
 template = "post.html"
 authors = ["Clayton Ramsey"]
-draft = true
 +++
 
 > Every language attempts to expand until it can be Java. Those languages which cannot so expand are replaced by ones which can.
@@ -14,6 +13,8 @@ draft = true
 A long time ago, I wrote a [garbage collector](/blog/dumpster), called [`dumpster`](https://github.com/claytonwramsey/dumpster), in Rust.
 If I may say so myself, it was a delightful garbage collector.
 However, I think it was imperfect, so I'm writing up this blog post to write about new improvements coming to `dumpster` after two years in the wild.
+For this post, I selected just a couple of the cooler changes to `dumpster`, mostly to share the joy of working on this project.
+I'll try my best to explain the changes for those without much expertise in garbage collection and brag a bit about how cool they are.
 
 ## Recap episode
 
