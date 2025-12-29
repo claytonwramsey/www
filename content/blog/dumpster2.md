@@ -39,10 +39,14 @@ foo.this.set(foo.clone()); // Were `foo` in an `Rc`, this would leak!
 dumpster::unsync::collect(); // still collects foo!
 ```
 
+You might not think that a garbage collector is useful in Rust, but it shows up in surprisingly many places.
+I personally got into garbage collection while implementing a language runtime: Rust is a great language for writing interpreters, but unlike Go or Java, you can't rely on the language runtime to do garbage collection for you.
+Likewise, it's a big help in graph algorithms, which can have pointer spaghetti going all over the place.
+
 ## All in on dynamic dispatch
 
 To collect cycles, `dumpster` needs some way of inspecting every garbage collected value for any `Gc`s that they may contain.
-We achive our inspection by forcing garbage-collected values to implement a special trait, called `Trace`.
+We achieve our inspection by forcing garbage-collected values to implement a special trait, called `Trace`.
 `Trace` borrows the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern): every time we want to do something to a garbage-collected value, we ask that value to accept a visitor, delegate that visitor to its fields, recursively going down until it reaches a `Gc`.
 
 ```rust
@@ -123,7 +127,7 @@ I find it a total pain everywhere from tests to documentation to application cod
 In order to have a self-reference, each garbage-collected value must contain some sort of interior mutability to smuggle a pointer into itself.
 Since the simplest and most common use case is for a garbage-collected value to keep a pointer to itself, there should be an easy way to construct a simple self-referential `Gc` like `Foo` above.
 
-Creativitiy is overrated.
+Creativity is overrated.
 There's already a function that does that in the standard library, called [`Rc::new_cyclic`](https://doc.rust-lang.org/std/rc/struct.Rc.html#method.new_cyclic) (or [`Arc::new_cyclic`](https://doc.rust-lang.org/std/sync/struct.Arc.html#method.new_cyclic)).
 In a `new_cyclic` function, client code can construct a `Gc` by passing in a helper function that builds a value out of a pointer to itself.
 For example, we could rewrite the construction for `Foo` using a straightforward call to `new_cyclic`.
@@ -146,18 +150,20 @@ The whole point of a `Gc` is that we guarantee that it is (almost) always valid,
 
 I chose to solve my problems by reusing the one good idea I had in this project: abusing the visitor pattern.
 When client code calls `new_cyclic` with some constructor `f`, we can lie: instead of having the `this` pointer actually point to an allocation, we'll just pass in a garbage, dead `Gc`.
+This dead `Gc` will contain a garbage sentinel value instead of a pointer, so it doesn't actually point to a value yet.
 Then, once the value has been constructed and `f` returns, we'll use our visitor to rehydrate every dead `Gc` into a live one.
+Since we only rehydrate dead `Gc`s, containing garbage values, the client code can include other, perfectly valid `Gc`s in their returned value without anything breaking.
 This approach is sound since we can just crash the program if client code attempts to dereference a dead `Gc`.
 
 At first, I thought this was only possible in my single-threaded `unsync` implementation of `Gc`.
 I had assumed that malicious client code could smuggle out a reference to the value returned from `f`, making the rehydration process for `Gc`s into Undefined Behavior due to the shared-xor-borrow rule.
-Howver, the Rust type system came to save me once again: since returning a value from `f` is a move, it necessarily invalidates all borrows against the newly-constructed value.
+However, the Rust type system came to save me once again: since returning a value from `f` is a move, it necessarily invalidates all borrows against the newly-constructed value.
 Since the implementation of `Trace` expressly forbids weird pointer types from being stored in a `Gc`, it's impossible for client code to observe the rehydration process.
 
 ## Breadheel
 
 There were actually a lot of big changes to `dumpster` in the last two years!
-I have only finite energy and time, so I've only highlighted just two of the coolest ideas.
+I have only finite energy and time, so I've highlighted just two of the coolest ideas.
 I had a lot of fun implementing all this, and there's still a lot more to do!
 For instance, I want to see if I can get niche-optimization for zero-overhead `Option<Gc>` and, of course, I always want to crank out extra performance.
 But for now, I think this is a good place for `dumpster` to be: it's fast, powerful, and as always a little cute.
