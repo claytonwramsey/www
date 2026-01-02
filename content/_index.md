@@ -14,8 +14,6 @@ Check out the links up at the top if you'd like to explore.
 
 - **2025-05-27**: I started as a Visiting Technologist at NASA Johnson Space Center, collaborating with the
   [Dexterous Robotics group](https://www.nasa.gov/software-robotics-and-simulation-division/robotic-systems-technology-branch/)!
-- **2025-02-05**: I've been invited to give a talk at the [Rust for Robotics Workshop](https://sites.google.com/view/r4rworkshop) at [ICRA 2025](https://2025.ieee-icra.org/) in Atlanta this May!
-  I'll be talking about my recent and upcoming work on efficient motion planning as well as task and motion planning.
 - **2024-06-08**: My paper "Collision-Affording Point Trees:
   SIMD-Amenable Nearest Neighbors for Fast Collision Checking" was
   accepted at [Robotics: Science and
@@ -23,17 +21,6 @@ Check out the links up at the top if you'd like to explore.
   Netherlands. I'll be presenting it on July 16! For more details,
   check out my [blog post](/blog/captree) or the
   [arXiv](https://arxiv.org/abs/2406.02807).
-- **2024-04-24**: I'll be presenting a poster on my recent work in
-  collision-checking at [the Texas Regional Robotics
-  Symposium](https://teros-texas.github.io/) on April 30 at Texas A&M
-  University.
-- **2024-04-23**: I was accepted for a spotlight talk at the [Agile
-  Robotics
-  workshop](https://agile-robotics-workshop.github.io/icra2024/) at
-  [ICRA 2024](https://2024.ieee-icra.org/) in Yokohama, Japan. I'll
-  be presenting my workshop paper Dynamic Motion Planning from
-  Perception via Accelerated Point Cloud Collision Checking on May 13.
-- **2024-04-05**: I won the [NASA
   NSTGRO](https://www.nasa.gov/nasa-space-technology-graduate-research-opportunities-nstgro/)
   fellowship with my proposal, Low-Power Real-Time Planning for Robots
   in Uncertain Environments.
