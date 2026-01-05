@@ -39,7 +39,7 @@ Everything on this website, unless otherwise specified, is written by hand by me
 I don't use generative models for any of the text or images found on this website; for a reasoning, check my article on [why I'd rather read the prompt](/blog/prompt).
 
 The source code for this website can be found
-[here](https://github.com/claytonwramsey/www).
+[on its GitHub repository](https://github.com/claytonwramsey/www).
 
 ## License and copyright
 
