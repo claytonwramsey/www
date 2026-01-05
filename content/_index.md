@@ -21,9 +21,6 @@ Check out the links up at the top if you'd like to explore.
   Netherlands. I'll be presenting it on July 16! For more details,
   check out my [blog post](/blog/captree) or the
   [arXiv](https://arxiv.org/abs/2406.02807).
-  NSTGRO](https://www.nasa.gov/nasa-space-technology-graduate-research-opportunities-nstgro/)
-  fellowship with my proposal, Low-Power Real-Time Planning for Robots
-  in Uncertain Environments.
 - **2023-08-15**: I started my Ph.D. at Rice University, working in
   the [Kavraki Lab](https://www.kavrakilab.org/) on algorithmic
   robotics.
