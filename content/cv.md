@@ -24,10 +24,10 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Professional Experience
 
-- **Visiting Technologist**, NASA Johnson Space Center, Houston, TX. May 2025 - Present
 - **Doctoral Student**, Rice University, Houston, TX. Aug 2023 - Present
   <br>
   Advised by Dr. Lydia E. Kavraki
+- **Visiting Technologist**, NASA Johnson Space Center, Houston, TX. May 2025 - Aug 2025
 - **Undergraduate Researcher**, Rice University, Houston, TX. May 2021 - Aug 2022
   <br>
   Advised by Dr. Lydia E. Kavraki
@@ -67,10 +67,10 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Service
 
-### Referree
+### Reviewer
 
 - IEEE Robotics and Automation Letters (RA-L); 2024, 2025
-- IEEE International Conference on Robotics and Automation (ICRA); 2024, 2025
+- IEEE International Conference on Robotics and Automation (ICRA); 2024, 2025, 2026
 - Rust for Robotics Workshop, IEEE International Conference on Robotics and Automation, 2025
 - International Journal of Robotics Research (IJRR); 2024
 
@@ -92,15 +92,19 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Invited Talks
 
-### SIMD-Accelerated Sampling-Based Motion Planning
+**Running it back with robots**
+
+- NASA Johnson Space Center, August 2025
+
+**SIMD-Accelerated Sampling-Based Motion Planning**
 
 - [RoboARCH Workshop](https://sites.google.com/view/roboarch-icra25/schedule?authuser=0), IEEE International Conference on Robotics and Automation, May 2025
 
-### Fast, flexible robot planning in Rust
+**Fast, flexible robot planning in Rust**
 
 - [Rust for Robotics Workshop](https://sites.google.com/view/r4rworkshop), IEEE International Conference on Robotics and Automation, May 2025
 
-### Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking
+**Collision-Affording Point Trees: SIMD-Amenable Nearest Neighbors for Fast Collision Checking**
 
 - NASA Johnson Space Center, December 2024
 - University of Houston Downtown, November 2024
@@ -112,7 +116,7 @@ description = "Clayton Ramsey's curriculum vitae"
 
 - [dumpster](https://github.com/claytonwramsey/dumpster)
 - [Vector-Accelerated Motion Planner (VAMP)](https://github.com/KavrakiLab/vamp)
-- [captree-rs](https://github.com/KavrakiLab/captree-rs)
+- [capt](https://github.com/KavrakiLab/capt)
 
 ### Contributor
 
