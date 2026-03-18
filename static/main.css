@@ -22,6 +22,7 @@ nav {
   line-height: 1.2;
   font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
   text-align: center;
+  text-transform: lowercase;
 }
 
 .nav-block {
