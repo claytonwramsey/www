@@ -284,6 +284,14 @@ main > p:last-child:after {
     column-fill: auto;
   }
 
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-align: left;
+  }
+
   body {
     font-family: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
     color: #000;
