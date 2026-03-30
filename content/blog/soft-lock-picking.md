@@ -51,7 +51,7 @@ This leaves you with a circular problem:
 
 - You need to access your accounts to locate your phone.
 - You need to pass two-factor authentication to access your accounts.
-- You need your phone to access your accounts.
+- You need your phone to pass two-factor authentication.
 
 If I could get back into my apartment, I could at least use my laptop to try bypassing two-factor authentication.
 But after a morning texting him from a borrowed phone, my landlord wasn't answering my texts, so that was right out.
