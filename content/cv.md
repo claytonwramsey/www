@@ -52,6 +52,12 @@ description = "Clayton Ramsey's curriculum vitae"
   Workshop - Agile Robotics: From Perception to Dynamic Action</cite>, 2024.
   \*Equal Contribution.
 
+### Preprints
+
+- Thai Duong, **Clayton W. Ramsey**, Zachary Kingston, Wil Thomason, and Lydia E. Kavraki.
+  "[Ultrafast Sampling-based Kinodynamic Planning via Differential Flatness](https://arxiv.org/pdf/2603.16059)."
+  arXiv preprint arXiv:2603.16059, 2026.
+
 ## Awards and Honors
 
 - [NASA Space Technology Graduate Research Opportunities Fellowship](https://www.nasa.gov/directorates/stmd/space-tech-research-grants/nstgro/),
@@ -69,8 +75,9 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Reviewer
 
-- IEEE Robotics and Automation Letters (RA-L); 2024, 2025
+- IEEE International Conference on Intelligent Robots and Systems (IROS), 2026
 - IEEE International Conference on Robotics and Automation (ICRA); 2024, 2025, 2026
+- IEEE Robotics and Automation Letters (RA-L); 2024, 2025
 - Rust for Robotics Workshop, IEEE International Conference on Robotics and Automation, 2025
 - International Journal of Robotics Research (IJRR); 2024
 
@@ -114,9 +121,9 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Maintainer
 
-- [dumpster](https://github.com/claytonwramsey/dumpster)
 - [Vector-Accelerated Motion Planner (VAMP)](https://github.com/KavrakiLab/vamp)
 - [capt](https://github.com/KavrakiLab/capt)
+- [dumpster](https://github.com/claytonwramsey/dumpster)
 
 ### Contributor
 
@@ -124,6 +131,6 @@ description = "Clayton Ramsey's curriculum vitae"
 
 <footer>
 
-Last updated May 2025.
+Last updated April 2026.
 
 </footer>
