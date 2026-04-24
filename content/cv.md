@@ -46,10 +46,14 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Workshop Papers
 
+- **Clayton W. Ramsey** and Lydia E. Kavraki.
+  "Coroutine Scheduling in Task and Motion Planning."
+  In <cite>IEEE ICRA 2026 Workshop - [Robotics Acceleration with Computing Hardware and Systems](https://sites.google.com/view/roboarch-icra26)</cite>, 2026.
+
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
   Lydia E. Kavraki. "Dynamic Motion Planning from Perception via
   Accelerated Point Cloud Collision Checking." In <cite>IEEE ICRA 2024
-  Workshop - Agile Robotics: From Perception to Dynamic Action</cite>, 2024.
+  Workshop - [Agile Robotics: From Perception to Dynamic Action](https://agile-robotics-workshop.github.io/icra2024/)</cite>, 2024.
   \*Equal Contribution.
 
 ### Preprints

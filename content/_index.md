@@ -12,6 +12,7 @@ Check out the links up at the top if you'd like to explore.
 
 ## News
 
+- **2026-04-24**: I'll be heading to ICRA 2026, presenting a talk and poster on my recent work on task and motion planning with coroutines at the [RoboARCH workshop](https://sites.google.com/view/roboarch-icra26) on June 5.
 - **2025-05-27**: I started as a Visiting Technologist at NASA Johnson Space Center, collaborating with the
   [Dexterous Robotics group](https://www.nasa.gov/software-robotics-and-simulation-division/robotic-systems-technology-branch/)!
 - **2024-06-08**: My paper "Collision-Affording Point Trees:
