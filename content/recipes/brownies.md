@@ -1,5 +1,5 @@
 +++
-title = "Brownie"
+title = "Brownies"
 authors = ["Clayton Ramsey"]
 description = "It's just brownies (with lots of chocolate)"
 +++
