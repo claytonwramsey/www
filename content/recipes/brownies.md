@@ -27,12 +27,14 @@ I based this recipe off of one from [Sally's Baking Addiction](https://sallysbak
 5. Sift cocoa powder, flour, and salt into batter.
    Add remaining chocolate chips.
 6. Spread the batter evenly over the pan and bake for 30 minutes.
-   The brownies are done when a toothpick comes out clean; note that you must be sure not to accidentally hit a chocolate chip when testing.
+   The brownies are done when a toothpick comes out clean.
 7. Allow brownies to cool completely, around 2 or 3 hours.
    Cut into 1 inch squares with a sharp knife.
 
 ## Notes
 
+- When testing whether the brownies are done, you might accidentally hit a chocolate chip, causing the toothpick to get caught into a melted chocolate sludge.
+  You will likely have to try the toothpick test a few times to make sure.
 - I happen to like the crunchy parts of brownies more than the fudgy insides, so I intentionally spread the batter over a large pan.
   Use a smaller pan for fudgier, thicker brownies.
 - For style points, you could reserve some of the chocolate chips to spread on top of the brownies about halfway through the baking process.
