@@ -28,8 +28,8 @@ It takes roughly 1 hour to make.
 
 ## Directions
 
-1.  Heat a large pot on the stove. Sauté onion, celery, bell
-    peppers, and garlic in oil until clear.
+1.  Heat a large pot on the stove. Sauté onion, bell
+    peppers, and garlic in oil until the onions are clear.
 2.  Add sausage, slicing with a spatula until mixed and mostly cooked,
     approx. 5 min.
 3.  Add tomatoes, tomato sauce, and tomato paste. Bring to a simmer.
