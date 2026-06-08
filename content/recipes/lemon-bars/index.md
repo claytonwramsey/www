@@ -4,6 +4,14 @@ authors = ["Clayton Ramsey"]
 description = "A shortbread base and lemon custard topping."
 +++
 
+<figure>
+
+![A lemon bar with strawberry slices on top.](lemon-bars.jpg)
+
+I garnished this one with strawberry slices.
+
+</figure>
+
 A dessert with a shortbread base and lemon custard topping.
 It's based on [Clara Le's](https://clarale.com/recipes/lemon-bars/) modification of [Barry's lime bars](https://www.rockrecipes.com/lime-bars-super-easy/), but I have translated it into imperial units and slightly modified it.
 
