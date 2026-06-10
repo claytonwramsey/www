@@ -103,6 +103,10 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ## Invited Talks
 
+**The Open Motion Planning Library (OMPL 2.0)**
+
+- IEEE International Conference on Robotics and Automation, June 2026
+
 **Running it back with robots**
 
 - NASA Johnson Space Center, August 2025
