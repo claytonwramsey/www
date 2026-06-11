@@ -27,7 +27,7 @@ description = "Clayton Ramsey's curriculum vitae"
 - **Doctoral Student**, Rice University, Houston, TX. Aug 2023 - Present
   <br>
   Advised by Dr. Lydia E. Kavraki
-- **Visiting Technologist**, NASA Johnson Space Center, Houston, TX. May 2025 - Aug 2025
+- **NSTGRO Research Fellow**, NASA Johnson Space Center, Houston, TX. May 2025 - Present
 - **Undergraduate Researcher**, Rice University, Houston, TX. May 2021 - Aug 2022
   <br>
   Advised by Dr. Lydia E. Kavraki
