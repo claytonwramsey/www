@@ -61,6 +61,8 @@ description = "Clayton Ramsey's curriculum vitae"
 - Thai Duong, **Clayton W. Ramsey**, Zachary Kingston, Wil Thomason, and Lydia E. Kavraki.
   "[Ultrafast Sampling-based Kinodynamic Planning via Differential Flatness](https://arxiv.org/pdf/2603.16059)."
   arXiv preprint arXiv:2603.16059, 2026.
+- Weihang Guo, Theodoros Tyrovouzis, Emiliano Flores, **Clayton W. Ramsey**, Zachary K. Kingston, Ioan A. Şucan, Mark Moll, and Lydia E. Kavraki. "[The Open Motion Planning Library 2.0](https://arxiv.org/pdf/2605.29301)."
+  arXiv preprint arXiv:2605.29301, 2026.
 
 ## Awards and Honors
 
