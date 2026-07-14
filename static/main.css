@@ -268,7 +268,9 @@ main > p:last-child:after {
   }
 
   .night-invert {
-    filter: invert(88%) hue-rotate(180deg);
+    img {
+      filter: invert(88%) hue-rotate(180deg);
+    }
   }
 }
 
