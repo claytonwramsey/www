@@ -8,24 +8,35 @@
 -->
 
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Clayton Ramsey" />
+    <meta name="description" content="{% block description %} {% endblock %}" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{% block title2 %} {% endblock %}</title>
+    <link rel="canonical" href="{{ current_url | safe }}" />
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+    {% block headers %} {% endblock %}
+    <link rel="icon" href="/favicon.ico" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="author" content="Clayton Ramsey" />
-  <meta name="description" content="{% block description %} {% endblock %}" />
-  <meta name="viewport" content="width=device-width" />
-  <title>{% block title2 %} {% endblock %}</title>
-  <link rel="canonical" href="{{ current_url | safe }}" />
-  <link rel="stylesheet" type="text/css" href="/main.css" />
-  {% block headers %} {% endblock %}
-  <link rel="icon" href="/favicon.ico" />
-</head>
-
-<body>
-  <nav>
-    <span class="site-title">Clayton's Website</span><span class="nav-block"><a href="/">Home</a><a
-        href="/about">About</a><a href="/cv">CV</a><a href="/blog">Blog</a><a href="/recipes">Recipes</a></span>
-  </nav><h1>{% block title %}{% endblock %}</h1>{% block posttitle %}{% endblock %}</header><main>{% block content %}{% endblock %}</main>
-</body>
-
+  <body>
+    <header>
+      <nav>
+        <span class="site-title">Clayton's Website</span
+        ><span class="nav-block"
+          ><a href="/">Home</a><a href="/about">About</a><a href="/cv">CV</a><a href="/blog">Blog</a
+          ><a href="/recipes">Recipes</a></span
+        >
+      </nav>
+      <h1>{% block title %}{% endblock %}</h1>
+      {% block posttitle %}{% endblock %}
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <svg class="end-graphic" viewBox="8 0 113 60" aria-hidden="true" focusable="false">
+      <circle class="eg-circle" cx="24" cy="30" r="16" />
+      <polygon class="eg-triangle" points="63,10 82,46 44,46" />
+      <rect class="eg-square" x="90" y="13" width="33" height="33" />
+    </svg>
+  </body>
 </html>
