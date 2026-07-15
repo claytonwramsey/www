@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hyphen test</title>
+<title>Hyphen test v3</title>
 <style>
   body { font-family: sans-serif; }
   section { border: 3px solid #333; margin: 1.5em 0; padding: 0.5em 1em; }
   h2 { font-family: sans-serif; background: yellow; color: black; padding: 0.2em; }
   .arena p { text-align: justify; }
-  #p03 {
+  #pA, #pB, #pC, #pD {
     hyphens: auto;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
@@ -19,52 +19,37 @@
 </head>
 <body>
 
-<h1>Hyphenation isolation test v2</h1>
-<p>Look for a visible hyphen ( - ) breaking a word at the end of a line in each bordered section. This text is copied verbatim from the W3C test page that already hyphenated correctly on your phone, so every section below SHOULD hyphenate unless something specific is blocking it.</p>
+<h1>Hyphenation A/B test v3: lang="en" vs lang="en-US"</h1>
+<p>Same page, same CSS, same text. Only the <code>lang</code> attribute on the wrapping div differs. Look for a hyphen breaking a word at a line end in each section.</p>
 
-<h2>0. Verbatim W3C markup/CSS (known-good control)</h2>
-<div class="arena">
-<p id="p03">[#p03] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!</p>
+<h2>A. Wrapping div has lang="en"</h2>
+<div lang="en" class="arena">
+<p id="pA">[#pA] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!</p>
 </div>
 
-<h2>1. Same text, styled like our site's body rule (inline, no stylesheet)</h2>
-<section>
-<p style="text-align: justify; text-justify: inter-word; text-wrap: pretty; -webkit-hyphens: auto; -ms-hyphens: auto; hyphens: auto;">
-[#1] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!
-</p>
-</section>
+<h2>B. Wrapping div has lang="en-US"</h2>
+<div lang="en-US" class="arena">
+<p id="pB">[#pB] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!</p>
+</div>
 
-<h2>2. Same text, real /main.css loaded, plain &lt;p&gt; (no header/main nesting)</h2>
+<h2>C. No wrapping div lang at all (relies purely on &lt;html lang="en"&gt;)</h2>
+<div class="arena">
+<p id="pC">[#pC] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!</p>
+</div>
+
+<h2>D. Real site CSS (/main.css), text wrapped in lang="en-US" div</h2>
 <link rel="stylesheet" href="/main.css" />
-<section>
-<p>
-[#2] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!
-</p>
-</section>
-
-<h2>3. Same text and CSS, nested in header + main like the real site</h2>
-<section>
-  <header>
-    <nav>
-      <span class="site-title">Clayton's Website</span><span class="nav-block"><a href="/">Home</a><a href="/about">About</a><a href="/cv">CV</a><a href="/blog">Blog</a><a href="/recipes">Recipes</a></span>
-    </nav>
-    <h1>Test title</h1>
-  </header>
-  <main>
-    <p>
-    [#3] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!
-    </p>
-  </main>
-</section>
-
-<h2>4. Forced very narrow width, real CSS, to guarantee an in-word break is needed</h2>
-<section style="width: 140px;">
-  <main>
-    <p>
-    [#4] Corporate gibberish follows. Think visionary. If you generate proactively, you may have to e-enable interactively.
-    </p>
-  </main>
-</section>
+<div lang="en-US">
+<header>
+  <nav>
+    <span class="site-title">Clayton's Website</span><span class="nav-block"><a href="/">Home</a><a href="/about">About</a></span>
+  </nav>
+  <h1>Test title</h1>
+</header>
+<main>
+<p>[#pD] This is a paragraph with no embedded hyphenation hints but hyphen-related CSS applied.  Corporate gibberish follows.  Think visionary. If you generate proactively, you may have to e-enable interactively. We apply the proverb "Grass doesn't grow on a racetrack" not only to our re-purposing but our power to matrix. If all of this comes off as dumbfounding to you, that's because it is! Our feature set is unparalleled in the industry, but our reality-based systems and simple use is usually considered a remarkable achievement. The power to brand robustly leads to the aptitude to embrace seamlessly. What do we streamline? Anything and everything, regardless of reconditeness!</p>
+</main>
+</div>
 
 </body>
 </html>
