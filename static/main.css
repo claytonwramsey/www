@@ -142,7 +142,7 @@ iframe {
 
 p {
   margin: 0px;
-  overflow-inline: clip;
+  overflow-wrap: break-word;
 }
 
 p + p {
