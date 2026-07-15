@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hyphen test</title>
+<style>
+  body { font-family: sans-serif; }
+  section { border: 2px solid #333; margin: 1.5em 0; padding: 0.5em 1em; }
+  h2 { font-family: sans-serif; }
+  .w { width: 220px; }
+</style>
+</head>
+<body>
+
+<h1>Hyphenation isolation test</h1>
+<p>For each section below, note whether any word breaks with a visible hyphen ( - ) at the end of a line. The word "representation" should be a reliable hyphenation candidate (rep-re-sen-ta-tion) if it lands near a line's right edge.</p>
+
+<h2>A. Bare minimum control (no site CSS at all)</h2>
+<section>
+  <p lang="en" class="w" style="text-align: justify; -webkit-hyphens: auto; -moz-hyphens: auto; -ms-hyphens: auto; hyphens: auto;">
+    This is a representation of a paragraph about implementations and quaternions, forced into a narrow column to trigger hyphenation opportunities.
+  </p>
+</section>
+
+<h2>B. Site's real main.css loaded, plain paragraph, no nesting</h2>
+<link rel="stylesheet" href="/main.css" id="site-css" />
+<section>
+  <p>
+    This is a representation of a paragraph about implementations and quaternions, forced into a narrow column to trigger hyphenation opportunities.
+  </p>
+</section>
+
+<h2>C. Same CSS, but nested like the real site (header + main &gt; p)</h2>
+<section>
+  <header>
+    <nav>
+      <span class="site-title">Clayton's Website</span><span class="nav-block"><a href="/">Home</a><a href="/about">About</a></span>
+    </nav>
+    <h1>Test title</h1>
+  </header>
+  <main>
+    <p>
+      This is a representation of a paragraph about implementations and quaternions, forced into a narrow column to trigger hyphenation opportunities.
+    </p>
+  </main>
+</section>
+
+<h2>D. Real site markup verbatim (curly quotes, blockquote, inline em/strong)</h2>
+<section>
+  <header>
+    <nav>
+      <span class="site-title">Clayton's Website</span><span class="nav-block"><a href="/">Home</a><a href="/about">About</a></span>
+    </nav>
+    <h1>Test title</h1>
+  </header>
+  <main>
+    <p>You only have to read one or two of these answers to know exactly what&rsquo;s up: the students just copy&#8209;pasted the output from a large language model. The downsides of Euler angles make them difficult to utilize in robotics. It&rsquo;s important to note that very few implementations employ Euler angles for robotics. Instead, one could use rotation matrices or quaternions to facilitate more efficient rotation representation.</p>
+    <blockquote>
+      <p>Utilizing Euler angles for rotation representation could have the following possible downsides: some rotations do not have a unique representation in Euler angles, particularly at singularities.</p>
+    </blockquote>
+  </main>
+</section>
+
+<h2>E. Site CSS, disable justify (left align) to isolate justify's effect</h2>
+<section style="text-align: left;">
+  <p style="text-align: left;">
+    This is a representation of a paragraph about implementations and quaternions, forced into a narrow column to trigger hyphenation opportunities.
+  </p>
+</section>
+
+<h2>F. Site CSS, forced narrow width</h2>
+<section class="w">
+  <p>
+    This is a representation of a paragraph about implementations and quaternions, forced into a narrow column to trigger hyphenation opportunities.
+  </p>
+</section>
+
+</body>
+</html>
