@@ -21,11 +21,15 @@ body {
   text-align: justify;
   text-justify: inter-word;
   text-wrap: pretty;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
   hyphens: auto;
 }
 
 code,
 pre {
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
   hyphens: none;
 }
 
@@ -458,6 +462,8 @@ main > p:last-child::after {
     column-count: 2;
     column-gap: 2.2em;
     text-align: justify;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
     hyphens: auto;
     height: 100%;
     column-fill: auto;
