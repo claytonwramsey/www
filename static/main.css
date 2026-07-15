@@ -140,15 +140,6 @@ iframe {
   border-radius: 15px;
 }
 
-p,
-li,
-blockquote {
-  text-align: justify;
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-  hyphens: auto;
-}
-
 p {
   margin: 0px;
   overflow-wrap: break-word;
@@ -329,6 +320,17 @@ h3::before {
 
   h3::before {
     margin-right: 0.4em;
+  }
+}
+
+/* Justified text without working hyphenation leaves ragged gaps on narrow
+   screens, so fall back to ragged-right below phone-ish widths. */
+@media (max-width: 600px) {
+  body,
+  p,
+  li,
+  blockquote {
+    text-align: left;
   }
 }
 
