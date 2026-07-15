@@ -140,6 +140,15 @@ iframe {
   border-radius: 15px;
 }
 
+p,
+li,
+blockquote {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
+
 p {
   margin: 0px;
   overflow-wrap: break-word;
