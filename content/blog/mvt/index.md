@@ -40,6 +40,20 @@ Implementation details of the Rust approach.
 - Store everything in one big buffer
 - Split out mutability
 - Go generic over indices, float types, dimension
+- Choice of voxel width
+
+<figure class="night-invert">
+
+![Voxel width performance scaling](voxel_width_sweep.svg)
+
+<figcaption>
+
+Scaling of query speed with voxel width.
+Each curve shows the average query time for an MVT generated with the voxel width on the X axis, separated by robot. Scattered points show $r_"max"$, the recommended width given by the original MVT paper.
+
+</figcaption>
+
+</figure>
 
 ## Going sphere for sphere
 
@@ -87,7 +101,7 @@ Most likely, the performance bump comes from some quirk of cache memory: perhaps
 
 <figure class="night-invert">
 
-![Motion planning performance plots](mbm_plan_times.svg)
+![Motion planning performance plots](baxter_solve_time.svg)
 
 <figcaption>End-to-end motion planning performance distribution on the Baxter robot.</figcaption>
 
