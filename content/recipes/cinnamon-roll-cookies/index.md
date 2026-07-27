@@ -50,6 +50,7 @@ either. This recipe is scaled to make around 36 cookies and takes about
     strip on the edge uncovered. Roll up the dough, starting from the
     uncovered strip, until you have a single roll, roughly 1.5 inches in
     diameter.
-6.  Slice dough into rounds, roughly 1/4 inch thick. Cover a baking
+6.  Refrigerate the dough again until it is firm, at least 30 min.
+7.  Slice dough into rounds, roughly 1/4 inch thick. Cover a baking
     sheet in parchment paper and place the rounds on the sheet.
-7.  Bake for 15 minutes or until golden brown.
+8.  Bake for 15 minutes or until golden brown.
