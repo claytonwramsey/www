@@ -40,7 +40,16 @@ Implementation details of the Rust approach.
 - Store everything in one big buffer
 - Split out mutability
 - Go generic over indices, float types, dimension
-- Choice of voxel width
+
+### Big balls, big problems
+
+In order to build an MVT, you need to pick how big your voxels have to be.
+If voxels are too big, then collision-checking queries will waste too much time searching through far-away points, but if they're too close, then queries will instead have to cull against dozens of tiny voxels.
+
+There are a few plausible candidates, however.
+On each robot's spherized geometry, we can pick out the biggest sphere of the robot, whose radius is $r_"max"$.
+Alternately, we could restrict ourselves to just the moving links of the robot, skipping the big spheres on most robots' base links, yielding $r_"mobile"$.
+Lastly, we could take a look at the robot's bounding-volume hierarchy, and then pick out $r_"query"$, the size of the largest sphere ever used in a collision-check.
 
 <figure class="night-invert">
 
@@ -49,11 +58,24 @@ Implementation details of the Rust approach.
 <figcaption>
 
 Scaling of query speed with voxel width.
-Each curve shows the average query time for an MVT generated with the voxel width on the X axis, separated by robot. Scattered points show $r_"max"$, the recommended width given by the original MVT paper.
+Each curve shows the average query time for an MVT generated with the voxel width on the X axis, separated by robot.
+$r_"mobile"$, $r_"robot"$, and $r_"query"$ are all shown marked as ●, ■, and ▲ respectively.
 
 </figcaption>
 
 </figure>
+
+The original MVT paper recommended using $r_"max"$, largely just by waving generally at query times and claiming that performance was good enough with that selection.
+However, I wanted to get a better answer than that, so I decided to be empirical.
+For a simulated workload on every robot, I ran a parameter sweep over the voxel width and recorded the average collision-checking time
+I then rendered the collision checking performance in the plot shown above.
+
+For Fetch, Panda, and UR5, $r_"max"$ is indeed a respectable choice of voxel width, but not totally optimal.
+However, for the Baxter robot, I found that using $r_"max"$ as the voxel width is exceedingly slow, yielding query times twenty times slower than with an optimal selection.
+I suspect the orignal MVT authors never benchmarked against Baxter, or they would have found this, but in any event I will take my free speedup and carry on.
+
+Surprisingly enough, the optimal voxel width for all robots always lands roughly between 10 and 20 cm.
+I suspect this is a consequence of the point cloud filtering process: for a given point cloud density, there is a roughly optimal voxel size to minimize the amount of wasted work.
 
 ## Going sphere for sphere
 
@@ -66,7 +88,7 @@ For each problem, I recorded the data structure construction and collision check
 ![Collision checking structure construction times](mbm_throughput_construction.svg)
 
 <figcaption>Construction time scaling for each data structure.
-  Trendlines show average performance in a size bucket, while the hexbins are colored based on the overall distribution of planning times.</figcaption>
+  Each line shows average performance of a data structure for a bucket of point clouds.</figcaption>
 
 </figure>
 
@@ -75,6 +97,8 @@ CAPTs were always slow to build, and they were especially slow in the Rust imple
 In fact, when I benchmarked my end-to-end planning pipelines, CAPT construction was always the slowest step.
 Since MVTs don't do nearly as much bookkeeping at construction time, they get a big performance win.
 Also, since the MVT has linear memory scaling, its construction time is on the order of $O(n)$ with point cloud size $n$, instead of $O(k n log(n))$ for space-partitioning trees, meaning construction times are great even in large point clouds.
+
+Building mutable MVTs comes at some construction cost, since we have to maintain many separate allocations instead of one big pool, but even then, it's still pretty cheap.
 
 <!-- I don't have much to say about memory usage -->
 
@@ -90,7 +114,7 @@ Also, since the MVT has linear memory scaling, its construction time is on the o
 
 ![Collision checking throughput plots](mbm_throughput_query.svg)
 
-<figcaption>Collision-checking throughput scaling for each data structure, including the SIMD-parallel batch queries. I've removed the hexbins for non-SIMD queries to keep the plot from getting too messy.</figcaption>
+<figcaption>Collision-checking throughput scaling for each data structure, including the SIMD-parallel batch queries.</figcaption>
 
 </figure>
 
