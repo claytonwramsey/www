@@ -9,6 +9,15 @@ draft = true
 
 ## Recapt
 
+<figure>
+
+  <div style="display: flex">
+    <div style="width: 50%"><img src="panda.png" alt="Panda robot"/></div>
+    <div style="width: 50%"><img src="panda_sphere.png" alt="Spherized panda robot"/></div>
+    </div>
+  <figcaption>A Franka Emika Panda robot and its spherized collision-checking representation.</figcaption>
+</figure>
+
 I spend a lot of my time thinking about _motion planning_: finding ways for robots to find collision-free motions from a start state to a goal state.
 There are a million different ways to solve motion planning problems, but once you've read enough papers they all kind of look the same.
 You sample some configurations, test if they're valid, and try to do a big path search over all possible configurations.
@@ -26,12 +35,35 @@ The net result is that we have a $k$-d tree with a batch-parallel search algorit
 
 The big problem with CAPTs was the construction time: dense point clouds require a lot of duplicated data to avoid backtracking.
 Once point clouds get dense enough, CAPT construction scales at $O(n^2)$, which is disastrous for a user's hopes of getting planning at control-loop frequencies.
-As a workaround, I had to implement a new point cloud filtering method to get the clouds to be sparse enough to keep construction times under control.
+The data layout for CAPTs requires each leaf of the search tree, which represents some region in space, to store duplicate copies of many points in the point cloud.
+Those duplicate copies start to dominate the data structure's footprint, which in turn balloons construction time.
 
 ## Thinking inside the box
 
-- Idea: design the cells to be good instead of bad
-- Then take advantage of sparsity
+<figure>
+
+![Voxel-grid collision checking](voxels.png)
+
+<figcaption>
+
+Via [Chen and Yeh](https://rasevents.org/uploads/documents/pdfviewer/b1/d6/223112-5124.pdf), a voxel-based collision-checking scheme.
+
+</figcaption>
+
+</figure>
+
+Ching Chen and Tsung-Tai Yeh, two other robotics researchers, decided to fix the problems with CAPTs for themselves.
+To do so, they started by ditching nearest-neighbor search trees entirely.
+Instead of with a space-partitioning tree, you can cut up the space into a grid of voxels, each storing a list of points that they contain.
+The benefit here is twofold: first, you can tell which voxel a query sphere lies in with simple arithmetic, and second, you don't have to duplicate any points, as finding adjacent voxels is trivial.
+
+But naïvely just storing every voxel in the workspace doesn't work.
+If the workspace is a hundred voxels long in every dimension, then you'd have to store the information for a million voxels to record a single point cloud, which after filtering only contains a few thousand points.
+To keep things under control, Chen and Yeh sparsely store only occupied voxels in a three-layer sparse tree, where each layer is segmented by one dimension.
+
+Put together with a few axis-aligned bounding box tests, the resulting structure is a _multilevel voxel table_, or MVT.
+Like the CAPT, MVTs are parallelizable using single-instruction, multiple-data parallelism (SIMD).
+For any given voxel, the collision checker can do a big batch check for collision withh all the points contained in the voxel for a free constant speedup.
 
 ## Patching some flat tiers
 
