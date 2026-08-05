@@ -67,11 +67,70 @@ For any given voxel, the collision checker can do a big batch check for collisio
 
 ## Patching some flat tiers
 
-Implementation details of the Rust approach.
+### Flat as a board
 
-- Store everything in one big buffer
-- Split out mutability
-- Go generic over indices, float types, dimension
+The original implementation of MVTs had some gnarly C++-isms: namely, the voxel tables used a tapestry of pointers to each row of tables.
+In addition to being kind of unhinged in general, this made memory management quite difficult, and also was not very size-efficient.
+The original C++ implementation also has a bunch of weird manual pool management, which results in disastrous crashes once point clouds get too big.
+
+```cpp
+struct MVT {
+    // pointers to voxel indices
+    using ZLevelTable = uint32_t*;
+    // pointers to z-level tables
+    using YLevelTable = uint32_t**;
+    // pointers to y-level tables
+    using XLevelTable = uint32_t***;
+
+    XLevelTable x_level_table;
+}
+```
+
+To make things easier to implement in Rust, I simplified things a little bit: we just back everything with a `Box<[]>`.
+
+```rust
+struct Mvt {
+    /// tells us where to get voxel data from a grid index
+    tables: Box<[u32]>,
+    /// tells us where to get point lists in `points`
+    voxels: Box<[u32]>,
+    /// flattened SoA shared buffer of all point data
+    points: [Box<[f32]>; 3]
+    // other fields...
+}
+
+struct Voxel {
+    /// index of first point stored in this voxel in `points`
+    offset: u32,
+    /// number of points in the voxel
+    count: u32,
+    /// other fields...
+}
+```
+
+The search logic then becomes super simple: use `tables` to find out which voxel you belong to, looked up in `voxels`.
+Then use your voxel to find which span of `points` you need to collision-check against, and finally do a brute-force check against those points.
+
+### Getting mutable
+
+In addition to making the search logic way simpler, the new search structure makes it trivial to make MVTs mutable, just by giving each `Voxel` its own points field, instead of sharing one big buffer.
+
+```rust
+// `points` is removed from `Mvt`
+
+struct Voxel {
+    /// index of first point stored in this voxel in `points`
+    offset: u32,
+    /// number of points in the voxel
+    count: u32,
+    /// SoA buffer of points in this voxel
+    points: [Vec<[f32]>; 3]
+    // other fields...
+}
+```
+
+Adding mutability comes at a roughly 2x size penalty and a 1.5x construction-time penalty, but it's a nice feature to have.
+To keep good performance for people who use `Mvt`s as a single-use structure, I split out the implementation: I wrote both an immutable default `Mvt` and a `MutableMvt` structure.
 
 ### Big balls, big problems
 
@@ -169,4 +228,12 @@ But on the Baxter robot of my problem dataset, which had the hardest problems, I
 
 **TODO: use final charts from execution on longinus**
 
-##
+## The big problems still aren't solved
+
+MVTs are pretty cool data structures!
+They're fast, cheap, and easy to manage.
+I also had a blast implementing my Rust version of them.
+However, they only fix one of the big problems with CAPTs, which is their construction time.
+
+Point cloud data is necessarily imperfect: it comes out of a camera, and that camera can only ever see one side of an object.
+When we plan for
