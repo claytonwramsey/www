@@ -134,6 +134,13 @@ To keep good performance for people who use `Mvt`s as a single-use structure, I 
 
 ### Big balls, big problems
 
+<figure class="night-invert">
+
+![The spherized model of a robot](fetch_spheres.png)
+![Robot sphere sizing](fetch_highlight.png)
+
+</figure>
+
 In order to build an MVT, you need to pick how big your voxels have to be.
 If voxels are too big, then collision-checking queries will waste too much time searching through far-away points, but if they're too close, then queries will instead have to cull against dozens of tiny voxels.
 
@@ -216,17 +223,14 @@ Most likely, the performance bump comes from some quirk of cache memory: perhaps
 
 <figure class="night-invert">
 
-![Motion planning performance plots](baxter_solve_time.svg)
+![Motion planning performance plots](primitive_vs_other.svg)
 
-<figcaption>End-to-end motion planning performance distribution on the Baxter robot.</figcaption>
+<figcaption>End-to-end motion planning performance. Planning times with ground-truth primitive geometry are on the x-axis, while the y-axis is the planning time using a tested point cloud representation. Each dot represents planning time for one problem.</figcaption>
 
 </figure>
 
-When solving real motion planning problems, the planners do a bunch of other unrelated work, so the performance differences are not quite as stark.
-But on the Baxter robot of my problem dataset, which had the hardest problems, I we find that there is still a big improvement: median planning times fell from about 50 ms using the CAPT's SIMD implementation to more like 24 ms.
-**Strangely enough kiddo is in first place...**
-
-**TODO: use final charts from execution on longinus**
+When solving real motion planning problems, MVTs give a respectable speedup across the board.
+In the above plot, we see that for nearly every problem, planning with the MVT point cloud representation is faster than with a CAPT, and often is even faster than the ground-truth primitive geometry representation.
 
 ## The big problems still aren't solved
 
@@ -236,4 +240,4 @@ I also had a blast implementing my Rust version of them.
 However, they only fix one of the big problems with CAPTs, which is their construction time.
 
 Point cloud data is necessarily imperfect: it comes out of a camera, and that camera can only ever see one side of an object.
-When we plan for
+When we plan for **TODO finish writing**
