@@ -494,6 +494,7 @@ main > p:last-child::after {
     hyphens: auto;
     height: 100%;
     column-fill: auto;
+    width: 100%;
   }
 
   h2,
