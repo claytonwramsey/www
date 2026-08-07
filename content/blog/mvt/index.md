@@ -40,7 +40,7 @@ Those duplicate copies start to dominate the data structure's footprint, which i
 
 ## Thinking inside the box
 
-<figure>
+<figure class="night-invert">
 
 ![Voxel-grid collision checking](voxels.png)
 
@@ -136,8 +136,27 @@ To keep good performance for people who use `Mvt`s as a single-use structure, I 
 
 <figure class="night-invert">
 
+<div style="display: flex">
+
+<div style="width: 46%">
+
 ![The spherized model of a robot](fetch_spheres.png)
+
+</div>
+
+<div style="width: 54%">
+
 ![Robot sphere sizing](fetch_highlight.png)
+
+</div>
+
+</div>
+
+<figcaption>
+
+The spherization of a Fetch robot (left) and the radii (right) $r_"max"$, $r_"mobile"$, and $r_"query"$ shown in red, green, and purple respectively.
+
+</figcaption>
 
 </figure>
 
