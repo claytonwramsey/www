@@ -493,7 +493,7 @@ main > p:last-child::after {
     -ms-hyphens: auto;
     hyphens: auto;
     height: 100%;
-    column-fill: auto;
+    column-fill: balance-all;
     width: 100%;
   }
 
