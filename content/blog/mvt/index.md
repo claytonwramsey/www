@@ -1,11 +1,23 @@
 +++
 title = "We're not done with point clouds"
 date = 2026-07-14
-description = ""
+description = "If you wait long enough to solve a problem, someone else might just solve it for you."
 template = "post.html"
 authors = ["Clayton Ramsey"]
 draft = true
 +++
+
+If you wait long enough to solve a problem, someone else might just solve it for you.
+At least that's what I tell myself about the dishes in my sink.
+
+While in Vienna for a conference, I found another set of researchers who did just that for me: they took some work I had published two years ago and ran with it, and they beat me on just about every benchmark.
+I'm writing up this article to draw some attention to their work and, a little selfishly, to yap about the things I learned while reimplementing their work.
+In short, they made a data structure for collision-checking against point clouds that runs really fast while also being extremely cheap in memory and construction time.
+
+If you don't care about details, you can jump straight to the [paper](https://rasevents.org/uploads/documents/pdfviewer/b1/d6/223112-5124.pdf) or to the original [C++ implementation](https://github.com/chingchennn/vamp_mvt).
+I've also published a Rust implementation with my own optimizations, with [source code on GitHub](https://claytonwramsey/mvtable) and a [package on crates.io](https://crates.io/crates/mvtable).
+
+**TODO publish to crates.io and verify link**
 
 ## Recapt
 
@@ -198,7 +210,7 @@ I suspect this is a consequence of the point cloud filtering process: for a give
 
 Naturally, you have to actually benchmark your code to tell if it's fast.
 To do so, I whipped together a few fun benchmarks: I solved a bunch of motion planning problems, recorded all of the collision checks that the planners made, and then replayed those collision checks to just time the collision checking throughput.
-For each problem, I recorded the data structure construction and collision checking time across all the data structures I considered: the MVT implementations, my old CAPT implementation, and `kiddo`, a $k$-d tree.
+For each problem, I recorded the data structure construction and collision checking time across all the data structures I considered: the MVT implementations, my old CAPT implementation, and [`kiddo`](https://github.com/sdd-org/kiddo), a $k$-d tree.
 
 <figure class="night-invert">
 
@@ -259,4 +271,10 @@ I also had a blast implementing my Rust version of them.
 However, they only fix one of the big problems with CAPTs, which is their construction time.
 
 Point cloud data is necessarily imperfect: it comes out of a camera, and that camera can only ever see one side of an object.
-When we plan for **TODO finish writing**
+When we plan for real robots, we have to account for this, typically by assuming that unseen space is also invalid.
+Previous work on perception data, such as [octomaps](https://octomap.github.io/), can do just this, but I had sacrificed occlusion handling for the CAPT work at the altar of performance.
+Now, users are left with the cruel tradeoff of being safe or being fast: octomaps are wicked slow but so far are the only ones handling occlusion.
+
+In a more general sense, I think the classical formulation of motion planning, where a robot gets to operate in a beautiful still-life painting of the world, is just incorrect.
+Even the best perception for robots is never better than "bad," and so our approaches to planning should contend with the fact that we only ever plan against an approximation of the real world.
+So, much like my dishes, planning from perception remains yet unsolved.
