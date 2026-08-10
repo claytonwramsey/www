@@ -14,7 +14,7 @@ I'm writing up this article to draw some attention to their work and, a little s
 In short, they made a data structure for collision-checking against point clouds that runs really fast while also being extremely cheap in memory and construction time.
 
 If you don't care about details, you can jump straight to the [paper](https://rasevents.org/uploads/documents/pdfviewer/b1/d6/223112-5124.pdf) or to the original [C++ implementation](https://github.com/chingchennn/vamp_mvt).
-I've also published a Rust implementation with my own optimizations, with [source code on GitHub](https://claytonwramsey/mvtable) and a [package on crates.io](https://crates.io/crates/mvtable).
+I've also published a Rust implementation with my own optimizations, with [source code on GitHub](https://github.com/claytonwramsey/mvtable) and a [package on crates.io](https://crates.io/crates/mvtable).
 
 ## Recapt
 
