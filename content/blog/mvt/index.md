@@ -1,10 +1,9 @@
 +++
 title = "We're not done with point clouds"
-date = 2026-07-14
+date = 2026-08-10
 description = "If you wait long enough to solve a problem, someone else might just solve it for you."
 template = "post.html"
 authors = ["Clayton Ramsey"]
-draft = true
 +++
 
 If you wait long enough to solve a problem, someone else might just solve it for you.
