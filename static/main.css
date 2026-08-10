@@ -444,7 +444,7 @@ main > p:last-child::after {
 }
 
 @page {
-  margin: 2cm 1.6cm;
+  margin: 1in;
 
   @bottom-center {
     content: counter(page);
@@ -486,8 +486,8 @@ main > p:last-child::after {
   }
 
   main {
-    column-count: 2;
-    column-gap: 2.2em;
+    column-width: 2.8in;
+    column-gap: 1em;
     text-align: justify;
     -webkit-hyphens: auto;
     -ms-hyphens: auto;
@@ -521,6 +521,7 @@ main > p:last-child::after {
     font-size: 10pt;
     line-height: 1.3;
     margin: auto;
+    max-width: none;
     text-wrap: pretty;
     word-break: normal;
     text-justify: auto;
@@ -558,13 +559,16 @@ main > p:last-child::after {
     padding-top: 0.03lh;
   }
 
-  /* workaround for break-after: avoid not supported */
   h1,
   h2,
   h3 {
+    /* works in chromium but not firefox */
+    break-after: avoid-column avoid-page;
+    /* prevent orphans */
     break-inside: avoid;
   }
 
+  /* hack to prevent orphans */
   h1::after {
     content: none;
   }
