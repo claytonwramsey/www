@@ -210,7 +210,7 @@ I suspect this is a consequence of the point cloud filtering process: for a give
 
 Naturally, you have to actually benchmark your code to tell if it's fast.
 To do so, I whipped together a few fun benchmarks: I solved a bunch of motion planning problems, recorded all of the collision checks that the planners made, and then replayed those collision checks to just time the collision checking throughput.
-For each problem, I recorded the data structure construction and collision checking time across all the data structures I considered: the MVT implementations, my old CAPT implementation, and [`kiddo`](https://github.com/sdd-org/kiddo), a $k$-d tree.
+For each problem, I recorded the data structure construction and collision checking time across all the data structures I considered: the MVT implementations (both my Rust code and the original C++ version), my old CAPT implementation, and [`kiddo`](https://github.com/sdd-org/kiddo), a very fast $k$-d tree.
 
 <figure class="night-invert">
 
