@@ -582,6 +582,6 @@ main > p:last-child::after {
   figure {
     margin-left: 5px;
     margin-right: 5px;
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 }
