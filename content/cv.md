@@ -44,6 +44,11 @@ description = "Clayton Ramsey's curriculum vitae"
   Checking.](https://www.roboticsproceedings.org/rss20/p038.html)" In <cite>Robotics: Science
   and Systems</cite>, 2024. \*Equal Contribution.
 
+### Peer-Reviewed Articles and Journal Papers
+
+- Weihang Guo, Theodoros Tyrovouzis, Emiliano Flores, **Clayton W. Ramsey**, Zachary K. Kingston, Ioan A. Şucan, Mark Moll, and Lydia E. Kavraki. "[The Open Motion Planning Library 2.0](https://arxiv.org/pdf/2605.29301)."
+  IEEE Robotics and Automation Magazine, 2026. To appear.
+
 ### Workshop Papers
 
 - **Clayton W. Ramsey** and Lydia E. Kavraki.
@@ -61,8 +66,6 @@ description = "Clayton Ramsey's curriculum vitae"
 - Thai Duong, **Clayton W. Ramsey**, Zachary Kingston, Wil Thomason, and Lydia E. Kavraki.
   "[Ultrafast Sampling-based Kinodynamic Planning via Differential Flatness](https://arxiv.org/pdf/2603.16059)."
   arXiv preprint arXiv:2603.16059, 2026.
-- Weihang Guo, Theodoros Tyrovouzis, Emiliano Flores, **Clayton W. Ramsey**, Zachary K. Kingston, Ioan A. Şucan, Mark Moll, and Lydia E. Kavraki. "[The Open Motion Planning Library 2.0](https://arxiv.org/pdf/2605.29301)."
-  arXiv preprint arXiv:2605.29301, 2026.
 
 ## Awards and Honors
 
@@ -81,9 +84,11 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Reviewer
 
-- IEEE International Conference on Intelligent Robots and Systems (IROS), 2026
+- IEEE Transactions on Automation Science and Engineering (T-ASE); 2026
+- IEEE Transactions on Robotics (T-RO); 2026
+- IEEE International Conference on Intelligent Robots and Systems (IROS); 2026
 - IEEE International Conference on Robotics and Automation (ICRA); 2024, 2025, 2026
-- IEEE Robotics and Automation Letters (RA-L); 2024, 2025
+- IEEE Robotics and Automation Letters (RA-L); 2024, 2025, 2026
 - Rust for Robotics Workshop, IEEE International Conference on Robotics and Automation, 2025
 - International Journal of Robotics Research (IJRR); 2024
 
@@ -104,6 +109,10 @@ description = "Clayton Ramsey's curriculum vitae"
 - **Fundamentals of Computer Engineering**, Rice University, Fall 2020 - Spring 2021
 
 ## Invited Talks
+
+**Now you're planning with coroutines**
+
+- NASA Johnson Space Center, August 2026
 
 **The Open Motion Planning Library (OMPL 2.0)**
 
@@ -134,6 +143,8 @@ description = "Clayton Ramsey's curriculum vitae"
 - [Vector-Accelerated Motion Planner (VAMP)](https://github.com/KavrakiLab/vamp)
 - [capt](https://github.com/KavrakiLab/capt)
 - [dumpster](https://github.com/claytonwramsey/dumpster)
+- [mvtable](https://github.com/claytonwramsey/mvtable)
+- [cricket](https://github.com/CoMMALab/cricket)
 
 ### Contributor
 
@@ -141,6 +152,6 @@ description = "Clayton Ramsey's curriculum vitae"
 
 <footer>
 
-Last updated April 2026.
+Last updated August 2026.
 
 </footer>
