@@ -7,7 +7,7 @@
 <!--/>
 {% block content %} {{
 section.content | safe }}
-<ul>
+<ul class="index">
   {% for page in section.pages %}
   <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
   {% endfor %}
