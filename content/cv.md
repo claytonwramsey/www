@@ -41,23 +41,23 @@ description = "Clayton Ramsey's curriculum vitae"
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
   Lydia E. Kavraki. "[Collision-Affording Point Trees: SIMD-Amenable
   Nearest Neighbors for Fast Collision
-  Checking.](https://www.roboticsproceedings.org/rss20/p038.html)" In <cite>Robotics: Science
+  Checking.](https://www.roboticsproceedings.org/rss20/p038.html)" <cite>Robotics: Science
   and Systems</cite>, 2024. \*Equal Contribution.
 
 ### Peer-Reviewed Articles and Journal Papers
 
 - Weihang Guo, Theodoros Tyrovouzis, Emiliano Flores, **Clayton W. Ramsey**, Zachary K. Kingston, Ioan A. Şucan, Mark Moll, and Lydia E. Kavraki. "[The Open Motion Planning Library 2.0](https://arxiv.org/pdf/2605.29301)."
-  IEEE Robotics and Automation Magazine, 2026. To appear.
+  <cite>IEEE Robotics and Automation Magazine</cite>, 2026. To appear.
 
 ### Workshop Papers
 
 - **Clayton W. Ramsey** and Lydia E. Kavraki.
   "Coroutine Scheduling in Task and Motion Planning."
-  In <cite>IEEE ICRA 2026 Workshop - [Robotics Acceleration with Computing Hardware and Systems](https://sites.google.com/view/roboarch-icra26)</cite>, 2026.
+  <cite>IEEE ICRA 2026 Workshop - [Robotics Acceleration with Computing Hardware and Systems](https://sites.google.com/view/roboarch-icra26)</cite>, 2026.
 
 - **Clayton W. Ramsey**, Zachary Kingston\*, Wil Thomason\*, and
   Lydia E. Kavraki. "Dynamic Motion Planning from Perception via
-  Accelerated Point Cloud Collision Checking." In <cite>IEEE ICRA 2024
+  Accelerated Point Cloud Collision Checking." <cite>IEEE ICRA 2024
   Workshop - [Agile Robotics: From Perception to Dynamic Action](https://agile-robotics-workshop.github.io/icra2024/)</cite>, 2024.
   \*Equal Contribution.
 
