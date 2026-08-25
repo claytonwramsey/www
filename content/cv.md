@@ -149,6 +149,7 @@ description = "Clayton Ramsey's curriculum vitae"
 ### Contributor
 
 - [kiddo](https://github.com/sdd/kiddo)
+- [rerun](https://github.com/rerun-io/rerun)
 
 <footer>
 
