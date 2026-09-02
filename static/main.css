@@ -228,6 +228,7 @@ figure {
 
 figcaption {
   text-align: left;
+  font-style: italic;
 }
 
 .typst-display {
@@ -330,7 +331,8 @@ blockquote {
 }
 
 /* endmark */
-main > p:last-child::after {
+main > p:last-child::after,
+main > figure:last-child > figcaption::after {
   content: "";
   display: inline-block;
   width: 0.75em;
