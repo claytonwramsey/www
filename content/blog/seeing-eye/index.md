@@ -1,10 +1,9 @@
 +++
 title = "I'm a seeing-eye dog for a computer"
 template = "post.html"
-date = 2026-09-02
+date = 2026-09-03
 authors = ["Clayton Ramsey"]
 description = "I'd rather argue with strangers on the Internet."
-draft = true
 +++
 
 <figure>
