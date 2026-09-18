@@ -1,0 +1,11 @@
+{
+  // These .html files are Tera templates, not HTML documents. Prettier parses them
+  // as HTML, which makes every `{% block %}` tag body text: it reflows the whole
+  // file into one paragraph and deletes any comment markers used to hold the lines
+  // apart. Nothing inside the file can survive that, so turn the formatter off here.
+  "languages": {
+    "HTML": {
+      "format_on_save": "off"
+    }
+  }
+}

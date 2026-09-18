@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-<!--/>
+
 {% block description %}{{ section.description | safe }}{% endblock %}
-<!--/>
+
 {% block title %}{{ section.title | safe }}{% endblock %}
 {% block title2 %}{{ section.title | safe }}{% endblock %}
-<!--/>
 
 {% block content %}
 {{section.content | safe }}
-{% for year, posts in section.pages | group_by(attribute="year") %}
+{% set by_year = section.pages | group_by(attribute="year") %}
+{% for year in by_year | keys | sort | reverse %}
 <h2>{{ year }}</h2>
 
 <ul class="index">
-{% for post in posts %}
+{% for post in by_year[year] %}
     <li><a href="{{ post.permalink }}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>

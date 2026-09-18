@@ -245,17 +245,16 @@ figcaption {
   border-radius: 0px;
 }
 
-.typst-inline {
-  /*
-    Typst renders every inline equation at a near-constant ~1.99em tall box.
-    Crop the box down to a budget that comfortably covers the vast majority
-    of inline equations without touching glyph scale, and pull the
-    unused margin back in so the line box doesn't inflate
-  */
-  clip-path: inset(0.4em 0 0.19em 0);
-  margin-top: -0.4em;
-  margin-bottom: -0.19em;
-  vertical-align: -0.4em !important;
+math[display="block"] {
+  /* `block math`, not plain `block`. */
+  display: block math;
+  /* Shrink to the equation's width so `auto` margins can center it, but
+     let a wide one scroll rather than push the page sideways. */
+  width: fit-content;
+  max-width: 100%;
+  margin: 1em auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 h1 {
@@ -374,6 +373,9 @@ main > figure:last-child > figcaption::after {
     background-color: #222;
   }
 
+  /* Typst diagrams are rendered as black-on-transparent images, so they need
+     inverting to stay legible. Equations are MathML and inherit the page's
+     colours, so they are unaffected. */
   .typst-doc {
     filter: invert(100%) hue-rotate(180deg);
   }
@@ -494,17 +496,6 @@ main > figure:last-child > figcaption::after {
     word-break: normal;
     text-justify: auto;
     padding-bottom: 0px;
-  }
-
-  /* Print's line-height is tighter than screen's, so the .typst-inline crop
-     budget needs to shrink to match (values are still em-relative, just a
-     smaller ascent/descent allowance so equation lines don't run taller than
-     the surrounding 1.3 line-height). */
-  .typst-inline {
-    clip-path: inset(0.5em 0 0.24em 0);
-    margin-top: -0.5em;
-    margin-bottom: -0.24em;
-    vertical-align: -0.35em !important;
   }
 
   ul,

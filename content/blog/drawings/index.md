@@ -55,7 +55,7 @@ This gives cleaner lines and yields scalable figures, but sometimes it smudges t
 </style>
 
 ```typ
-#import "@preview/fletcher:0.5.2" as fletcher: *
+#import "@preview/fletcher:0.5.8" as fletcher: *
 
 #set page(margin: 1pt)
 

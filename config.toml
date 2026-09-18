@@ -9,14 +9,17 @@ build_search_index = false
 feed_filenames = ["rss.xml", "atom.xml"]
 
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
-highlight_code = true
-highlight_theme = "css"
 smart_punctuation = true
+
+[markdown.highlighting]
+style = "class"
+light_theme = "bauhaus-light"
+dark_theme = "bauhaus-dark"
+extra_themes = ["highlight_themes/bauhaus-light.json", "highlight_themes/bauhaus-dark.json"]
 
 [markdown.math]
 engine = "typst"
+format = "mathml"
 
 [extra]
 # Put all your custom variables here

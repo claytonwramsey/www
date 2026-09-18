@@ -12,12 +12,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Zola fork that renders Typst math as MathML.
       - name: Install forked zola from git
         uses: baptiste0928/cargo-install@v3
         with:
           crate: zola
-          git: https://github.com/cestef/zola.git
-          commit: c09afde
+          git: https://github.com/claytonwramsey/zola.git
+          commit: 7daa305936261c99b0399b245ce6d53bb4b5fb47
 
       - name: Build website
         run: zola build
