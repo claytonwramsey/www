@@ -65,7 +65,7 @@ description = "Clayton Ramsey's curriculum vitae"
   Workshop - [Agile Robotics: From Perception to Dynamic Action](https://agile-robotics-workshop.github.io/icra2024/)</cite>, 2024.
   \*Equal Contribution.
 
-### Preprints
+<!--### Preprints-->
 
 ## Awards and Honors
 
@@ -148,11 +148,12 @@ description = "Clayton Ramsey's curriculum vitae"
 
 ### Contributor
 
-- [kiddo](https://github.com/sdd/kiddo)
+- [Open Motion Planning Library (OMPL)](https://github.com/ompl/ompl)
 - [rerun](https://github.com/rerun-io/rerun)
+- [kiddo](https://github.com/sdd/kiddo)
 
 <footer>
 
-Last updated August 2026.
+Last updated October 2026.
 
 </footer>
