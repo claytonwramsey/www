@@ -1,0 +1,74 @@
+{#- Components for the CV in content/cv.md. -#}
+
+{#- Dates as written, eg "Aug 2023 - Present", "Dec 5 2024", or "Fall 2022 and
+    Spring 2023", with each date wrapped in a <time> and each date or range in a
+    `.cv-range`. Seasons only resolve to their year. A ", " between ranges is
+    wrapped in `.cv-and` so a role can stack its date ranges. -#}
+{% component when(text) -%}
+{%- set months = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"} -%}
+<span class="cv-range">
+{%- for piece in text | replace(from=" - ", to="|-|") | replace(from=" and ", to="|and|") | replace(from=", ", to="|,|") | split(pat="|") -%}
+{%- if piece == "-" -%}{{ " - " }}
+{%- elif piece == "and" -%}</span>{{ " and " }}<span class="cv-range">
+{%- elif piece == "," -%}</span><span class="cv-and">, </span><span class="cv-range">
+{%- elif piece == "Present" -%}Present
+{%- else -%}
+{%- set w = piece | split(pat=" ") -%}
+{%- if w | length == 1 -%}<time datetime="{{ w[0] }}">{{ piece }}</time>
+{%- elif w | length == 2 and w[0] in months -%}<time datetime="{{ w[1] }}-{{ months[w[0]] }}">{{ piece }}</time>
+{%- elif w | length == 2 -%}<time datetime="{{ w[1] }}">{{ piece }}</time>
+{%- elif w[1] | length == 1 -%}<time datetime="{{ w[2] }}-{{ months[w[0]] }}-0{{ w[1] }}">{{ piece }}</time>
+{%- else -%}<time datetime="{{ w[2] }}-{{ months[w[0]] }}-{{ w[1] }}">{{ piece }}</time>
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+</span>
+{%- endcomponent when %}
+
+{#- A list of the components below. -#}
+{% component list() -%}
+<ul role="list" class="cv-list">
+{{ body | trim | safe }}
+</ul>
+{%- endcomponent list %}
+
+{#- A headed entry with its dates at the right margin and a detail line underneath. -#}
+{% component entry(title, location, dates) -%}
+<li class="cv-entry"><span class="cv-body"><b>{{ title }}</b>, {{ location }}</span><span class="cv-sep">, </span><span class="cv-date">{{ <when text={dates} /> }}</span><p class="cv-detail">{{ body | trim | markdown(inline=true) | safe }}</p></li>
+{%- endcomponent entry %}
+
+{#- An item with its date at the right margin and an optional note indented underneath. -#}
+{% component dated(date, note="") -%}
+<li class="cv-dated"><span class="cv-body">{{ body | trim | markdown(inline=true) | safe }}</span><span class="cv-sep">, </span><span class="cv-date">{{ <when text={date} /> }}</span>{% if note %}<p class="cv-note">{{ note | markdown(inline=true) | safe }}</p>{% endif %}</li>
+{%- endcomponent dated %}
+
+{#- An item without a date. Lines after the first get a hanging indent. -#}
+{% component item() -%}
+<li class="cv-item">{{ body | trim | markdown(inline=true) | safe }}</li>
+{%- endcomponent item %}
+
+{#- An item heading a nested list of the items in its body. -#}
+{% component group(title) -%}
+<li class="cv-group"><span class="cv-body">{{ title | markdown(inline=true) | safe }}</span><ul role="list" class="cv-list cv-sublist">
+{{ body | trim | safe }}
+</ul></li>
+{%- endcomponent group %}
+
+{#- Employment history: an `employers` list of `employer`s, each holding `role`s.
+    CSS lines every role up in one column across employers. -#}
+{% component employers() -%}
+<ul role="list" class="cv-list cv-experience">
+{{ body | trim | safe }}
+</ul>
+{%- endcomponent employers %}
+
+{% component employer(name, location, note="") -%}
+<li class="cv-employer"><span class="cv-org"><b>{{ name }}</b>, {{ location }}</span><ul role="list" class="cv-list cv-roles">
+{{ body | trim | safe }}
+</ul>{% if note %}<p class="cv-org-note">{{ note }}</p>{% endif %}</li>
+{%- endcomponent employer %}
+
+{#- A role held one or more times; separate several date ranges with ", ". -#}
+{% component role(title, dates) -%}
+<li class="cv-role"><span class="cv-role-title">{{ title }}</span><span class="cv-sep">, </span><span class="cv-date">{{ <when text={dates} /> }}</span></li>
+{%- endcomponent role %}

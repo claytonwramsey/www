@@ -1,0 +1,331 @@
+/* CV styles */
+
+:root {
+  --cv-serif: "Libertinus Serif", "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
+  --cv-sans: Montserrat, Avenir, Corbel, "URW Gothic", source-sans-pro, sans-serif;
+  /* indent for hanging notes */
+  --cv-indent: 1.5em;
+}
+
+/* The body keeps the site's sans on screen and switches to serif in print. */
+main {
+  line-height: 1.4;
+  text-align: left;
+  -webkit-hyphens: manual;
+  -ms-hyphens: manual;
+  hyphens: manual;
+}
+
+h1 {
+  font-family: var(--cv-sans);
+  font-size: 1.6em;
+  letter-spacing: normal;
+  margin-bottom: 0.25em;
+}
+
+h1::after {
+  content: none;
+}
+
+address.cv-contact {
+  text-align: center;
+  font-style: normal;
+}
+
+.cv-contact a {
+  display: inline-block;
+  margin: 0 0.5em;
+}
+
+main h2 {
+  font-family: var(--cv-sans);
+  font-size: 1.2em;
+  margin: 1.1em 0 0.5em;
+}
+
+main h3 {
+  font-family: inherit;
+  font-size: 1em;
+  font-style: italic;
+  margin: 0.5em 0 0.1em;
+}
+
+/* Paper and talk titles are <cite>s set upright; venues keep the italics. */
+cite.cv-title,
+cite.cv-talk {
+  font-style: normal;
+}
+
+cite.cv-talk {
+  font-weight: bold;
+}
+
+ul.cv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.cv-sublist {
+  margin-left: var(--cv-indent);
+}
+
+/* Separates an item from its date for readers without CSS (screen readers,
+   reader mode, copied text); the layout already separates them on screen. */
+.cv-sep {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* An item with its date at the right margin and a note or detail line under
+   both. */
+.cv-dated,
+.cv-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1em;
+  align-items: baseline;
+}
+
+.cv-note,
+.cv-detail {
+  grid-column: 1 / -1;
+}
+
+.cv-date,
+.cv-role-title,
+.cv-note,
+.cv-org-note {
+  font-style: italic;
+}
+
+.cv-date {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Lines after the first get a hanging indent so multi-line items stay
+   distinct from their neighbors. */
+.cv-body,
+.cv-item {
+  padding-left: var(--cv-indent);
+  text-indent: calc(-1 * var(--cv-indent));
+}
+
+.cv-group > .cv-body {
+  display: block;
+}
+
+.cv-note {
+  margin-left: var(--cv-indent);
+}
+
+.cv-entry + .cv-entry {
+  margin-top: 0.6em;
+}
+
+/* Employment history as one grid, so every role lines up in the same column
+   across employers. Each employer's note sits under its name, beside the
+   employer's second role. */
+.cv-experience {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 1.2em;
+}
+
+.cv-employer {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+.cv-employer + .cv-employer {
+  margin-top: 0.8em;
+}
+
+.cv-org {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.cv-org-note {
+  grid-column: 1;
+  grid-row: 2;
+  padding-left: var(--cv-indent);
+}
+
+ul.cv-roles {
+  grid-column: 2 / -1;
+  grid-row: 1 / span 2;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-content: start;
+}
+
+.cv-role {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+/* Stacked date ranges for roles held several times */
+.cv-roles .cv-and {
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+
+main > footer {
+  margin-top: 2em;
+}
+
+/* Too narrow for three columns: stack each employer's name, roles, and note.
+   Each role keeps its title on one line, with its dates floated to the right
+   margin of that line, or of the next when they don't fit. These layouts are
+   screen-only because Firefox matches print against the page width, which
+   for Letter paper is under 720px. */
+@media screen and (max-width: 720px) {
+  .cv-experience,
+  .cv-employer,
+  ul.cv-roles {
+    display: block;
+  }
+
+  .cv-role {
+    display: flow-root;
+  }
+
+  .cv-role-title {
+    white-space: nowrap;
+  }
+
+  .cv-role .cv-date {
+    float: right;
+    margin-left: 1em;
+  }
+}
+
+/* On phones there's no room for a date column, so each item runs inline as
+   "text, date", showing the comma that's otherwise hidden. */
+@media screen and (max-width: 600px) {
+  .cv-dated,
+  .cv-entry,
+  .cv-role {
+    display: block;
+    padding-left: var(--cv-indent);
+    text-indent: calc(-1 * var(--cv-indent));
+  }
+
+  .cv-dated .cv-body,
+  .cv-entry .cv-body {
+    padding-left: 0;
+    text-indent: 0;
+  }
+
+  .cv-sep {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+
+  .cv-date,
+  .cv-role .cv-date {
+    float: none;
+    margin-left: 0;
+    text-align: left;
+    white-space: normal;
+    /* Italics mark the date column; inline after a comma they aren't needed,
+       and leaving them off keeps wrapped dates distinct from italic notes. */
+    font-style: normal;
+  }
+
+  /* Lines may break between date ranges, but not inside one. */
+  .cv-range {
+    white-space: nowrap;
+  }
+
+  .cv-roles .cv-and {
+    display: inline;
+    height: auto;
+    overflow: visible;
+  }
+
+  .cv-note,
+  .cv-detail {
+    margin-left: 0;
+    text-indent: 0;
+  }
+
+  /* The detail line sits flush left, outside the hanging indent. */
+  .cv-detail {
+    margin-left: calc(-1 * var(--cv-indent));
+  }
+}
+
+@page {
+  margin: 0.8in 1in;
+}
+
+@media print {
+  body {
+    font-family: var(--cv-serif);
+    max-width: none;
+  }
+
+  header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /* main.css only hides the nav, which still pads the header by its
+     overflowing links in Chromium. */
+  nav {
+    display: none;
+  }
+
+  h1 {
+    font-size: 16pt;
+    margin: 0 0 0.3em;
+  }
+
+  main {
+    column-count: 1;
+    column-width: auto;
+    text-align: left;
+    line-height: 1.25;
+    -webkit-hyphens: manual;
+    -ms-hyphens: manual;
+    hyphens: manual;
+  }
+
+  main h2 {
+    font-size: 12pt;
+  }
+
+  /* Links print as plain text, except the contact line. */
+  main a:link,
+  main a:visited {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cv-contact a:link,
+  .cv-contact a:visited {
+    text-decoration: underline;
+  }
+
+  .cv-dated,
+  .cv-entry,
+  .cv-item,
+  .cv-group,
+  .cv-employer {
+    break-inside: avoid;
+  }
+}
