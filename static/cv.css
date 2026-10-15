@@ -329,3 +329,16 @@ main > footer {
     break-inside: avoid;
   }
 }
+
+/* The CV body gets to be wider than the header. */
+@media screen {
+  body {
+    max-width: 760px;
+  }
+
+  header {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

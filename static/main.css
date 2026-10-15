@@ -9,7 +9,7 @@
 body {
   position: relative;
   margin: 15px auto;
-  max-width: 760px;
+  max-width: 600px;
   line-height: 1.5;
   font-size: 16px;
   padding: 0 10px;
@@ -69,13 +69,18 @@ header::before {
 
 .site-title {
   display: inline-block;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-right: 0.4em;
+  margin-left: 0.4em;
+  white-space: nowrap;
   font-weight: bold;
 }
 
 nav {
-  font-size: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  font-size: 23px;
   line-height: 1.2;
   font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
   text-align: center;
@@ -83,13 +88,14 @@ nav {
 }
 
 .nav-block {
-  margin-left: auto;
-  display: inline-block;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 
   a {
     display: inline-block;
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-right: 0.3em;
+    margin-left: 0.3em;
     text-decoration: none;
     color: inherit;
   }
@@ -280,6 +286,11 @@ h6 {
   line-height: 1.2;
   margin-bottom: 0.6em;
   break-after: avoid;
+  /* Never hyphenate headings; only break a word that is too long for the line. */
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: break-word;
   font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
 }
 
@@ -343,15 +354,6 @@ main > figure:last-child > figcaption::after {
 
 /* Raise text size on small screens */
 @media only screen and (min-device-width: 300px) and (max-device-width: 1150px) {
-  nav {
-    font-size: 22px;
-
-    a {
-      margin-left: 5px;
-      margin-right: 5px;
-    }
-  }
-
   pre {
     font-size: 14px;
   }
