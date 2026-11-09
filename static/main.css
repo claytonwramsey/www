@@ -43,28 +43,12 @@ pre {
   opacity: 0.9;
 }
 
-.end-graphic .eg-circle {
-  fill: var(--bh-blue);
-}
-
-.end-graphic .eg-triangle {
-  fill: var(--bh-yellow);
-}
-
-.end-graphic .eg-square {
-  fill: var(--bh-red);
+.end-graphic {
+  fill: #222;
 }
 
 header {
   position: relative;
-}
-
-header::before {
-  content: "";
-  display: block;
-  height: 8px;
-  margin-bottom: 22px;
-  background: linear-gradient(to right, var(--bh-red) 0 33%, var(--bh-yellow) 33% 66%, var(--bh-blue) 66% 100%);
 }
 
 .site-title {
@@ -107,26 +91,7 @@ nav {
   a:hover {
     text-decoration: underline;
     text-decoration-thickness: 5px;
-  }
-
-  :nth-child(1):hover {
-    text-decoration-color: var(--bh-red);
-  }
-
-  :nth-child(2):hover {
-    text-decoration-color: var(--bh-yellow);
-  }
-
-  :nth-child(3):hover {
-    text-decoration-color: var(--bh-blue);
-  }
-
-  :nth-child(4):hover {
-    text-decoration-color: var(--bh-red);
-  }
-
-  :nth-child(5):hover {
-    text-decoration-color: var(--bh-yellow);
+    text-decoration-skip-ink: none;
   }
 
   font-weight: 400;
@@ -171,11 +136,6 @@ code {
 
 iframe {
   border-radius: 15px;
-}
-
-pre {
-  background-color: rgba(0, 0, 0, 0.045);
-  border-left: 4px solid var(--bh-black);
 }
 
 pre code {
@@ -268,15 +228,6 @@ h1 {
   letter-spacing: 0.03em;
 }
 
-h1::after {
-  content: "";
-  display: block;
-  width: 70px;
-  height: 5px;
-  margin: 0.5em auto 0;
-  background: var(--bh-blue);
-}
-
 h1,
 h2,
 h3,
@@ -330,8 +281,6 @@ blockquote {
   margin-bottom: 0.5em;
   margin-left: 0;
   margin-right: 0;
-  border-left: 5px solid var(--bh-red);
-  background-color: rgba(0, 0, 0, 0.035);
 
   footer {
     text-align: left;
@@ -396,15 +345,6 @@ main > figure:last-child > figcaption::after {
     }
   }
 
-  pre {
-    background-color: rgba(255, 255, 255, 0.06);
-    border-left-color: #eee;
-  }
-
-  blockquote {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
   th {
     border-bottom-color: #eee;
   }
@@ -412,6 +352,10 @@ main > figure:last-child > figcaption::after {
   table {
     border-top-color: #eee;
     border-bottom-color: #eee;
+  }
+
+  .end-graphic {
+    fill: #eee;
   }
 }
 
@@ -440,11 +384,6 @@ main > figure:last-child > figcaption::after {
 
   main > p:last-child::after {
     background: #000;
-  }
-
-  blockquote {
-    border-left-color: #000;
-    background-color: rgba(0, 0, 0, 0.04);
   }
 
   body {

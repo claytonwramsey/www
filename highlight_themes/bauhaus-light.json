@@ -2,8 +2,8 @@
   "name": "bauhaus-light",
   "type": "light",
   "colors": {
-    "editor.foreground": "#1a1a1a",
-    "editor.background": "#f4f4f4"
+    "editor.foreground": "#000000",
+    "editor.background": "#ffffff"
   },
   "tokenColors": [
     {
