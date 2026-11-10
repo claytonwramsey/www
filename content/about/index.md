@@ -37,6 +37,5 @@ I have deleted most of my social media accounts, but you can still reach me thro
 - **Email:**
   [claytonwramsey@gmail.com](mailto:claytonwramsey@gmail.com)
 - **GitHub:** [\@claytonwramsey](https://github.com/claytonwramsey)
-- **LinkedIn:** <https://www.linkedin.com/in/claytonwramsey> (fair warning, I hardly ever check this one)
-- **Google Scholar:**
-  <https://scholar.google.com/citations?user=VOYJI5YAAAAJ>
+- **LinkedIn:** [/in/claytonwramsey](https://www.linkedin.com/in/claytonwramsey) (fair warning, I hardly ever check this one)
+- **Google Scholar:** [VOYJI5YAAAAJ](https://scholar.google.com/citations?user=VOYJI5YAAAAJ)
