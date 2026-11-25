@@ -120,9 +120,30 @@ $$T^star = op("arg min", limits: #true)_T integral_0^T |bold(y)^((r))(t)|^2 d t 
 
 Here, the parameter $rho$ decides how important low acceleration is versus fast motions: bigger $rho$ gets you fast motions, but a really high control effort $bold(y)^((r))(t)$.
 You may notice the squared term inside the integral -- this is highly motivated: if you are good at optimiziation, you can find that the above system can be solved for $T^star$ just by solving a polynomial system.
-To be exact, for a derivative order $r$, $T^star$ is the solution to a polynomial of order $2r$.
+To be exact, for a derivative order $r$, $T^star$ is the minimum of a polynomial of order $2r + 1$; in other words, it's solution to a polynomial $q$ of order $2r$.
 
 ### They don't teach this in Algebra II
+
+Finding $T^star$ sounded easy in the last paragraph, but when you get down to the details, it's actually pretty hard, especially if you want to go fast.
+From the above definition, we are given some polynomial with order $2r - 1$ and asked to find its minimum.
+Taking a derivative, we need to find the zeros of a polynomial $q(t)$ with degree $2r$ where the polynomial crosses from positive to negative.
+
+You may remember from your elementary school abstract algebra classes that polynomials of degree 4 or lower all have closed-form solutions.
+This is great for simple, order-2 systems where we can control the robot's acceleration, since the closed form solution is quick to compute and numerically quite accurate.
+
+For higher values of $r$, such when planning for a drone, we are not so lucky.
+6th and 8th degree polynomials have no closed form solution, so to find $T^star$, you'll have to start by browsing the Wikipedia page for [root finding algorithms](https://en.wikipedia.org/wiki/Real-root_isolation).
+
+The most typical trick uses some linear algebra.
+Since this is a blog post, I'll skate over the details, but here's a quick overview.
+Given a polynomial $q$, start by constructing a [special matrix](https://en.wikipedia.org/wiki/Companion_matrix) $C(q)$, such that $C$'s eigenvalues are exactly the roots of the polynomial.
+Then throw $C$ into your favorite linear algebra library's eigenvalue solver.
+This has the advantage of being easy to program and numerically stable, but it's also not super fast.
+
+To account for this, I wrote my own root solver.
+
+- Bisection solvers
+- Descartes' rule
 
 ### Direction matters
 
